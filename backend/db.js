@@ -98,10 +98,7 @@ db.exec(`
 
 // Migración simple: si la base de datos ya existía de una versión anterior
 // (sin esta columna), se la agrega ahora en vez de fallar.
-const columnasUsuarios = db.prepare("PRAGMA table_info(usuarios)").all().map((c) => c.name);
-if (!columnasUsuarios.includes("telefono")) {
-  db.exec("ALTER TABLE usuarios ADD COLUMN telefono TEXT");
-}
+const columnasRemates = db.prepare("PRAGMA table_info(remates)").all().map((c) => c.name);
 if (!columnasRemates.includes("moneda")) {
   db.exec("ALTER TABLE remates ADD COLUMN moneda TEXT NOT NULL DEFAULT 'UYU'");
 }
@@ -144,8 +141,6 @@ if (!columnasUsuarios.includes("cedula")) {
   db.exec("ALTER TABLE usuarios ADD COLUMN cedula TEXT");
 }
 if (!columnasUsuarios.includes("aprobado")) {
-  // Los usuarios que ya existían (antes de este cambio) quedan aprobados
-  // automáticamente, para no dejar a nadie afuera de golpe.
   db.exec("ALTER TABLE usuarios ADD COLUMN aprobado INTEGER NOT NULL DEFAULT 1");
 }
 if (!columnasUsuarios.includes("email_verificado")) {
@@ -153,6 +148,9 @@ if (!columnasUsuarios.includes("email_verificado")) {
 }
 if (!columnasUsuarios.includes("bloqueado")) {
   db.exec("ALTER TABLE usuarios ADD COLUMN bloqueado INTEGER NOT NULL DEFAULT 0");
+}
+if (!columnasUsuarios.includes("telefono")) {
+  db.exec("ALTER TABLE usuarios ADD COLUMN telefono TEXT");
 }
 
 module.exports = db;
