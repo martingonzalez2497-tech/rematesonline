@@ -1250,8 +1250,14 @@ ul { list-style: none; margin: 0; padding: 0; }
   .brand { font-size: 1.05rem; flex-shrink: 1; min-width: 0; }
   .brand-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .header-icons { gap: 0.4rem; flex-shrink: 0; }
-  .header-icons .cuenta-area { flex-shrink: 1; min-width: 0; }
+  .header-icons .cuenta-area { flex-shrink: 1; min-width: 0; overflow: hidden; }
   .link-cuenta { white-space: nowrap; font-size: 0.9rem; }
+  .cuenta-nombre { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 6rem; display: inline-block; vertical-align: middle; }
+  /* Ocultar badge de rol y Cerrar sesion del header en mobile — van en el menu lateral */
+  .cuenta-rol-header { display: none; }
+  .cuenta-salir-header { display: none; }
+  /* Estilo del item Cerrar sesion dentro del menu lateral */
+  #cerrarSesionMobileItem { border-top: 2px solid var(--accent); margin-top: 0.5rem; padding-top: 1rem !important; }
 
   /* --- Hero: borde a borde, sin padding lateral --- */
   .hero-banner { padding: 0; margin-top: 0; }

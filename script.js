@@ -408,15 +408,29 @@ function renderCuentaArea() {
     panelNavItem.hidden = true;
     document.getElementById("usuariosNavItem").hidden = true;
     document.getElementById("misOfertasNavItem").hidden = true;
+    const itemMobile = document.getElementById("cerrarSesionMobileItem");
+    if (itemMobile) itemMobile.remove();
     return;
   }
 
   area.innerHTML = `
     <span class="cuenta-nombre">${sesion.usuario.nombre}</span>
-    <span class="cuenta-rol">${NOMBRES_ROL[sesion.usuario.rol] || sesion.usuario.rol}</span>
-    <button type="button" class="link-salir" id="btnCerrarSesion">Cerrar sesión</button>
+    <span class="cuenta-rol cuenta-rol-header">${NOMBRES_ROL[sesion.usuario.rol] || sesion.usuario.rol}</span>
+    <button type="button" class="link-salir cuenta-salir-header" id="btnCerrarSesion">Cerrar sesión</button>
   `;
   document.getElementById("btnCerrarSesion").addEventListener("click", cerrarSesion);
+
+  // En mobile: agregar rol y cerrar sesión al final del menú lateral
+  const itemCerrarSesionMobile = document.getElementById("cerrarSesionMobileItem");
+  if (itemCerrarSesionMobile) itemCerrarSesionMobile.remove();
+  const li = document.createElement("li");
+  li.id = "cerrarSesionMobileItem";
+  li.innerHTML = `
+    <span class="cuenta-rol" style="font-size:0.8rem;margin-bottom:0.25rem;display:block">${NOMBRES_ROL[sesion.usuario.rol] || sesion.usuario.rol}</span>
+    <button type="button" class="link-salir" id="btnCerrarSesionMobile">Cerrar sesión</button>
+  `;
+  document.getElementById("navLista").appendChild(li);
+  document.getElementById("btnCerrarSesionMobile").addEventListener("click", () => { cerrarPanelLateral(); cerrarSesion(); });
 
   panelNavItem.hidden = !["rematador", "administrador"].includes(sesion.usuario.rol);
   document.getElementById("usuariosNavItem").hidden = sesion.usuario.rol !== "administrador";
