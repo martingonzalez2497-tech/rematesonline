@@ -215,27 +215,74 @@ document.querySelector(".form-newsletter").addEventListener("submit", (event) =>
 function buscarLotes() {
   const texto = document.getElementById("buscar").value.toLowerCase().trim();
   if (!texto) return;
+  aplicarFiltros();
+}
 
-  const coincidencias = LOTES.filter((lote) =>
-    !loteEstaCerrado(lote) && (
-      (lote.numero || "").toLowerCase().includes(texto) ||
-      (lote.titulo || "").toLowerCase().includes(texto) ||
-      (lote.remate_titulo || "").toLowerCase().includes(texto) ||
-      (lote.rubro || lote.remate_rubro || "").toLowerCase().includes(texto)
-    )
-  );
+// ===== Sistema de filtros en tiempo real =====
+function aplicarFiltros() {
+  const texto = (document.getElementById("filtroTexto")?.value || document.getElementById("buscar")?.value || "").toLowerCase().trim();
+  const rubroSel = document.getElementById("filtroRubroSelect")?.value || "";
+  const estadoSel = document.getElementById("filtroEstado")?.value || "";
+  const precioMin = Number(document.getElementById("filtroPrecioMin")?.value) || 0;
+  const precioMax = Number(document.getElementById("filtroPrecioMax")?.value) || Infinity;
+  const btnLimpiar = document.getElementById("btnLimpiarFiltros");
+  const resultado = document.getElementById("filtrosResultado");
 
-  const seccionActivas = document.getElementById("activas");
-  if (seccionActivas.scrollIntoView) seccionActivas.scrollIntoView({ behavior: "smooth" });
+  const hayFiltros = texto || rubroSel || estadoSel || precioMin || precioMax < Infinity;
+  if (btnLimpiar) btnLimpiar.hidden = !hayFiltros;
 
+  const lotesFiltrados = LOTES.filter((l) => {
+    if (loteEstaCerrado(l)) return false;
+    if (texto && !(
+      (l.titulo || "").toLowerCase().includes(texto) ||
+      (l.numero || "").toLowerCase().includes(texto) ||
+      (l.remate_titulo || "").toLowerCase().includes(texto) ||
+      (l.rubro || l.remate_rubro || "").toLowerCase().includes(texto)
+    )) return false;
+    if (rubroSel && (l.remate_rubro || l.rubro) !== rubroSel) return false;
+    if (estadoSel === "sin-ofertas" && l.cantidad_ofertas > 0) return false;
+    if (estadoSel === "con-ofertas" && l.cantidad_ofertas === 0) return false;
+    if (l.oferta_actual < precioMin) return false;
+    if (l.oferta_actual > precioMax) return false;
+    return true;
+  });
+
+  if (!hayFiltros) {
+    renderLotes();
+    if (resultado) resultado.hidden = true;
+    return;
+  }
+
+  mostrarSoloSeccion("activas");
   const activasGrid = document.getElementById("activasGrid");
-  renderGridComoListaDeLotes(activasGrid, `Resultados para "${document.getElementById("buscar").value}"`, "", coincidencias);
-
-  // Si hay un único resultado, vamos directo a su ficha en vez de mostrar el listado
-  if (coincidencias.length === 1) {
-    abrirModal(coincidencias[0]);
+  renderGridComoListaDeLotes(activasGrid, texto ? `Resultados para "${texto}"` : "Lotes filtrados", "", lotesFiltrados);
+  if (resultado) {
+    resultado.hidden = false;
+    resultado.textContent = `${lotesFiltrados.length} lote${lotesFiltrados.length !== 1 ? "s" : ""} encontrado${lotesFiltrados.length !== 1 ? "s" : ""}`;
   }
 }
+
+// Conectar filtros con debounce
+let debounceFilters = null;
+function iniciarFiltros() {
+  const inputs = ["filtroTexto", "filtroRubroSelect", "filtroEstado", "filtroPrecioMin", "filtroPrecioMax"];
+  inputs.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", () => {
+      clearTimeout(debounceFilters);
+      debounceFilters = setTimeout(aplicarFiltros, 300);
+    });
+  });
+  const btnLimpiar = document.getElementById("btnLimpiarFiltros");
+  if (btnLimpiar) btnLimpiar.addEventListener("click", () => {
+    ["filtroTexto", "filtroPrecioMin", "filtroPrecioMax"].forEach((id) => { const el = document.getElementById(id); if (el) el.value = ""; });
+    ["filtroRubroSelect", "filtroEstado"].forEach((id) => { const el = document.getElementById(id); if (el) el.value = ""; });
+    renderLotes();
+    document.getElementById("filtrosResultado").hidden = true;
+    btnLimpiar.hidden = true;
+  });
+}
+iniciarFiltros();
 document.querySelector(".search-form").addEventListener("submit", (event) => {
   event.preventDefault();
   buscarLotes();
@@ -1302,10 +1349,11 @@ function crearGrupoRemate(remate, lotesDelRemate) {
   li.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); abrir(); } });
 
   const primerLote = lotesDelRemate.find((l) => l.imagen) || lotesDelRemate[0];
-  const portada = document.createElement(primerLote && primerLote.imagen ? "img" : "p");
+  const srcPortada = remate.imagen_portada || (primerLote && primerLote.imagen) || null;
+  const portada = document.createElement(srcPortada ? "img" : "p");
   portada.className = "subasta-img";
-  if (primerLote && primerLote.imagen) {
-    portada.src = primerLote.imagen;
+  if (srcPortada) {
+    portada.src = srcPortada;
     portada.alt = `Foto de portada de ${remate.titulo}`;
   } else {
     portada.setAttribute("role", "img");
@@ -1390,7 +1438,21 @@ function renderLotes() {
   });
 
   if (activasGrid.children.length === 0) {
-    activasGrid.innerHTML = `<li class="aviso-backend">Todavía no hay subastas activas.</li>`;
+    activasGrid.innerHTML = `
+      <li class="subastas-vacias">
+        <div class="subastas-vacias-icono">🔨</div>
+        <h3>Próximamente nuevas subastas</h3>
+        <p>Todavía no hay subastas activas en este momento.<br>Registrate para recibir notificaciones cuando publiquemos nuevos remates.</p>
+        <button type="button" class="btn btn-primary" id="btnRegistrarseVacio">Registrarme gratis</button>
+      </li>`;
+    document.getElementById("btnRegistrarseVacio")?.addEventListener("click", () => abrirLogin("registro"));
+  }
+
+  // Llenar select de rubros en filtros
+  const rubroSelect = document.getElementById("filtroRubroSelect");
+  if (rubroSelect) {
+    const rubros = [...new Set(LOTES.filter(l => !loteEstaCerrado(l)).map(l => l.remate_rubro || l.rubro).filter(Boolean))].sort();
+    rubroSelect.innerHTML = `<option value="">Todos los rubros</option>` + rubros.map(r => `<option value="${r}">${r}</option>`).join("");
   }
   activarScrollReveal(activasGrid);
 
@@ -2109,6 +2171,25 @@ let fotosExtraSubidas = []; // URLs de las fotos adicionales (2da en adelante), 
 let loteImagenActual = ""; // la foto que ya tenía el lote, por si se edita sin cambiarla
 let ignorarProximoEscape = false; // Windows a veces manda un Escape fantasma al cerrar el selector de archivos
 
+// ===== Compresión de imágenes antes de subir =====
+async function comprimirImagen(archivo, maxWidth = 1400, calidad = 0.82) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(archivo);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      if (width > maxWidth) { height = Math.round(height * maxWidth / width); width = maxWidth; }
+      const canvas = document.createElement("canvas");
+      canvas.width = width; canvas.height = height;
+      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+      canvas.toBlob((blob) => resolve(new File([blob], archivo.name, { type: "image/jpeg" })), "image/jpeg", calidad);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(archivo); }; // fallback sin compresión
+    img.src = url;
+  });
+}
+
 document.getElementById("panelImagen").addEventListener("change", async (event) => {
   ignorarProximoEscape = true;
   setTimeout(() => { ignorarProximoEscape = false; }, 500);
@@ -2125,9 +2206,10 @@ document.getElementById("panelImagen").addEventListener("change", async (event) 
   const urlsSubidas = [];
 
   for (let i = 0; i < archivos.length; i++) {
-    nota.textContent = `Subiendo foto ${i + 1} de ${archivos.length}…`;
+    nota.textContent = `Comprimiendo y subiendo foto ${i + 1} de ${archivos.length}…`;
+    const archivoComprimido = await comprimirImagen(archivos[i]);
     const formData = new FormData();
-    formData.append("foto", archivos[i]);
+    formData.append("foto", archivoComprimido);
     try {
       const resp = await fetch(`${API_URL}/uploads`, {
         method: "POST",
@@ -2279,11 +2361,29 @@ formNuevoRemate.addEventListener("submit", async (event) => {
   if (!sesion) return;
 
   const editando = Boolean(remateEnEdicionId);
+
+  // Subir imagen de portada si se eligió una
+  let imagen_portada = undefined;
+  const archivoPortada = document.getElementById("rematePortada")?.files?.[0];
+  if (archivoPortada) {
+    panelMensaje.textContent = "Subiendo imagen de portada…";
+    panelMensaje.className = "panel-mensaje";
+    const comprimido = await comprimirImagen(archivoPortada, 1600, 0.85);
+    const fd = new FormData();
+    fd.append("foto", comprimido);
+    try {
+      const r = await fetch(`${API_URL}/uploads`, { method: "POST", headers: { Authorization: `Bearer ${sesion.token}` }, body: fd });
+      const d = await r.json();
+      if (r.ok) imagen_portada = d.url;
+    } catch (e) {}
+  }
+
   const body = {
     titulo: document.getElementById("remateTitulo").value,
     rubro: document.getElementById("remateRubro").value,
     descripcion: document.getElementById("remateDescripcion").value,
     moneda: document.getElementById("remateMoneda").value,
+    ...(imagen_portada !== undefined && { imagen_portada }),
   };
 
   try {
@@ -3285,6 +3385,7 @@ document.querySelectorAll("[data-terminos]").forEach((link) => {
   });
 });
 document.getElementById("btnCerrarTerminos").addEventListener("click", volverAHome);
+document.getElementById("btnCerrarComoFunciona")?.addEventListener("click", volverAHome);
 document.getElementById("btnAbrirFinalizadas").addEventListener("click", () => {
   mostrarSoloSeccion("finalizadasSeccion");
   renderFinalizadasPagina();

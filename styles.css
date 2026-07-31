@@ -552,6 +552,37 @@ ul { list-style: none; margin: 0; padding: 0; }
   border-radius: 3px;
   font-size: 0.9em;
 }
+
+/* Estado vacío mejorado */
+.subastas-vacias {
+  grid-column: 1 / -1; text-align: center;
+  padding: 3rem 1rem; list-style: none;
+}
+.subastas-vacias-icono { font-size: 3rem; margin-bottom: 1rem; }
+.subastas-vacias h3 { font-size: 1.3rem; margin: 0 0 0.5rem; }
+.subastas-vacias p { color: var(--fg-muted); margin: 0 0 1.5rem; line-height: 1.6; }
+
+/* Barra de filtros */
+.filtros-barra {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-bottom: 1rem; align-items: center;
+}
+.filtro-input {
+  padding: 0.45rem 0.75rem; border-radius: var(--radius);
+  border: 1px solid var(--line); background: var(--bg-2); color: var(--fg);
+  font: inherit; font-size: 0.9rem; min-width: 0;
+}
+.filtro-input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+#filtroTexto { flex: 1; min-width: 12rem; }
+.filtro-select {
+  padding: 0.45rem 0.6rem; border-radius: var(--radius);
+  border: 1px solid var(--line); background: var(--bg-2); color: var(--fg);
+  font: inherit; font-size: 0.9rem; cursor: pointer;
+}
+.filtro-precio { display: flex; align-items: center; gap: 0.4rem; }
+.filtro-precio-input { width: 8rem; }
+.filtro-limpiar { font-size: 0.85rem; padding: 0.4rem 0.8rem; }
+.filtros-resultado { margin: -0.5rem 0 0.75rem; font-size: 0.85rem; color: var(--fg-muted); }
 /* Tarjeta de portada de remate — estilo Bavastro: imagen panorámica + overlay */
 .remate-tarjeta-portada {
   position: relative;
@@ -1308,6 +1339,26 @@ ul { list-style: none; margin: 0; padding: 0; }
 .pasos li p a { color: var(--accent); font-weight: 600; text-decoration: none; }
 .pasos li p a:hover { text-decoration: underline; }
 
+/* Cómo funciona mejorada */
+.como-intro { background: var(--accent-bg); border-left: 3px solid var(--accent); padding: 1rem 1.2rem; border-radius: 0 var(--radius) var(--radius) 0; margin-bottom: 2rem; }
+.como-subtitulo { font-size: 1.1rem; margin: 2rem 0 1rem; color: var(--accent); }
+.como-faq { margin-top: 2rem; }
+.faq-item {
+  border: 1px solid var(--line); border-radius: var(--radius);
+  margin-bottom: 0.5rem; overflow: hidden;
+}
+.faq-item summary {
+  padding: 0.9rem 1rem; font-weight: 600; cursor: pointer;
+  list-style: none; display: flex; justify-content: space-between; align-items: center;
+  user-select: none;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after { content: "+"; font-size: 1.3rem; color: var(--accent); transition: transform 0.2s; }
+.faq-item[open] summary::after { transform: rotate(45deg); }
+.faq-item p { padding: 0 1rem 1rem; margin: 0; color: var(--fg-muted); line-height: 1.6; font-size: 0.9rem; }
+.como-cta { margin-top: 2.5rem; text-align: center; padding: 2rem; background: var(--bg-2); border-radius: var(--radius); }
+.como-cta p { margin: 0 0 1rem; font-size: 1rem; color: var(--fg-muted); }
+
 #carritoSeccion.contenido {
   max-width: var(--content-max);
   margin-inline: 0;
@@ -1599,4 +1650,10 @@ ul { list-style: none; margin: 0; padding: 0; }
   .subasta-card { border-radius: var(--radius); overflow: hidden; }
   .subasta-img-wrap { aspect-ratio: 16/9; max-height: 14rem; }
   .subasta-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* --- Filtros: columna en mobile --- */
+  .filtros-barra { flex-direction: column; align-items: stretch; }
+  #filtroTexto { min-width: unset; }
+  .filtro-precio { flex-wrap: wrap; }
+  .filtro-precio-input { width: calc(50% - 1rem); }
 }

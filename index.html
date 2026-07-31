@@ -95,6 +95,28 @@
 
   <section class="subastas" id="activas" aria-labelledby="activas-heading">
     <h2 id="activas-heading">Subastas activas</h2>
+
+    <!-- Barra de filtros -->
+    <div class="filtros-barra" id="filtrosBarra">
+      <input type="search" id="filtroTexto" class="filtro-input" placeholder="🔍 Buscar lote, rubro...">
+      <select id="filtroRubroSelect" class="filtro-select">
+        <option value="">Todos los rubros</option>
+      </select>
+      <select id="filtroEstado" class="filtro-select">
+        <option value="">Todos</option>
+        <option value="activa">Activos</option>
+        <option value="sin-ofertas">Sin ofertas</option>
+        <option value="con-ofertas">Con ofertas</option>
+      </select>
+      <div class="filtro-precio">
+        <input type="number" id="filtroPrecioMin" class="filtro-input filtro-precio-input" placeholder="Precio mín.">
+        <span>—</span>
+        <input type="number" id="filtroPrecioMax" class="filtro-input filtro-precio-input" placeholder="Precio máx.">
+      </div>
+      <button type="button" class="btn btn-ghost filtro-limpiar" id="btnLimpiarFiltros" hidden>✕ Limpiar</button>
+    </div>
+    <p class="filtros-resultado" id="filtrosResultado" hidden></p>
+
     <ul class="subastas-grid" id="activasGrid"></ul>
   </section>
 
@@ -131,34 +153,90 @@
   </section>
 
   <section class="contenido" id="como-ofertar-detalle" aria-labelledby="como-ofertar-heading">
-    <h2 id="como-ofertar-heading">¿Cómo Ofertar?</h2>
+    <button type="button" class="btn-volver" id="btnCerrarComoFunciona"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Volver</button>
+    <h2 id="como-ofertar-heading">¿Cómo funciona Remate Directo?</h2>
+
+    <div class="como-intro">
+      <p>Remate Directo es una plataforma de <strong>subastas online progresivas</strong>. Eso significa que el precio sube a medida que los participantes ofertan — gana quien tenga la oferta más alta cuando cierra el tiempo.</p>
+    </div>
+
+    <h3 class="como-subtitulo">Paso a paso</h3>
     <ol class="pasos">
       <li>
         <span class="pasos-numero">1</span>
-        <h3>Explorá el catálogo</h3>
-        <p>Recorré las subastas activas o buscá por rubro con el menú desplegable de la parte de arriba.</p>
+        <div>
+          <h3>Explorá el catálogo</h3>
+          <p>Recorré las subastas activas, filtrá por rubro o buscá un artículo específico. Cada remate agrupa varios lotes del mismo rubro.</p>
+        </div>
       </li>
       <li>
         <span class="pasos-numero">2</span>
-        <h3>Entrá al lote que te interesa</h3>
-        <p>Hacé clic en "Ingresar" para ver la foto, la descripción completa, la oferta actual y el tiempo restante.</p>
+        <div>
+          <h3>Registrate gratis</h3>
+          <p>Creá tu cuenta en 30 segundos. Solo necesitás nombre, email y cédula. Un administrador aprueba tu cuenta antes de que puedas ofertar.</p>
+        </div>
       </li>
       <li>
         <span class="pasos-numero">3</span>
-        <h3>Hacé tu oferta</h3>
-        <p>Escribí un monto mayor a la oferta actual y confirmá. Si ofertás en el último minuto, el cierre se extiende un minuto más.</p>
+        <div>
+          <h3>Hacé tu oferta</h3>
+          <p>Ingresá un monto mayor al precio actual y confirmá. El sistema te avisa si alguien te supera. <strong>Si ofertás en el último minuto, el cierre se extiende 1 minuto más</strong> — así nadie puede "robar" el remate al final.</p>
+        </div>
       </li>
       <li>
         <span class="pasos-numero">4</span>
-        <h3>Seguí el lote</h3>
-        <p>Marcalo con la estrella de favoritos para encontrarlo fácil y revisar si te superaron la oferta.</p>
+        <div>
+          <h3>Usá la oferta automática</h3>
+          <p>Si no querés estar pendiente, configurá un <strong>tope máximo</strong>. El sistema va a ofertar automáticamente por vos de a poco, solo lo necesario para seguir ganando, sin pasarse de tu límite.</p>
+        </div>
       </li>
       <li>
         <span class="pasos-numero">5</span>
-        <h3>Si ganás</h3>
-        <p>Te contactamos para coordinar el pago y el retiro según lo detallado en <a href="#" data-terminos>Términos y Condiciones</a>.</p>
+        <div>
+          <h3>Si ganás</h3>
+          <p>Te contactamos para coordinar el pago y el retiro. Tenés <strong>72 horas hábiles</strong> para pagar y retirar. Para envíos al interior, 6 días hábiles. Comisión: 18,3% IVA incluido.</p>
+        </div>
       </li>
     </ol>
+
+    <div class="como-faq">
+      <h3 class="como-subtitulo">Preguntas frecuentes</h3>
+
+      <details class="faq-item">
+        <summary>¿Qué es una subasta progresiva?</summary>
+        <p>Es una subasta donde el precio sube paso a paso. Cada vez que alguien oferta, el precio mínimo siguiente sube un poco. Ganás si tu oferta es la más alta cuando termina el tiempo.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>¿Cuánto sube el precio con cada oferta?</summary>
+        <p>El incremento mínimo es del 6% del precio actual. Por ejemplo, si el lote está en $10.000, tu próxima oferta mínima es $10.600.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>¿Qué pasa si me superan en el último segundo?</summary>
+        <p>Si alguien oferta en el último minuto antes del cierre, el tiempo se extiende 1 minuto más. Eso se repite cada vez que hay una oferta nueva, así todos tienen la misma oportunidad de responder.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>¿La oferta automática me puede hacer pagar de más?</summary>
+        <p>No. La oferta automática nunca supera el tope máximo que configuraste. Si alguien oferta por encima de tu tope, dejás de competir automáticamente.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>¿Cuándo y cómo pago?</summary>
+        <p>Si ganás un lote, te contactamos por email para coordinar. El pago se realiza en los 3 días hábiles siguientes al cierre del remate. Aceptamos efectivo, transferencia y tarjeta.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>¿Puedo ver los lotes sin registrarme?</summary>
+        <p>Sí, podés explorar todos los lotes y remates sin cuenta. Solo necesitás registrarte para hacer una oferta.</p>
+      </details>
+    </div>
+
+    <div class="como-cta">
+      <p>¿Tenés más dudas?</p>
+      <a href="https://wa.me/59899924004" target="_blank" rel="noopener" class="btn btn-primary">Escribinos por WhatsApp</a>
+    </div>
   </section>
 
 
@@ -284,6 +362,10 @@
         <option value="UYU">Pesos uruguayos ($)</option>
         <option value="USD">Dólares (US$)</option>
       </select>
+
+      <label for="rematePortada">Imagen de portada (opcional)</label>
+      <input id="rematePortada" type="file" accept="image/jpeg,image/png,image/webp">
+      <p class="login-nota" style="margin-top:-0.5rem">Si no subís una, se usa la foto del primer lote.</p>
 
       <button class="btn btn-primary" type="submit" id="botonGuardarRemate">Crear remate</button>
       <button class="btn btn-ghost" type="button" id="botonCancelarEdicionRemate" hidden>Cancelar edición</button>

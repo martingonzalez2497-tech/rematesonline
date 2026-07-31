@@ -102,6 +102,9 @@ const columnasRemates = db.prepare("PRAGMA table_info(remates)").all().map((c) =
 if (!columnasRemates.includes("moneda")) {
   db.exec("ALTER TABLE remates ADD COLUMN moneda TEXT NOT NULL DEFAULT 'UYU'");
 }
+if (!columnasRemates.includes("imagen_portada")) {
+  db.exec("ALTER TABLE remates ADD COLUMN imagen_portada TEXT");
+}
 
 const columnasLotes = db.prepare("PRAGMA table_info(lotes)").all().map((c) => c.name);
 ["condicion", "marca_modelo", "material", "dimensiones", "anio", "pago_confirmado"].forEach((columna) => {

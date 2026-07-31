@@ -48,12 +48,13 @@ router.put("/:id", requireAuth, requireRole("rematador", "administrador"), (req,
     return res.status(403).json({ error: "Solo el rematador dueño o un administrador puede editar este remate." });
   }
 
-  const { titulo, rubro, descripcion, moneda } = req.body;
-  db.prepare("UPDATE remates SET titulo = ?, rubro = ?, descripcion = ?, moneda = ? WHERE id = ?").run(
+  const { titulo, rubro, descripcion, moneda, imagen_portada } = req.body;
+  db.prepare("UPDATE remates SET titulo = ?, rubro = ?, descripcion = ?, moneda = ?, imagen_portada = ? WHERE id = ?").run(
     titulo ?? remate.titulo,
     rubro ?? remate.rubro,
     descripcion ?? remate.descripcion,
     moneda === "USD" || moneda === "UYU" ? moneda : remate.moneda,
+    imagen_portada !== undefined ? imagen_portada : remate.imagen_portada,
     remate.id
   );
 
