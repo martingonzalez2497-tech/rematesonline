@@ -142,6 +142,8 @@ ul { list-style: none; margin: 0; padding: 0; }
   animation: parpadeoUrgente 1.2s ease-in-out infinite;
 }
 .cuenta-nombre { font-weight: 600; font-size: 0.9rem; }
+/* El item de cerrar sesión mobile se oculta en desktop */
+#cerrarSesionMobileItem { display: none; }
 .cuenta-rol {
   font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.03em;
   background: var(--accent-bg); color: var(--accent);
@@ -550,7 +552,64 @@ ul { list-style: none; margin: 0; padding: 0; }
   border-radius: 3px;
   font-size: 0.9em;
 }
-.subasta-img-carrusel { position: relative; }
+/* Tarjeta de portada de remate — estilo Bavastro: imagen panorámica + overlay */
+.remate-tarjeta-portada {
+  position: relative;
+  cursor: pointer;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.remate-tarjeta-portada .subasta-img {
+  aspect-ratio: 16 / 9;
+  max-height: 20rem;
+  width: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  margin: 0;
+}
+.remate-tarjeta-portada:hover .subasta-img { transform: scale(1.04); }
+/* Overlay con gradiente y texto encima de la imagen */
+.remate-tarjeta-portada h4,
+.remate-tarjeta-portada .remate-grupo-rubro,
+.remate-tarjeta-portada .lote-cantidad-ofertas,
+.remate-tarjeta-portada .btn {
+  position: absolute;
+  left: 0; right: 0;
+}
+.remate-tarjeta-portada::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0) 100%);
+  pointer-events: none;
+}
+.remate-tarjeta-portada h4 {
+  bottom: 2.6rem; margin: 0;
+  padding: 0 1rem;
+  color: #fff;
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  z-index: 1;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+}
+.remate-tarjeta-portada .remate-grupo-rubro {
+  bottom: 1.5rem; margin: 0;
+  padding: 0 1rem;
+  color: rgba(255,255,255,0.8);
+  font-size: 0.8rem;
+  z-index: 1;
+}
+.remate-tarjeta-portada .lote-cantidad-ofertas {
+  display: none; /* ya se ve en el overlay */
+}
+.remate-tarjeta-portada .btn {
+  bottom: 0; margin: 0;
+  border-radius: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 2;
+}
+.remate-tarjeta-portada:hover .btn { opacity: 1; }
 .subasta-img-carrusel .subasta-img { margin: 0; }
 .carrusel-flecha {
   position: absolute; top: 50%; transform: translateY(-50%);
@@ -1245,19 +1304,19 @@ ul { list-style: none; margin: 0; padding: 0; }
 /* ===== OPTIMIZACIÓN MOBILE (< 480px) ===== */
 @media (max-width: 30rem) {
 
-  /* --- Header: más compacto --- */
-  .header-top { padding: 0.5rem 0.75rem; gap: 0.4rem; overflow: hidden; }
-  .brand { font-size: 1.05rem; flex-shrink: 1; min-width: 0; }
-  .brand-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .header-icons { gap: 0.4rem; flex-shrink: 0; }
-  .header-icons .cuenta-area { flex-shrink: 1; min-width: 0; overflow: hidden; }
-  .link-cuenta { white-space: nowrap; font-size: 0.9rem; }
-  .cuenta-nombre { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 6rem; display: inline-block; vertical-align: middle; }
+  /* --- Header estilo Bavastro: hamburguesa + logo + iconos, sin nombre usuario --- */
+  .header-top { padding: 0.6rem 0.75rem; gap: 0.5rem; }
+  .brand { font-size: 1.1rem; flex-shrink: 0; }
+  .brand-name { white-space: nowrap; }
+  .header-icons { gap: 0.5rem; flex-shrink: 0; }
+  .header-icons .cuenta-area { flex-shrink: 0; }
+  /* Ocultar nombre de usuario en header mobile — solo se ve en menu lateral */
+  .cuenta-nombre-desktop { display: none; }
   /* Ocultar badge de rol y Cerrar sesion del header en mobile — van en el menu lateral */
   .cuenta-rol-header { display: none; }
   .cuenta-salir-header { display: none; }
-  /* Estilo del item Cerrar sesion dentro del menu lateral */
-  #cerrarSesionMobileItem { border-top: 2px solid var(--accent); margin-top: 0.5rem; padding-top: 1rem !important; }
+  /* Mostrar y estilizar el item Cerrar sesion dentro del menu lateral */
+  #cerrarSesionMobileItem { display: block; border-top: 2px solid var(--accent); margin-top: 0.5rem; padding-top: 1rem !important; }
 
   /* --- Hero: borde a borde, sin padding lateral --- */
   .hero-banner { padding: 0; margin-top: 0; }

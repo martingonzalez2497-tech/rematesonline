@@ -414,7 +414,7 @@ function renderCuentaArea() {
   }
 
   area.innerHTML = `
-    <span class="cuenta-nombre">${sesion.usuario.nombre}</span>
+    <span class="cuenta-nombre cuenta-nombre-desktop">${sesion.usuario.nombre}</span>
     <span class="cuenta-rol cuenta-rol-header">${NOMBRES_ROL[sesion.usuario.rol] || sesion.usuario.rol}</span>
     <button type="button" class="link-salir cuenta-salir-header" id="btnCerrarSesion">Cerrar sesión</button>
   `;
