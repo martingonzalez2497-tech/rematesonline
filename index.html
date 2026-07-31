@@ -500,23 +500,22 @@
       <strong id="modalCuentaRegresiva"></strong>
     </p>
 
-    <form class="form-oferta" id="formOferta">
+    <form class="form-oferta" id="formOferta" hidden>
       <label class="sr-only" for="montoOferta">Tu oferta</label>
       <input id="montoOferta" type="number" step="100" min="0" placeholder="Tu oferta ($)">
       <button class="btn btn-primary" type="submit">Ofertar</button>
     </form>
-    <p class="oferta-mensaje" id="ofertaMensaje" aria-live="polite"></p>
+    <p class="oferta-mensaje" id="ofertaMensaje" aria-live="polite" hidden></p>
 
-    <details class="oferta-auto-detalle">
-      <summary>¿Preferís no estar pendiente? Configurá una oferta automática</summary>
-      <p class="login-nota">Poné el monto máximo que estás dispuesto a pagar. El sistema va a ir ofertando de a poco por vos cada vez que alguien te supere, sin pasarse de ese máximo.</p>
+    <div class="oferta-auto-detalle">
+      <p class="login-nota" style="margin-bottom:0.6rem">Poné el monto máximo que estás dispuesto a pagar. El sistema va a ir ofertando de a poco por vos cada vez que alguien te supere, sin pasarse de ese máximo.</p>
       <form class="form-oferta" id="formOfertaAuto">
         <label class="sr-only" for="montoMaximo">Tu monto máximo</label>
         <input id="montoMaximo" type="number" step="100" min="0" placeholder="Tu monto máximo" style="-moz-appearance:textfield;appearance:textfield">
-        <button class="btn btn-ghost" type="submit">Activar</button>
+        <button class="btn btn-primary" type="submit">Activar</button>
       </form>
       <p class="oferta-mensaje" id="ofertaAutoMensaje" aria-live="polite"></p>
-    </details>
+    </div>
 
     <button class="btn-favorito" id="btnFavorito" type="button">
       <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg> Agregar a favoritos

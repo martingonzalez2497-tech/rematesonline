@@ -1516,8 +1516,9 @@ function abrirModal(lote) {
     estadoCierre.textContent = "Cierre";
     cuenta.textContent = new Date(lote.cierre).toLocaleDateString("es-UY");
     form.hidden = true;
+    document.querySelector(".oferta-auto-detalle").hidden = true;
   } else {
-    form.hidden = false;
+    form.hidden = true; // la oferta manual se hace desde la card, no desde el modal
     estadoPrecio.textContent = lote.cantidad_ofertas > 0 ? "Oferta actual" : "Precio inicial";
     precio.textContent = formatoMonto(lote.oferta_actual, lote.remate_moneda);
     estadoCierre.textContent = "Tiempo restante";
@@ -1533,7 +1534,7 @@ function abrirModal(lote) {
 
   modalOverlay.hidden = false;
   if (lote.estado !== "finalizada") {
-    document.getElementById("montoOferta").focus();
+    document.getElementById("montoMaximo").focus();
   } else {
     modalClose.focus();
   }
