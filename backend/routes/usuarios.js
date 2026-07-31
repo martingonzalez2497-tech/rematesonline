@@ -16,11 +16,12 @@ router.get("/", requireAuth, requireRole("administrador"), (req, res) => {
       .prepare("SELECT pago_confirmado FROM lotes WHERE ganador_id = ? AND estado = 'finalizada'")
       .all(usuario.id);
 
-    // Arranca en 100 (neutral). Cada lote pagado suma, cada uno sin pagar resta.
-    // Los que todavía están esperando confirmación (pago_confirmado null) no afectan.
-    let puntaje = 100;
+    // Arranca en 0. Cada lote pagado suma 10 puntos. Cada lote sin pagar resta 20.
+    // Los pendientes (pago_confirmado null) no afectan.
+    // Máximo 150 (usuario excelente). Mínimo 0.
+    let puntaje = 0;
     lotesGanados.forEach((l) => {
-      if (l.pago_confirmado === 1) puntaje += 5;
+      if (l.pago_confirmado === 1) puntaje += 10;
       else if (l.pago_confirmado === 0) puntaje -= 20;
     });
     puntaje = Math.max(0, Math.min(150, puntaje));

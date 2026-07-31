@@ -1404,9 +1404,10 @@ ul { list-style: none; margin: 0; padding: 0; }
   min-width: 1.8rem; height: 1.8rem; padding: 0 0.4rem; border-radius: 999px;
   font-weight: 700; font-size: 0.8rem; color: #fff; margin-right: 0.4rem;
 }
-.puntaje-alto { background: #2E9E5B; }
-.puntaje-medio { background: var(--dorado); }
-.puntaje-bajo { background: #A3402F; }
+.puntaje-alto { background: #2E9E5B; }   /* verde: excelente pagador */
+.puntaje-medio { background: var(--dorado); } /* dorado: buen historial */
+.puntaje-nuevo { background: var(--fg-muted); } /* gris: sin historial aún */
+.puntaje-bajo { background: #A3402F; }   /* rojo: no pagó */
 
 .estado-pago { font-size: 0.8rem; font-weight: 600; margin-right: 0.5rem; }
 .estado-pago.pago-si { color: #2E9E5B; }

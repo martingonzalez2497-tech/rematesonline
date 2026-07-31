@@ -3564,9 +3564,10 @@ async function rechazarUsuario(usuarioId) {
 }
 
 function claseColorPuntaje(puntaje) {
-  if (puntaje >= 100) return "puntaje-alto";
-  if (puntaje >= 60) return "puntaje-medio";
-  return "puntaje-bajo";
+  if (puntaje >= 80) return "puntaje-alto";   // excelente
+  if (puntaje >= 30) return "puntaje-medio";  // bien
+  if (puntaje > 0)   return "puntaje-nuevo";  // sin historial aún
+  return "puntaje-bajo";                       // sin pagos o con deudas
 }
 
 async function bloquearUsuario(usuarioId) {
