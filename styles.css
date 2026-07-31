@@ -942,6 +942,53 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 .lote-link-whatsapp:hover { opacity: 0.75; }
 
+/* Botón compartir en card */
+.lote-btn-compartir {
+  display: flex; align-items: center; gap: 0.35rem;
+  width: calc(100% - 2 * var(--space-s)); margin: 0 var(--space-s) 0.25rem;
+  background: none; border: 1px solid var(--line); border-radius: var(--radius);
+  color: var(--fg-muted); font: inherit; font-size: 0.78rem; font-weight: 600;
+  cursor: pointer; padding: 0.4rem 0.6rem; transition: border-color 0.15s, color 0.15s;
+}
+.lote-btn-compartir:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Panel de redes sociales */
+.compartir-panel {
+  width: calc(100% - 2 * var(--space-s)); margin: 0 var(--space-s) var(--space-s);
+  background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 0.6rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem;
+}
+.compartir-red {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.45rem 0.6rem; border-radius: calc(var(--radius) - 2px);
+  font-size: 0.8rem; font-weight: 600; text-decoration: none; cursor: pointer;
+  border: none; font-family: inherit; transition: opacity 0.15s;
+  background: var(--bg); color: var(--fg); border: 1px solid var(--line);
+}
+.compartir-red:hover { opacity: 0.8; }
+.compartir-wa  { color: #25D366; border-color: #25D366; }
+.compartir-fb  { color: #1877F2; border-color: #1877F2; }
+.compartir-tg  { color: #229ED9; border-color: #229ED9; }
+.compartir-mail { color: var(--fg-muted); }
+.compartir-copy { color: var(--fg-muted); }
+
+/* Botón flotante WhatsApp */
+.whatsapp-flotante {
+  position: fixed; bottom: 1.5rem; right: 1.5rem;
+  width: 3.25rem; height: 3.25rem; border-radius: 50%;
+  background: #25D366; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(37,211,102,0.45);
+  z-index: 150; text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: pulsoWA 2.5s ease-in-out infinite;
+}
+.whatsapp-flotante:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(37,211,102,0.6); }
+@keyframes pulsoWA {
+  0%, 100% { box-shadow: 0 4px 16px rgba(37,211,102,0.45); }
+  50% { box-shadow: 0 4px 24px rgba(37,211,102,0.75), 0 0 0 8px rgba(37,211,102,0.1); }
+}
+
 .oferta-mensaje {
   margin: -0.25rem 0 var(--space-s);
   font-size: 0.85rem;
