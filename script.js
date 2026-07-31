@@ -1034,6 +1034,16 @@ function crearTarjetaLote(lote) {
     btnSiguiente.innerHTML = "›";
     btnSiguiente.addEventListener("click", (e) => { autoplaySuspendido = true; irAFoto(indiceFoto + 1, e); });
 
+    // Swipe touch
+    let touchStartX = 0;
+    contenedorFoto.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    contenedorFoto.addEventListener("touchend", (e) => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) < 40) return; // ignorar taps cortos
+      autoplaySuspendido = true;
+      irAFoto(diff > 0 ? indiceFoto + 1 : indiceFoto - 1, null);
+    }, { passive: true });
+
     // Autoplay: solo si hay 3 o más fotos
     if (fotos.length >= 3) {
       const intervalo = setInterval(() => {
