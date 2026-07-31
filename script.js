@@ -1322,6 +1322,10 @@ function crearTarjetaLote(lote) {
     linkAuto.addEventListener("click", (e) => {
       e.stopPropagation();
       abrirModal(lote);
+      setTimeout(() => {
+        const detalle = document.querySelector(".oferta-auto-detalle");
+        if (detalle) detalle.open = true;
+      }, 100);
     });
     li.appendChild(linkAuto);
   }
@@ -1857,7 +1861,7 @@ function abrirModal(lote) {
     form.hidden = true;
     document.querySelector(".oferta-auto-detalle").hidden = true;
   } else {
-    form.hidden = true; // la oferta manual se hace desde la card, no desde el modal
+    form.hidden = false;
     estadoPrecio.textContent = lote.cantidad_ofertas > 0 ? "Oferta actual" : "Precio inicial";
     precio.textContent = formatoMonto(lote.oferta_actual, lote.remate_moneda);
     estadoCierre.textContent = "Tiempo restante";
@@ -1886,7 +1890,7 @@ function abrirModal(lote) {
   actualizarBtnPush(lote);
 
   if (lote.estado !== "finalizada") {
-    document.getElementById("montoMaximo").focus();
+    document.getElementById("montoOferta").focus();
   } else {
     modalClose.focus();
   }
@@ -2649,7 +2653,7 @@ async function registrarVistaLote(loteId) {
 
 // ===== Historial de precios (gráfico) =====
 async function cargarHistorialPrecios(lote) {
-  const detalle = document.getElementById("historialDetalle");
+  const detalle = document.getElementById("historialPreciosDetalle");
   const lista = document.getElementById("historialLista");
   if (!detalle) return;
 
