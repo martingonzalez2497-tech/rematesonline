@@ -1042,6 +1042,18 @@ function actualizarAvisoSuperado() {
   );
   aviso.hidden = !teSuperaronEnAlgunLote;
 
+  // Notificación push nativa si te superaron y tenés permiso
+  if (teSuperaronEnAlgunLote && Notification.permission === "granted") {
+    const loteSuperado = LOTES.find(l => !loteEstaCerrado(l) && estadoDeMiOferta(l) === "perdiendo");
+    if (loteSuperado) {
+      new Notification("¡Te superaron en ¿Quién Da Más?!", {
+        body: `Alguien ofertó más en "${loteSuperado.titulo}". Entrá a contraofertar.`,
+        icon: "/fotos/icon-192.png",
+        tag: `superado-${loteSuperado.id}`,
+      });
+    }
+  }
+
   renderNotificaciones(sesion);
 }
 
@@ -1472,14 +1484,55 @@ function renderLotes() {
   });
 
   if (activasGrid.children.length === 0) {
-    activasGrid.innerHTML = `
-      <li class="subastas-vacias">
-        <div class="subastas-vacias-icono">🔨</div>
-        <h3>Próximamente nuevas subastas</h3>
-        <p>Todavía no hay subastas activas en este momento.<br>Registrate para recibir notificaciones cuando publiquemos nuevos remates.</p>
-        <button type="button" class="btn btn-primary" id="btnRegistrarseVacio">Registrarme gratis</button>
-      </li>`;
+    // Calcular próximo sábado a las 11:55hs (hora Uruguay, UTC-3)
+    const ahora = new Date();
+    const proximoSabado = new Date(ahora);
+    const diaSemana = ahora.getDay(); // 0=dom, 6=sab
+    const diasHastaSabado = diaSemana === 6 ? 7 : (6 - diaSemana);
+    proximoSabado.setDate(ahora.getDate() + diasHastaSabado);
+    proximoSabado.setHours(11, 55, 0, 0);
+    // Si ya pasó el sábado de esta semana, ir al siguiente
+    if (proximoSabado <= ahora) {
+      proximoSabado.setDate(proximoSabado.getDate() + 7);
+    }
+
+    const li = document.createElement("li");
+    li.className = "subastas-vacias";
+    li.innerHTML = `
+      <div class="subastas-vacias-icono">📺</div>
+      <h3>Próximo remate en vivo</h3>
+      <p>¿Quién Da Más? · Sábados 11:55hs · Canal 10</p>
+      <div class="countdown-wrap" id="countdownWrap">
+        <div class="countdown-bloque"><span class="countdown-num" id="cdDias">--</span><small>días</small></div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-bloque"><span class="countdown-num" id="cdHoras">--</span><small>horas</small></div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-bloque"><span class="countdown-num" id="cdMinutos">--</span><small>min</small></div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-bloque"><span class="countdown-num" id="cdSegundos">--</span><small>seg</small></div>
+      </div>
+      <p style="color:var(--fg-muted);font-size:0.85rem;margin-top:0.5rem">Registrate para ofertar cuando empiece el remate</p>
+      <button type="button" class="btn btn-primary" id="btnRegistrarseVacio">Registrarme gratis</button>`;
+    activasGrid.appendChild(li);
+
     document.getElementById("btnRegistrarseVacio")?.addEventListener("click", () => abrirLogin("registro"));
+
+    // Actualizar countdown cada segundo
+    const actualizarCountdown = () => {
+      const diff = proximoSabado - new Date();
+      if (diff <= 0) { clearInterval(intervalCountdown); return; }
+      const dias = Math.floor(diff / 86400000);
+      const horas = Math.floor((diff % 86400000) / 3600000);
+      const minutos = Math.floor((diff % 3600000) / 60000);
+      const segundos = Math.floor((diff % 60000) / 1000);
+      const pad = n => String(n).padStart(2, "0");
+      document.getElementById("cdDias").textContent = pad(dias);
+      document.getElementById("cdHoras").textContent = pad(horas);
+      document.getElementById("cdMinutos").textContent = pad(minutos);
+      document.getElementById("cdSegundos").textContent = pad(segundos);
+    };
+    actualizarCountdown();
+    const intervalCountdown = setInterval(actualizarCountdown, 1000);
   }
 
   // Llenar select de rubros en filtros
@@ -1828,6 +1881,9 @@ function abrirModal(lote) {
 
   // Cargar historial de precios
   cargarHistorialPrecios(lote);
+
+  // Mostrar botón push
+  actualizarBtnPush(lote);
 
   if (lote.estado !== "finalizada") {
     document.getElementById("montoMaximo").focus();
@@ -3743,6 +3799,69 @@ function activarScrollReveal(contenedor) {
     tarjeta.classList.add("reveal-pendiente");
     observerRevelado.observe(tarjeta);
   });
+}
+
+// Botón "Avisame si me superan" en el modal
+document.getElementById("btnNotifPush")?.addEventListener("click", async () => {
+  await solicitarPermisoPush();
+});
+
+// Mostrar botón push en el modal si el usuario está logueado y el lote es activo
+function actualizarBtnPush(lote) {
+  const btn = document.getElementById("btnNotifPush");
+  if (!btn) return;
+  const sesion = leerSesion();
+  const soportado = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+  btn.hidden = !sesion || loteEstaCerrado(lote) || !soportado;
+  if (Notification.permission === "granted") {
+    btn.textContent = "🔔 Notificaciones activadas";
+    btn.disabled = true;
+  } else {
+    btn.textContent = "🔔 Avisame si me superan";
+    btn.disabled = false;
+  }
+}
+const VAPID_PUBLIC_KEY = "BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDkBNinBuaZRoAo0RHrMkSK0-LwFzFnFVpM4rNF1K8ac"; // placeholder — reemplazar con clave real
+
+async function solicitarPermisoPush() {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+  try {
+    const reg = await navigator.serviceWorker.register("/sw.js");
+    const permiso = await Notification.requestPermission();
+    if (permiso !== "granted") return;
+    const suscripcion = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: VAPID_PUBLIC_KEY,
+    });
+    // Guardar suscripción en el servidor
+    await fetch(`${API_URL}/push/suscribir`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(suscripcion),
+    });
+    mostrarToast("🔔 Notificaciones activadas. Te avisamos cuando te superen la oferta.");
+  } catch (e) {
+    console.warn("Push no disponible:", e);
+  }
+}
+
+function mostrarToast(mensaje, duracion = 4000) {
+  let toast = document.getElementById("toastGlobal");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "toastGlobal";
+    toast.className = "toast-global";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = mensaje;
+  toast.classList.add("visible");
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove("visible"), duracion);
+}
+
+// Registrar SW en background (sin pedir permiso todavía)
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js").catch(() => {});
 }
 
 // ===== Inicializar =====
