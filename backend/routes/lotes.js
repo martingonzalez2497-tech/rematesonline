@@ -27,7 +27,7 @@ router.get("/", (req, res) => {
     sql += " WHERE lotes.remate_id = ?";
     params.push(req.query.remateId);
   }
-  sql += " ORDER BY lotes.creado_en DESC, lotes.id DESC";
+  sql += " ORDER BY CAST(REPLACE(REPLACE(lotes.numero, '#', ''), ' ', '') AS INTEGER) ASC, lotes.id ASC";
 
   const lotes = db.prepare(sql).all(...params);
   res.json(lotes);
