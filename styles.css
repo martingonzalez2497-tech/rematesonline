@@ -272,7 +272,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 /* ===== Hero banner (carrusel) ===== */
 .hero-banner {
   position: relative;
-  margin: 0 auto var(--space-l);
+  margin: 0 auto var(--space-s);
   max-width: 100%;
   padding: 0;
 }
@@ -396,7 +396,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 /* ===== Info cards ===== */
 .info-cards {
   max-width: var(--content-max);
-  margin: var(--space-l) auto;
+  margin: var(--space-m) auto;
   padding: 0 var(--space-m);
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
@@ -413,7 +413,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 .link-more:hover { text-decoration: underline; }
 
 /* ===== Subastas (agrupadas por remate) ===== */
-.subastas { max-width: var(--content-max); margin: var(--space-l) auto; padding: 0 var(--space-m); }
+.subastas { max-width: var(--content-max); margin: var(--space-m) auto; padding: 0 var(--space-m); }
 
 .ofertas-recientes {
   max-width: var(--content-max);
@@ -455,7 +455,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 .lote-destacado-seccion {
   max-width: var(--content-max);
-  margin: var(--space-l) auto 0;
+  margin: var(--space-m) auto 0;
   padding: 0.9rem;
   background: var(--accent-bg);
   border: 2px solid var(--accent);
@@ -570,7 +570,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 .skeleton-img { width: 100%; aspect-ratio: 4/3; border-radius: 0; }
 .skeleton-linea { height: 0.9rem; }
 
-.subastas h2 { font-family: var(--font-display); font-size: var(--step-2); margin: 0 0 var(--space-m); letter-spacing: -0.01em; }
+.subastas h2 { font-family: var(--font-display); font-size: var(--step-2); margin: 0 0 var(--space-s); letter-spacing: -0.01em; }
 .subastas-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
@@ -1466,7 +1466,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 .carruseles-por-rubro {
   max-width: var(--content-max);
-  margin: var(--space-l) auto 0;
+  margin: var(--space-m) auto 0;
   padding: 0 var(--space-m);
   display: flex;
   flex-direction: column;
@@ -1488,7 +1488,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 .confianza {
   max-width: var(--content-max);
-  margin: var(--space-l) auto 0;
+  margin: var(--space-m) auto 0;
   padding: var(--space-m);
   position: relative;
   box-shadow: 0 0 0 100vmax var(--bg-2);
