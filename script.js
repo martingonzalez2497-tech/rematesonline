@@ -350,6 +350,22 @@ function filtrarPorRubro(rubro) {
     .forEach((tarjeta) => {
       tarjeta.style.display = tarjeta.dataset.rubro === rubro ? "" : "none";
     });
+
+  // Mostrar badge de filtro activo con botón para limpiar
+  let badge = document.getElementById("filtroRubroBadge");
+  if (!badge) {
+    badge = document.createElement("p");
+    badge.id = "filtroRubroBadge";
+    badge.style.cssText = "margin: 0 0 1rem; font-size: 0.85rem; color: var(--fg-muted);";
+    const activasGrid = document.getElementById("activasGrid");
+    activasGrid.parentElement.insertBefore(badge, activasGrid);
+  }
+  badge.innerHTML = `Filtrando: <strong>${rubro}</strong> · <button type="button" style="background:none;border:none;color:var(--accent);cursor:pointer;font:inherit;text-decoration:underline;padding:0" id="btnLimpiarFiltroRubro">Ver todos</button>`;
+  document.getElementById("btnLimpiarFiltroRubro").addEventListener("click", () => {
+    document.querySelectorAll("#activasGrid .subasta-card, #finalizadasGrid .subasta-card")
+      .forEach((t) => { t.style.display = ""; });
+    badge.remove();
+  });
 }
 
 function revisarLandingDeRubro() {
@@ -1311,8 +1327,11 @@ function renderCarruselesPorRubro() {
     link.textContent = "Ver rubro completo";
     link.addEventListener("click", (e) => {
       e.preventDefault();
+      mostrarSoloSeccion("activas");
       filtrarPorRubro(rubro);
-      document.getElementById("activas").scrollIntoView({ behavior: "smooth" });
+      setTimeout(() => {
+        document.getElementById("activas").scrollIntoView({ behavior: "smooth" });
+      }, 50);
     });
     encabezado.append(h2, link);
 
