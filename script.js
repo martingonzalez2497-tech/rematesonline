@@ -34,6 +34,19 @@ if (typeof io !== "undefined") {
 // ===== Año en el footer =====
 document.getElementById("anio").textContent = new Date().getFullYear();
 
+// Ocultar botón flotante WhatsApp cuando el footer es visible
+{
+  const btnWA = document.getElementById("whatsappFlotante");
+  const footer = document.querySelector(".site-footer");
+  if (btnWA && footer) {
+    const observer = new IntersectionObserver(
+      ([entry]) => btnWA.classList.toggle("oculto", entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    observer.observe(footer);
+  }
+}
+
 // ===== Toggle de modo oscuro =====
 const root = document.documentElement;
 const themeToggle = document.getElementById("themeToggle");
