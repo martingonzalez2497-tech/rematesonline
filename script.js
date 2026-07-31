@@ -3715,6 +3715,11 @@ document.getElementById("linkInicio").addEventListener("click", (event) => {
   event.preventDefault();
   volverAHome();
 });
+document.getElementById("btnNavInicio")?.addEventListener("click", (event) => {
+  event.preventDefault();
+  volverAHome();
+  cerrarPanelLateral();
+});
 document.getElementById("btnAbrirTodosLosLotes").addEventListener("click", () => {
   mostrarSoloSeccion("todosLosLotesSeccion");
   renderTodosLosLotesPagina();
