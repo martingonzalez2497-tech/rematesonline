@@ -117,6 +117,9 @@ db.exec(`
     creado_en TEXT NOT NULL DEFAULT (datetime('now'))
   );
 `);
+
+// Tabla de vistas de lotes (para contador en vivo)
+db.exec(`
   CREATE TABLE IF NOT EXISTS vistas_lote (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     lote_id INTEGER NOT NULL REFERENCES lotes(id),
