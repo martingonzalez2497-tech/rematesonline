@@ -30,6 +30,7 @@
     </form>
 
     <nav class="header-icons" aria-label="Cuenta y carrito">
+      <button type="button" id="btnBuscarMobile" class="btn-buscar-mobile cart-link" aria-label="Buscar" style="display:none">⌕</button>
       <span class="cuenta-area" id="cuentaArea">
         <button type="button" id="btnAbrirLogin" class="link-cuenta"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Ingresar</button>
       </span>
@@ -70,6 +71,12 @@
     </ul>
   </nav>
   <div class="panel-lateral-fondo" id="panelLateralFondo"></div>
+  <!-- Barra búsqueda expandida mobile -->
+  <div class="search-expandida" id="searchExpandida" hidden style="display:none">
+    <input type="search" id="buscarMobile" placeholder="Buscar por…" aria-label="Buscar">
+    <button type="button" id="btnBuscarMobileSubmit" class="btn btn--primario" style="padding:0.55rem 0.8rem">⌕</button>
+    <button type="button" id="btnCerrarBusqueda" style="background:none;border:none;color:var(--fg);font-size:1.2rem;cursor:pointer;padding:0.3rem" aria-label="Cerrar búsqueda">✕</button>
+  </div>
 </header>
 
 <main id="top">

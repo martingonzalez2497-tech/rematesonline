@@ -222,6 +222,52 @@ document.querySelector(".search-form").addEventListener("submit", (event) => {
   buscarLotes();
 });
 
+// ===== Búsqueda mobile =====
+(function() {
+  const btnBuscarMobile = document.getElementById("btnBuscarMobile");
+  const searchExpandida = document.getElementById("searchExpandida");
+  const inputMobile = document.getElementById("buscarMobile");
+  const btnSubmitMobile = document.getElementById("btnBuscarMobileSubmit");
+  const btnCerrar = document.getElementById("btnCerrarBusqueda");
+
+  // Mostrar botón lupa sólo en mobile
+  function actualizarVisibilidadBusqueda() {
+    const esMobile = window.matchMedia("(max-width: 30rem)").matches;
+    if (btnBuscarMobile) btnBuscarMobile.style.display = esMobile ? "flex" : "none";
+  }
+  actualizarVisibilidadBusqueda();
+  window.addEventListener("resize", actualizarVisibilidadBusqueda);
+
+  if (btnBuscarMobile) {
+    btnBuscarMobile.addEventListener("click", () => {
+      searchExpandida.style.display = "flex";
+      inputMobile.focus();
+    });
+  }
+  if (btnCerrar) {
+    btnCerrar.addEventListener("click", () => {
+      searchExpandida.style.display = "none";
+      inputMobile.value = "";
+    });
+  }
+  if (btnSubmitMobile) {
+    btnSubmitMobile.addEventListener("click", () => {
+      document.getElementById("buscar").value = inputMobile.value;
+      buscarLotes();
+      searchExpandida.style.display = "none";
+    });
+  }
+  if (inputMobile) {
+    inputMobile.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        document.getElementById("buscar").value = inputMobile.value;
+        buscarLotes();
+        searchExpandida.style.display = "none";
+      }
+    });
+  }
+})();
+
 // ===== Dropdown de Rubros =====
 // ===== Menú hamburguesa (mobile) =====
 const navToggle = document.getElementById("navToggle");
