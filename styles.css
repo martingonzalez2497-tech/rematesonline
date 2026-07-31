@@ -1722,7 +1722,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   .hero-mensaje-titulo { font-size: 1.25rem; margin-bottom: 0.4rem; }
   .hero-mensaje-sub { display: none; }
   .hero-mensaje-tag { display: none; }
-  .hero-mensaje-cta { font-size: 0.88rem; padding: 0.6rem 1.2rem; margin-top: 0.5rem; }
+  .hero-mensaje-cta { font-size: 0.82rem; padding: 0.5rem 1rem; margin-top: 0.4rem; align-self: flex-start; }
 
   /* Cards de portada: ancho completo en slider mobile */
   .grid-slider > li.remate-tarjeta-portada { width: calc(100vw - 3rem); min-width: 0; }
@@ -1873,7 +1873,8 @@ ul { list-style: none; margin: 0; padding: 0; }
   /* Botones más altos y fáciles de tocar */
   .lote-oferta-inline input { min-height: 2.8rem; font-size: 0.95rem; }
   .lote-oferta-inline button { min-height: 2.8rem; font-size: 0.95rem; padding: 0.7rem 1rem; }
-  .btn { min-height: 2.75rem; }
+  /* Solo los botones de oferta son grandes, no todos */
+  .hero-mensaje-cta { min-height: unset !important; }
 
   /* --- Remate grupo: padding más chico --- */
   .remate-grupo {
