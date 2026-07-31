@@ -1860,8 +1860,8 @@ function cerrarModal() {
   if (intervaloModal) clearInterval(intervaloModal);
   loteAbierto = null;
   // Restaurar URL y título
-  window.history.pushState({}, "Remate Directo", "/");
-  document.title = "Remate Directo";
+  window.history.pushState({}, "¿Quién Da Más?", "/");
+  document.title = "¿Quién Da Más? — Remates Online · Canal 10";
   if (elementoAntesDelModal) elementoAntesDelModal.focus();
 }
 modalClose.addEventListener("click", cerrarModal);

@@ -2003,3 +2003,29 @@ ul { list-style: none; margin: 0; padding: 0; }
   .nosotros-canal-badge { display: none; }
   .contacto-grid { grid-template-columns: 1fr; }
 }
+
+/* ===== Banda Canal 10 ===== */
+.banda-canal10 {
+  background: var(--ink);
+  color: rgba(255,255,255,0.85);
+  font-size: 0.8rem;
+  padding: 0.4rem 1.5rem;
+  display: flex; align-items: center; gap: 0.6rem;
+  justify-content: center;
+}
+[data-theme="dark"] .banda-canal10 { background: #000; }
+.banda-canal10-dot {
+  width: 0.5rem; height: 0.5rem; border-radius: 50%;
+  background: #E84C1E; animation: parpadeoUrgente 1.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.banda-canal10 strong { color: #fff; }
+.banda-canal10-link {
+  color: var(--accent); text-decoration: none; font-weight: 700;
+  margin-left: auto;
+}
+.banda-canal10-link:hover { text-decoration: underline; }
+@media (max-width: 30rem) {
+  .banda-canal10-link { display: none; }
+  .banda-canal10 { font-size: 0.72rem; padding: 0.35rem 0.75rem; }
+}
