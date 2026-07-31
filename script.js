@@ -3671,7 +3671,7 @@ function mostrarSoloSeccion(idAMostrar) {
 function volverAHome() {
   // Estas son "páginas" separadas (no forman parte de la home) — hay que
   // ocultarlas explícitamente al volver, si no se quedan mezcladas con la home.
-  const paginasDedicadas = ["terminos", "misOfertasSeccion", "carritoSeccion", "finalizadasSeccion", "todosLosLotesSeccion", "panelSeccion", "usuariosSeccion", "nosotrosSeccion", "galeriaSeccion", "contactoSeccion", "como-ofertar-detalle"];
+  const paginasDedicadas = ["terminos", "misOfertasSeccion", "carritoSeccion", "finalizadasSeccion", "todosLosLotesSeccion", "panelSeccion", "usuariosSeccion", "nosotrosSeccion", "galeriaSeccion", "contactoSeccion"];
   document.querySelectorAll("main > section").forEach((s) => {
     if (paginasDedicadas.includes(s.id)) s.hidden = true;
     else if (s.id !== "ofertasRecientesSeccion") s.hidden = false;
