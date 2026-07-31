@@ -69,7 +69,6 @@
         <ul class="dropdown-menu" id="rubrosMenu"></ul>
       </li>
       <li><button type="button" class="link-cuenta" id="btnAbrirFinalizadas">Finalizadas</button></li>
-      <li><button type="button" class="link-cuenta" id="btnAbrirGaleria">Galería</button></li>
       <li class="nav-separador" aria-hidden="true"></li>
       <li><a href="#como-ofertar-detalle">¿Cómo ofertar?</a></li>
       <li><button type="button" class="link-cuenta" id="btnAbrirNosotros">Quiénes somos</button></li>
@@ -251,8 +250,11 @@
     </div>
 
     <div class="como-cta">
-      <p>¿Tenés más dudas?</p>
-      <a href="https://wa.me/59899924004" target="_blank" rel="noopener" class="btn btn-primary">Escribinos por WhatsApp</a>
+      <p>¿Tenés dudas o querés ver lo que ya vendimos?</p>
+      <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
+        <a href="https://wa.me/59899924004" target="_blank" rel="noopener" class="btn btn-primary">Escribinos por WhatsApp</a>
+        <button type="button" class="btn btn-ghost" onclick="mostrarSoloSeccion('finalizadasSeccion');renderFinalizadasPagina()">Ver remates anteriores</button>
+      </div>
     </div>
   </section>
 
