@@ -797,6 +797,47 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 .lote-insignia-ganando { background: var(--accent-bg); color: var(--accent); }
 .lote-insignia-perdiendo { background: rgba(163, 64, 47, 0.12); color: #A3402F; }
+.lote-insignia-popular { background: rgba(255, 160, 0, 0.12); color: #c07800; }
+
+/* Contador de vistas */
+.modal-vistas {
+  font-size: 0.8rem; color: var(--fg-muted); margin: -0.25rem 0 0.5rem;
+  display: flex; align-items: center; gap: 0.3rem;
+}
+
+/* Historial de precios */
+.historial-precios-detalle {
+  border: 1px solid var(--line); border-radius: var(--radius);
+  margin: 1rem 0; overflow: hidden;
+}
+.historial-precios-detalle summary {
+  padding: 0.7rem 1rem; cursor: pointer; font-weight: 600; font-size: 0.9rem;
+  list-style: none; user-select: none;
+}
+.historial-precios-detalle summary::-webkit-details-marker { display: none; }
+.historial-grafico-wrap { padding: 0.5rem 1rem; }
+.historial-grafico-wrap canvas { width: 100%; display: block; }
+.historial-lista { list-style: none; padding: 0 1rem 0.75rem; margin: 0; }
+.historial-item {
+  display: flex; gap: 0.5rem; align-items: center;
+  padding: 0.3rem 0; border-top: 1px solid var(--line); font-size: 0.82rem;
+}
+.historial-nombre { flex: 1; font-weight: 600; }
+.historial-monto { color: var(--accent); font-weight: 700; }
+.historial-fecha { color: var(--fg-muted); font-size: 0.75rem; }
+
+/* Tabla de ganadores */
+.ganadores-tabla {
+  width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 0.5rem;
+}
+.ganadores-tabla th {
+  background: var(--bg-2); padding: 0.5rem 0.6rem;
+  text-align: left; font-weight: 600; border-bottom: 2px solid var(--line);
+}
+.ganadores-tabla td {
+  padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--line); vertical-align: middle;
+}
+.ganadores-tabla tr:hover td { background: var(--bg-2); }
 
 .lote-cuenta-urgente {
   color: #c0392b !important;

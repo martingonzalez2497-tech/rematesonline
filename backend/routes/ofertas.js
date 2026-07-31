@@ -224,7 +224,7 @@ router.get("/lote/:loteId", (req, res) => {
     .prepare(
       `SELECT ofertas.monto, ofertas.fecha, usuarios.nombre AS usuario_nombre
        FROM ofertas JOIN usuarios ON usuarios.id = ofertas.usuario_id
-       WHERE lote_id = ? ORDER BY ofertas.monto DESC`
+       WHERE lote_id = ? ORDER BY ofertas.fecha ASC`
     )
     .all(req.params.loteId);
   res.json(ofertas);
@@ -240,6 +240,24 @@ router.get("/mias", requireAuth, (req, res) => {
     )
     .all(req.usuario.id);
   res.json(ofertas);
+});
+
+// Registrar vista de un lote (contador en vivo)
+router.post("/lote/:loteId/vista", (req, res) => {
+  const { sesion } = req.body;
+  if (!sesion) return res.status(400).json({ error: "Falta sesion." });
+  // Upsert: si la misma sesión ya vio este lote en los últimos 5 min, no duplicar
+  const yaVisto = db.prepare(
+    `SELECT id FROM vistas_lote WHERE lote_id = ? AND sesion = ? AND fecha > datetime('now', '-5 minutes')`
+  ).get(req.params.loteId, sesion);
+  if (!yaVisto) {
+    db.prepare("INSERT INTO vistas_lote (lote_id, sesion) VALUES (?, ?)").run(req.params.loteId, sesion);
+  }
+  // Contar vistas únicas de los últimos 10 minutos
+  const total = db.prepare(
+    `SELECT COUNT(DISTINCT sesion) AS n FROM vistas_lote WHERE lote_id = ? AND fecha > datetime('now', '-10 minutes')`
+  ).get(req.params.loteId).n;
+  res.json({ vistas: total });
 });
 
 module.exports = router;

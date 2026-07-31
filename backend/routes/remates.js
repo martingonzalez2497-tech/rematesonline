@@ -7,6 +7,20 @@ const router = express.Router();
 
 // Ver todos los remates — público, no requiere login
 router.get("/", (req, res) => {
+  const ahora = new Date().toISOString();
+  const remates = db
+    .prepare(
+      `SELECT remates.*, usuarios.nombre AS rematador_nombre
+       FROM remates JOIN usuarios ON usuarios.id = remates.rematador_id
+       WHERE remates.fecha_inicio IS NULL OR remates.fecha_inicio <= ?
+       ORDER BY remates.creado_en DESC, remates.id DESC`
+    )
+    .all(ahora);
+  res.json(remates);
+});
+
+// Ver TODOS los remates incluyendo programados — solo admin/rematador
+router.get("/todos", requireAuth, requireRole("rematador", "administrador"), (req, res) => {
   const remates = db
     .prepare(
       `SELECT remates.*, usuarios.nombre AS rematador_nombre
@@ -25,15 +39,13 @@ router.get("/:id", (req, res) => {
 
 // Crear un remate (evento) — solo rematador o administrador
 router.post("/", requireAuth, requireRole("rematador", "administrador"), (req, res) => {
-  const { titulo, rubro, descripcion, moneda } = req.body;
+  const { titulo, rubro, descripcion, moneda, fecha_inicio } = req.body;
   if (!titulo || !rubro) {
     return res.status(400).json({ error: "Faltan datos: título y rubro son obligatorios." });
   }
-
   const resultado = db
-    .prepare("INSERT INTO remates (titulo, rubro, descripcion, moneda, rematador_id) VALUES (?, ?, ?, ?, ?)")
-    .run(titulo, rubro, descripcion || "", moneda === "USD" ? "USD" : "UYU", req.usuario.id);
-
+    .prepare("INSERT INTO remates (titulo, rubro, descripcion, moneda, rematador_id, fecha_inicio) VALUES (?, ?, ?, ?, ?, ?)")
+    .run(titulo, rubro, descripcion || "", moneda === "USD" ? "USD" : "UYU", req.usuario.id, fecha_inicio || null);
   avisarActualizacion();
   res.status(201).json({ id: resultado.lastInsertRowid });
 });
@@ -48,13 +60,14 @@ router.put("/:id", requireAuth, requireRole("rematador", "administrador"), (req,
     return res.status(403).json({ error: "Solo el rematador dueño o un administrador puede editar este remate." });
   }
 
-  const { titulo, rubro, descripcion, moneda, imagen_portada } = req.body;
-  db.prepare("UPDATE remates SET titulo = ?, rubro = ?, descripcion = ?, moneda = ?, imagen_portada = ? WHERE id = ?").run(
+  const { titulo, rubro, descripcion, moneda, imagen_portada, fecha_inicio } = req.body;
+  db.prepare("UPDATE remates SET titulo = ?, rubro = ?, descripcion = ?, moneda = ?, imagen_portada = ?, fecha_inicio = ? WHERE id = ?").run(
     titulo ?? remate.titulo,
     rubro ?? remate.rubro,
     descripcion ?? remate.descripcion,
     moneda === "USD" || moneda === "UYU" ? moneda : remate.moneda,
     imagen_portada !== undefined ? imagen_portada : remate.imagen_portada,
+    fecha_inicio !== undefined ? (fecha_inicio || null) : remate.fecha_inicio,
     remate.id
   );
 
@@ -125,6 +138,30 @@ router.get("/:id/estadisticas", requireAuth, requireRole("rematador", "administr
     promedioSegundosPorLote,
     moneda: remate.moneda,
   });
+});
+
+// Dashboard de ganadores de un remate
+router.get("/:id/ganadores", requireAuth, requireRole("rematador", "administrador"), (req, res) => {
+  const remate = db.prepare("SELECT * FROM remates WHERE id = ?").get(req.params.id);
+  if (!remate) return res.status(404).json({ error: "Remate no encontrado." });
+
+  const ganadores = db.prepare(`
+    SELECT l.id, l.numero, l.titulo, l.oferta_actual, l.moneda, l.pago_confirmado,
+           u.nombre AS ganador_nombre, u.email AS ganador_email, u.cedula AS ganador_cedula
+    FROM lotes l
+    JOIN usuarios u ON u.id = l.ganador_id
+    WHERE l.remate_id = ? AND l.estado = 'finalizada' AND l.ganador_id IS NOT NULL
+    ORDER BY CAST(REPLACE(REPLACE(l.numero, '#', ''), ' ', '') AS INTEGER) ASC
+  `).all(req.params.id);
+
+  const pendientes = db.prepare(`
+    SELECT l.id, l.numero, l.titulo, l.oferta_actual, l.moneda
+    FROM lotes l
+    WHERE l.remate_id = ? AND l.estado = 'finalizada' AND l.ganador_id IS NULL
+    ORDER BY CAST(REPLACE(REPLACE(l.numero, '#', ''), ' ', '') AS INTEGER) ASC
+  `).all(req.params.id);
+
+  res.json({ remate, ganadores, sinGanador: pendientes });
 });
 
 // Estadísticas generales del administrador

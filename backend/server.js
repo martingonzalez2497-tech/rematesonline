@@ -48,6 +48,55 @@ app.use(express.json());
 
 app.get("/api/salud", (req, res) => res.json({ ok: true }));
 
+// Sitemap XML para Google
+app.get("/sitemap.xml", (req, res) => {
+  const lotes = db.prepare("SELECT id, titulo, creado_en FROM lotes WHERE estado = 'activa'").all();
+  const base = process.env.FRONTEND_ORIGIN || `${req.protocol}://${req.get("host")}`;
+  const urls = [
+    `<url><loc>${base}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>`,
+    ...lotes.map(l => `<url><loc>${base}/lote/${l.id}</loc><lastmod>${l.creado_en.split("T")[0]}</lastmod><changefreq>hourly</changefreq><priority>0.8</priority></url>`)
+  ].join("\n");
+  res.type("application/xml").send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`);
+});
+
+// Open Graph dinámico para /lote/:id — el crawler de WhatsApp/Facebook recibe este HTML
+app.get("/lote/:id", (req, res) => {
+  const lote = db.prepare(`
+    SELECT lotes.*, remates.titulo AS remate_titulo, remates.moneda AS remate_moneda
+    FROM lotes JOIN remates ON remates.id = lotes.remate_id
+    WHERE lotes.id = ?
+  `).get(req.params.id);
+
+  const base = process.env.FRONTEND_ORIGIN || `${req.protocol}://${req.get("host")}`;
+  const carpetaFrontend = path.join(__dirname, "..");
+
+  if (!lote) return res.sendFile(path.join(carpetaFrontend, "index.html"));
+
+  const moneda = lote.remate_moneda === "USD" ? "US$" : "$";
+  const precio = `${moneda} ${Number(lote.oferta_actual).toLocaleString("es-UY")}`;
+  const imagen = lote.imagen || `${base}/fotos/og-default.png`;
+  const titulo = `${lote.titulo} — Lote ${lote.numero}`;
+  const descripcion = `${lote.cantidad_ofertas > 0 ? `Oferta actual: ${precio}` : `Precio inicial: ${precio}`} · ${lote.remate_titulo}`;
+
+  // Inyectar OG tags en el HTML base
+  const fs = require("fs");
+  let html = fs.readFileSync(path.join(carpetaFrontend, "index.html"), "utf8");
+  const ogTags = `
+    <meta property="og:title" content="${titulo}">
+    <meta property="og:description" content="${descripcion}">
+    <meta property="og:image" content="${imagen}">
+    <meta property="og:url" content="${base}/lote/${lote.id}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Remate Directo">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="${titulo}">
+    <meta name="twitter:description" content="${descripcion}">
+    <meta name="twitter:image" content="${imagen}">
+    <title>${titulo} — Remate Directo</title>`;
+  html = html.replace("<title>Remate Directo — Subastas en Línea</title>", ogTags);
+  res.type("text/html").send(html);
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/remates", remateRoutes);
 app.use("/api/lotes", lotesRoutes);

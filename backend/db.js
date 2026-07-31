@@ -105,6 +105,20 @@ if (!columnasRemates.includes("moneda")) {
 if (!columnasRemates.includes("imagen_portada")) {
   db.exec("ALTER TABLE remates ADD COLUMN imagen_portada TEXT");
 }
+if (!columnasRemates.includes("fecha_inicio")) {
+  db.exec("ALTER TABLE remates ADD COLUMN fecha_inicio TEXT");
+}
+
+// Tabla de vistas de lotes (para contador en vivo)
+db.exec(`
+  CREATE TABLE IF NOT EXISTS vistas_lote (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    lote_id INTEGER NOT NULL REFERENCES lotes(id),
+    sesion TEXT NOT NULL,
+    fecha TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_vistas_lote ON vistas_lote(lote_id, fecha);
+`);
 
 const columnasLotes = db.prepare("PRAGMA table_info(lotes)").all().map((c) => c.name);
 ["condicion", "marca_modelo", "material", "dimensiones", "anio", "pago_confirmado"].forEach((columna) => {

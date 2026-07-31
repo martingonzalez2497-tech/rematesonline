@@ -1205,6 +1205,13 @@ function crearTarjetaLote(lote) {
     insigniaEstado = document.createElement("p");
     insigniaEstado.className = `lote-insignia lote-insignia-${estadoPropio}`;
     insigniaEstado.textContent = estadoPropio === "ganando" ? "¡Vas ganando!" : "¡Vas perdiendo!";
+  } else {
+    const txtPopular = insigniaPopular(lote);
+    if (txtPopular) {
+      insigniaEstado = document.createElement("p");
+      insigniaEstado.className = "lote-insignia lote-insignia-popular";
+      insigniaEstado.textContent = txtPopular;
+    }
   }
 
   const cuenta = document.createElement("p");
@@ -1784,6 +1791,13 @@ function abrirModal(lote) {
   // Actualizar URL a formato limpio /lote/id
   window.history.pushState({ loteId: lote.id }, `Lote ${lote.numero} — ${lote.titulo}`, `/lote/${lote.id}`);
   document.title = `${lote.titulo} — Remate Directo`;
+
+  // Registrar vista y mostrar contador
+  registrarVistaLote(lote.id);
+
+  // Cargar historial de precios
+  cargarHistorialPrecios(lote);
+
   if (lote.estado !== "finalizada") {
     document.getElementById("montoMaximo").focus();
   } else {
@@ -2404,6 +2418,7 @@ formNuevoRemate.addEventListener("submit", async (event) => {
     rubro: document.getElementById("remateRubro").value,
     descripcion: document.getElementById("remateDescripcion").value,
     moneda: document.getElementById("remateMoneda").value,
+    fecha_inicio: document.getElementById("remoteFechaInicio")?.value || null,
     ...(imagen_portada !== undefined && { imagen_portada }),
   };
 
@@ -2509,13 +2524,137 @@ function cambiarPanelTab(tab) {
   document.getElementById("formNuevoLote").hidden = tab !== "lotes";
   document.getElementById("importarLotesDetalle") && (document.getElementById("importarLotesDetalle").hidden = tab !== "lotes");
   document.getElementById("panelEstadisticasAdmin").hidden = tab !== "estadisticas-admin";
-  document.getElementById("panelLista").hidden = tab === "estadisticas-admin";
+  document.getElementById("panelLista").hidden = tab === "estadisticas-admin" || tab === "ganadores";
+  document.getElementById("dashboardGanadores").hidden = tab !== "ganadores";
   if (tab === "lotes") autocompletarProximoNumeroDeLote();
   if (tab === "estadisticas-admin") cargarEstadisticasAdmin();
+  if (tab === "ganadores") cargarDashboardGanadores();
 }
 document.querySelectorAll('[data-paneltab]').forEach((btn) => {
   btn.addEventListener("click", () => cambiarPanelTab(btn.dataset.paneltab));
 });
+// ===== Contador de vistas en vivo =====
+const SESION_ID = Math.random().toString(36).slice(2);
+async function registrarVistaLote(loteId) {
+  try {
+    const resp = await fetch(`${API_URL}/ofertas/lote/${loteId}/vista`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sesion: SESION_ID }),
+    });
+    const { vistas } = await resp.json();
+    const el = document.getElementById("modalVistas");
+    if (el && vistas > 1) {
+      el.hidden = false;
+      el.textContent = `👁 ${vistas} personas viendo esto ahora`;
+    }
+  } catch (e) {}
+}
+
+// ===== Historial de precios (gráfico) =====
+async function cargarHistorialPrecios(lote) {
+  const detalle = document.getElementById("historialDetalle");
+  const lista = document.getElementById("historialLista");
+  if (!detalle) return;
+
+  if (lote.cantidad_ofertas === 0) { detalle.hidden = true; return; }
+  detalle.hidden = false;
+
+  try {
+    const resp = await fetch(`${API_URL}/ofertas/lote/${lote.id}`);
+    const ofertas = await resp.json();
+    if (ofertas.length === 0) { detalle.hidden = true; return; }
+
+    // Lista de ofertas
+    lista.innerHTML = ofertas.slice().reverse().map(o => {
+      const fecha = new Date(o.fecha).toLocaleString("es-UY", { day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" });
+      return `<li class="historial-item"><span class="historial-nombre">${o.usuario_nombre}</span><span class="historial-monto">${formatoMonto(o.monto, lote.remate_moneda)}</span><span class="historial-fecha">${fecha}</span></li>`;
+    }).join("");
+
+    // Gráfico simple con Canvas
+    const canvas = document.getElementById("historialCanvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const montos = ofertas.map(o => o.monto);
+    const min = Math.min(...montos) * 0.95;
+    const max = Math.max(...montos) * 1.05;
+    const W = canvas.offsetWidth || 300;
+    const H = 120;
+    canvas.width = W; canvas.height = H;
+    ctx.clearRect(0, 0, W, H);
+
+    const accent = "#3D8EFF";
+    ctx.strokeStyle = accent; ctx.lineWidth = 2.5; ctx.lineJoin = "round";
+    ctx.beginPath();
+    ofertas.forEach((o, i) => {
+      const x = (i / (ofertas.length - 1 || 1)) * (W - 20) + 10;
+      const y = H - ((o.monto - min) / (max - min || 1)) * (H - 20) - 10;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // Puntos
+    ofertas.forEach((o, i) => {
+      const x = (i / (ofertas.length - 1 || 1)) * (W - 20) + 10;
+      const y = H - ((o.monto - min) / (max - min || 1)) * (H - 20) - 10;
+      ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = accent; ctx.fill();
+    });
+  } catch (e) { detalle.hidden = true; }
+}
+
+// ===== Dashboard de ganadores =====
+async function cargarDashboardGanadores() {
+  const sesion = leerSesion();
+  if (!sesion) return;
+  const select = document.getElementById("dashboardRemateSelect");
+  const contenido = document.getElementById("dashboardContenido");
+
+  const misRemates_ = misRemates();
+  select.innerHTML = misRemates_.map(r => `<option value="${r.id}">${r.titulo}</option>`).join("");
+  if (misRemates_.length === 0) { contenido.innerHTML = "<p style='color:var(--fg-muted)'>No tenés remates creados.</p>"; return; }
+
+  const cargar = async (remateId) => {
+    contenido.innerHTML = "<p>Cargando…</p>";
+    try {
+      const resp = await fetch(`${API_URL}/remates/${remateId}/ganadores`, {
+        headers: { Authorization: `Bearer ${sesion.token}` },
+      });
+      const { ganadores, sinGanador } = await resp.json();
+
+      let html = "";
+      if (ganadores.length === 0 && sinGanador.length === 0) {
+        html = "<p style='color:var(--fg-muted)'>No hay lotes finalizados en este remate.</p>";
+      } else {
+        if (ganadores.length > 0) {
+          html += `<table class="ganadores-tabla"><thead><tr><th>Lote</th><th>Artículo</th><th>Monto</th><th>Ganador</th><th>Email</th><th>Cédula</th><th>Pago</th></tr></thead><tbody>`;
+          ganadores.forEach(g => {
+            const pago = g.pago_confirmado === 1 ? "✅ Pagó" : g.pago_confirmado === 0 ? "❌ No pagó" : "⏳ Pendiente";
+            html += `<tr><td>${g.numero}</td><td>${g.titulo}</td><td>${formatoMonto(g.oferta_actual, g.moneda)}</td><td>${g.ganador_nombre}</td><td>${g.ganador_email}</td><td>${g.ganador_cedula || "—"}</td><td>${pago}</td></tr>`;
+          });
+          html += `</tbody></table>`;
+        }
+        if (sinGanador.length > 0) {
+          html += `<p style="color:var(--fg-muted);margin-top:1rem">Sin ganador: ${sinGanador.map(l => `Lote ${l.numero} — ${l.titulo}`).join(", ")}</p>`;
+        }
+      }
+      contenido.innerHTML = html;
+    } catch (e) {
+      contenido.innerHTML = "<p style='color:var(--error)'>No se pudo cargar.</p>";
+    }
+  };
+
+  select.addEventListener("change", () => cargar(select.value));
+  if (misRemates_.length > 0) cargar(misRemates_[0].id);
+}
+
+// ===== Insignia "Lote popular" =====
+function insigniaPopular(lote) {
+  if (lote.cantidad_ofertas >= 5) return "🔥 Popular";
+  if (lote.cantidad_ofertas >= 3) return "⚡ Activo";
+  return null;
+}
+
 function cerrarPanel() {
   volverAHome();
 }
