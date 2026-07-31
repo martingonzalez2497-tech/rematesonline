@@ -1,0 +1,6 @@
+Poné acá las fotos de tus lotes.
+
+Sugerencia de nombre: lote-014.jpg (usando el mismo número que el lote en script.js)
+
+Después, en script.js, en el objeto de ese lote, completá:
+imagen: "fotos/lote-014.jpg"

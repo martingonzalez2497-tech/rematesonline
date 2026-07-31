@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="es-UY">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Remate Directo — Subastas en Línea</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230F2A4A' rx='16'/%3E%3Ctext x='50' y='68' font-size='55' text-anchor='middle' fill='white'%3E%E2%9A%92%3C/text%3E%3C/svg%3E">
+<meta name="description" content="La manera más simple, rápida y segura de vender y comprar en subasta. Exhibición abierta y pujas en línea.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <section class="header-top">
+    <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="navLista" aria-label="Abrir menú">
+      <span aria-hidden="true">☰</span>
+    </button>
+    <a class="brand" href="#top">
+      <span class="brand-mark" aria-hidden="true">⚒</span>
+      <span class="brand-name">Remate&nbsp;Directo</span>
+    </a>
+
+    <form class="search-form" role="search" aria-label="Buscar subastas">
+      <label class="sr-only" for="buscar">Buscar por</label>
+      <input id="buscar" type="search" name="q" placeholder="Buscar por…">
+      <button type="submit" aria-label="Buscar">⌕</button>
+    </form>
+
+    <nav class="header-icons" aria-label="Cuenta y carrito">
+      <span class="cuenta-area" id="cuentaArea">
+        <button type="button" id="btnAbrirLogin" class="link-cuenta"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Ingresar</button>
+      </span>
+      <span class="notificaciones-wrap" id="notificacionesWrap" hidden>
+        <button type="button" id="btnNotificaciones" class="cart-link" aria-label="Notificaciones" aria-expanded="false">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="cart-count" id="notificacionesCount" hidden>0</span>
+        </button>
+        <ul class="dropdown-menu notificaciones-menu" id="notificacionesMenu"></ul>
+      </span>
+      <button type="button" id="btnAbrirCarrito" class="cart-link" aria-label="Carrito, lotes ganados">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Cambiar a modo oscuro">
+        <svg class="icono-sol" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        <svg class="icono-luna" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </nav>
+  </section>
+
+  <nav class="site-nav" aria-label="Navegación principal">
+    <ul id="navLista">
+      <li><a href="#top" id="linkInicio">Inicio</a></li>
+      <li class="has-dropdown">
+        <button class="dropdown-toggle" id="rubrosToggle" aria-expanded="false" aria-controls="rubrosMenu">
+          Rubros
+        </button>
+        <ul class="dropdown-menu" id="rubrosMenu"></ul>
+      </li>
+      <li><a href="#como-ofertar-detalle">¿Cómo ofertar?</a></li>
+      <li><a href="#activas">Subastas activas</a></li>
+      <li><button type="button" class="link-cuenta" id="btnAbrirTodosLosLotes">Todos los lotes</button></li>
+      <li><button type="button" class="link-cuenta" id="btnAbrirFinalizadas">Finalizadas</button></li>
+      <li id="panelNavItem" hidden><button type="button" class="link-cuenta" id="btnAbrirPanel">Panel</button></li>
+      <li id="usuariosNavItem" hidden><button type="button" class="link-cuenta" id="btnAbrirUsuarios">Usuarios</button></li>
+      <li id="misOfertasNavItem" hidden><button type="button" class="link-cuenta" id="btnAbrirMisOfertas">Mis ofertas <span class="aviso-superado" id="avisoSuperado" hidden></span></button></li>
+    </ul>
+  </nav>
+  <div class="panel-lateral-fondo" id="panelLateralFondo"></div>
+</header>
+
+<main id="top">
+
+  <h1 class="sr-only">Remate Directo — Subastas en línea en Montevideo, Uruguay</h1>
+
+  <section class="hero-banner" aria-roledescription="carrusel" aria-label="Subastas destacadas">
+    <ul class="hero-slides" id="heroSlides"></ul>
+    <nav class="hero-dots" aria-label="Seleccionar imagen destacada"></nav>
+    <div class="hero-mensaje">
+      <p class="hero-mensaje-titulo">Comprá al mejor precio.</p>
+      <p class="hero-mensaje-sub">Registrate gratis y ofertá en 30 segundos.</p>
+      <a href="#activas" class="hero-mensaje-cta">Ver subastas activas</a>
+    </div>
+  </section>
+
+  <section class="subastas" id="activas" aria-labelledby="activas-heading">
+    <h2 id="activas-heading">Subastas activas</h2>
+    <ul class="subastas-grid" id="activasGrid"></ul>
+  </section>
+
+  <section class="ofertas-recientes" id="ofertasRecientesSeccion" hidden>
+    <p class="ofertas-recientes-titulo"><span class="punto-en-vivo" aria-hidden="true"></span> Actividad reciente</p>
+    <ul class="ofertas-recientes-lista" id="ofertasRecientesLista"></ul>
+  </section>
+
+  <section class="carruseles-por-rubro" id="carruselesPorRubro"></section>
+
+  <section class="confianza">
+    <ul class="confianza-lista">
+      <li>
+        <span class="confianza-icono"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+        <h3>+5 años en el rubro</h3>
+        <p>Experiencia real en subastas, no una empresa que recién arranca de la nada.</p>
+      </li>
+      <li>
+        <span class="confianza-icono"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+        <h3>Local físico en Montevideo</h3>
+        <p>Podés venir a ver los artículos en persona antes de ofertar, no somos solo una web.</p>
+      </li>
+      <li>
+        <span class="confianza-icono"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+        <h3>Contacto directo</h3>
+        <p>Teléfono y WhatsApp reales, atendidos por una persona — no un bot ni un formulario perdido.</p>
+      </li>
+      <li>
+        <span class="confianza-icono"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+        <h3>Condiciones claras</h3>
+        <p>Comisión fija del 18,3% con IVA incluido, sin costos ocultos. Todo detallado en Términos y Condiciones.</p>
+      </li>
+    </ul>
+  </section>
+
+  <section class="contenido" id="como-ofertar-detalle" aria-labelledby="como-ofertar-heading">
+    <h2 id="como-ofertar-heading">¿Cómo Ofertar?</h2>
+    <ol class="pasos">
+      <li>
+        <span class="pasos-numero">1</span>
+        <h3>Explorá el catálogo</h3>
+        <p>Recorré las subastas activas o buscá por rubro con el menú desplegable de la parte de arriba.</p>
+      </li>
+      <li>
+        <span class="pasos-numero">2</span>
+        <h3>Entrá al lote que te interesa</h3>
+        <p>Hacé clic en "Ingresar" para ver la foto, la descripción completa, la oferta actual y el tiempo restante.</p>
+      </li>
+      <li>
+        <span class="pasos-numero">3</span>
+        <h3>Hacé tu oferta</h3>
+        <p>Escribí un monto mayor a la oferta actual y confirmá. Si ofertás en el último minuto, el cierre se extiende un minuto más.</p>
+      </li>
+      <li>
+        <span class="pasos-numero">4</span>
+        <h3>Seguí el lote</h3>
+        <p>Marcalo con la estrella de favoritos para encontrarlo fácil y revisar si te superaron la oferta.</p>
+      </li>
+      <li>
+        <span class="pasos-numero">5</span>
+        <h3>Si ganás</h3>
+        <p>Te contactamos para coordinar el pago y el retiro según lo detallado en <a href="#" data-terminos>Términos y Condiciones</a>.</p>
+      </li>
+    </ol>
+  </section>
+
+
+  <section class="contenido" id="carritoSeccion" aria-labelledby="carritoTitulo" hidden>
+    <button type="button" class="btn-volver" id="btnCerrarCarrito"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Volver</button>
+    <h2 id="carritoTitulo">Lotes ganados</h2>
+    <ul class="panel-lista" id="carritoLista"></ul>
+  </section>
+
+  <section class="contenido" id="misOfertasSeccion" aria-labelledby="misOfertasTitulo" hidden>
+    <button type="button" class="btn-volver" id="btnCerrarMisOfertas"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Volver</button>
+    <h2 id="misOfertasTitulo">Mis ofertas y favoritos</h2>
+
+    <h3>Mis ofertas</h3>
+    <ul class="panel-lista" id="misOfertasLista"></ul>
+
+    <h3>Mis favoritos</h3>
+    <ul class="panel-lista" id="misFavoritosLista"></ul>
+  </section>
+
+  <section class="contenido" id="todosLosLotesSeccion" aria-labelledby="todos-lotes-heading" hidden>
+    <button type="button" class="btn-volver" id="btnCerrarTodosLosLotes"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Volver</button>
+    <h2 id="todos-lotes-heading">Todos los lotes activos</h2>
+    <ul class="subastas-grid" id="todosLosLotesGrid"></ul>
+  </section>
+
+  <section class="contenido" id="finalizadasSeccion" aria-labelledby="finalizadas-heading" hidden>
+    <button type="button" class="btn-volver" id="btnCerrarFinalizadas"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Volver</button>
+    <h2 id="finalizadas-heading">Últimas subastas finalizadas</h2>
+    <ul class="subastas-grid" id="finalizadasGrid"></ul>
+  </section>
+
+  <section class="contenido" id="terminos" aria-labelledby="terminos-heading" hidden>
+    <button type="button" class="btn-volver" id="btnCerrarTerminos"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Volver</button>
+    <h2 id="terminos-heading">Términos y Condiciones</h2>
+
+    <ul class="terminos-lista">
+      <li class="terminos-item">
+        <h3>Comisión</h3>
+        <p>La comisión sobre el precio de venta de cada lote es del 18,3%, IVA incluido, sin costos ocultos adicionales.</p>
+      </li>
+
+      <li class="terminos-item">
+        <h3>Formas de pago</h3>
+        <p>Aceptamos pago por transferencia bancaria o en efectivo en nuestro local.</p>
+      </li>
+
+      <li class="terminos-item">
+        <h3>Plazos de pago y retiro</h3>
+        <p>Una vez finalizada la subasta y notificado como ganador del lote, el pago debe realizarse dentro de las 72 horas hábiles. El retiro de la mercadería puede hacerse en nuestro local dentro del mismo plazo, o coordinarse el envío al interior del país.</p>
+      </li>
+
+      <li class="terminos-item">
+        <h3>Exhibición</h3>
+        <p>Podés acercarte a ver los artículos en persona durante el período de exhibición abierta, previo a que finalice cada subasta.</p>
+      </li>
+
+      <li class="terminos-item">
+        <h3>Extensión por última oferta</h3>
+        <p>Si se recibe una oferta durante el último minuto de una subasta, el cierre se extiende automáticamente un minuto más, y así sucesivamente, para garantizar que todos los interesados puedan participar.</p>
+      </li>
+    </ul>
+  </section>
+
+<section class="contenido" id="usuariosSeccion" aria-labelledby="usuariosTitulo" hidden>
+  <button type="button" class="btn-volver" id="btnCerrarUsuarios"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Volver</button>
+  <h3 id="usuariosTitulo">Gestión de usuarios</h3>
+
+  <p class="panel-mensaje" id="usuariosMensaje" aria-live="polite"></p>
+
+  <form class="form-panel" id="formNuevoUsuario">
+    <h4>Crear cuenta de rematador o administrador</h4>
+
+    <label for="usuarioNombre">Nombre</label>
+      <input id="usuarioNombre" type="text" required>
+
+      <label for="usuarioEmail">Email</label>
+      <input id="usuarioEmail" type="email" required>
+
+      <label for="usuarioPassword">Contraseña (mínimo 6 caracteres)</label>
+      <input id="usuarioPassword" type="password" minlength="6" required>
+
+      <label for="usuarioRol">Rol</label>
+      <select id="usuarioRol">
+        <option value="rematador">Rematador</option>
+        <option value="administrador">Administrador</option>
+      </select>
+
+      <button class="btn btn-primary" type="submit">Crear cuenta</button>
+    </form>
+
+    <h4>Todos los usuarios</h4>
+    <ul class="panel-lista" id="usuariosLista"></ul>
+</section>
+
+<section class="contenido" id="panelSeccion" aria-labelledby="panelTitulo" hidden>
+  <button type="button" class="btn-volver" id="btnCerrarPanel"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Volver</button>
+    <h3 id="panelTitulo">Panel de remates y lotes</h3>
+
+    <p class="panel-mensaje" id="panelMensaje" aria-live="polite"></p>
+
+    <nav class="login-tabs" aria-label="Elegir sección">
+      <button type="button" class="login-tab is-active" data-paneltab="remates">Remates</button>
+      <button type="button" class="login-tab" data-paneltab="lotes">Lotes</button>
+    </nav>
+
+    <form class="form-panel" id="formNuevoRemate">
+      <h4 id="formRemateTitulo">Crear un remate nuevo</h4>
+      <p class="login-nota">Un remate agrupa varios lotes bajo un mismo rubro (ej. "Remate de Gastronomía"). Primero creás el remate, después le cargás los lotes.</p>
+
+      <label for="remateTitulo">Título del remate</label>
+      <input id="remateTitulo" type="text" placeholder="Remate de Gastronomía" required>
+
+      <label for="remateRubro">Rubro</label>
+      <input id="remateRubro" type="text" placeholder="Gastronomía" required>
+
+      <label for="remateDescripcion">Descripción</label>
+      <textarea id="remateDescripcion" rows="2"></textarea>
+
+      <label for="remateMoneda">Moneda</label>
+      <select id="remateMoneda">
+        <option value="UYU">Pesos uruguayos ($)</option>
+        <option value="USD">Dólares (US$)</option>
+      </select>
+
+      <button class="btn btn-primary" type="submit" id="botonGuardarRemate">Crear remate</button>
+      <button class="btn btn-ghost" type="button" id="botonCancelarEdicionRemate" hidden>Cancelar edición</button>
+    </form>
+
+    <form class="form-panel" id="formNuevoLote">
+      <h4 id="formLoteTitulo">Cargar un lote en un remate</h4>
+
+      <label for="panelRemateSelect">Remate</label>
+      <select id="panelRemateSelect" required></select>
+
+      <label for="panelNumero">Número de lote</label>
+      <input id="panelNumero" type="text" placeholder="#014" required>
+
+      <label for="panelTitulo2">Título</label>
+      <input id="panelTitulo2" type="text" required>
+
+      <label for="panelDescripcion">Descripción</label>
+      <textarea id="panelDescripcion" rows="2"></textarea>
+
+      <p class="ficha-tecnica-titulo">Ficha técnica (opcional)</p>
+      <label for="panelCondicion">Estado</label>
+      <input id="panelCondicion" type="text" placeholder="Ej: Usado, buen estado">
+
+      <label for="panelMarcaModelo">Marca / Modelo</label>
+      <input id="panelMarcaModelo" type="text" placeholder="Ej: Toyota Corolla">
+
+      <label for="panelMaterial">Material</label>
+      <input id="panelMaterial" type="text" placeholder="Ej: Oro 18k, madera maciza">
+
+      <label for="panelDimensiones">Medidas</label>
+      <input id="panelDimensiones" type="text" placeholder="Ej: 2m x 1,20m">
+
+      <label for="panelAnio">Año / Antigüedad</label>
+      <input id="panelAnio" type="text" placeholder="Ej: 2019">
+
+      <label for="panelImagen">Fotos del lote (opcional, podés elegir varias)</label>
+      <input id="panelImagen" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
+      <p class="panel-imagen-preview-nota" id="panelImagenNota"></p>
+
+      <label for="panelPrecio">Precio inicial ($)</label>
+      <input id="panelPrecio" type="number" min="0" step="100" required>
+
+      <label for="panelCierre">Fecha y hora de cierre</label>
+      <input id="panelCierre" type="datetime-local" required>
+
+      <button class="btn btn-primary" type="submit" id="botonGuardarLote">Publicar lote</button>
+      <button class="btn btn-ghost" type="button" id="botonCancelarEdicion" hidden>Cancelar edición</button>
+    </form>
+
+    <details class="importar-lotes-detalle">
+      <summary>¿Tenés muchos lotes? Importarlos todos juntos desde una planilla</summary>
+      <p class="login-nota">
+        1) Descargá la plantilla, completá una fila por lote.
+        2) Elegí el remate al que van a pertenecer.
+        3) Subí el archivo completado (Excel o CSV).
+      </p>
+      <a href="#" id="linkDescargarPlantilla" class="btn btn-ghost">⬇ Descargar plantilla</a>
+
+      <label for="importarRemateSelect">Remate destino</label>
+      <select id="importarRemateSelect"></select>
+
+      <label for="importarArchivo">Planilla completada</label>
+      <input id="importarArchivo" type="file" accept=".xlsx,.xls,.csv">
+      <button type="button" class="btn btn-primary" id="botonImportarLotes">Importar lotes</button>
+      <p class="panel-mensaje" id="importarMensaje" aria-live="polite"></p>
+    </details>
+
+    <h4>Mis remates y sus lotes</h4>
+    <ul class="panel-lista" id="panelLista"></ul>
+</section>
+
+</main>
+
+<footer class="site-footer" id="contacto">
+  <div class="footer-fila-superior">
+    <section class="footer-contacto">
+      <h2 class="sr-only">Contáctanos</h2>
+      <address>
+        <p><a href="https://www.google.com/maps/search/?api=1&query=Felipe+Sanguinetti+2400+Montevideo+Uruguay" target="_blank" rel="noopener">Felipe Sanguinetti 2400, Mvd.</a></p>
+        <p><a href="tel:+59899924004">099 924 004</a></p>
+        <p><a href="https://wa.me/59899924004" target="_blank" rel="noopener">WhatsApp</a></p>
+        <p>Lun–Vie 10:00–18:00</p>
+      </address>
+    </section>
+
+    <section class="footer-newsletter">
+      <h2 class="sr-only">Suscribite a nuestras novedades</h2>
+      <form class="form-newsletter">
+        <label class="sr-only" for="newsletter-email">Dirección de correo electrónico</label>
+        <input id="newsletter-email" type="email" placeholder="Tu correo" required>
+        <button class="btn btn-primary" type="submit">Suscribir</button>
+      </form>
+    </section>
+
+    <nav class="footer-social" aria-label="Redes sociales">
+      <a href="#">Facebook</a>
+      <a href="#">Instagram</a>
+    </nav>
+  </div>
+
+  <p class="footer-bottom">© <span id="anio"></span> Remate Directo — Montevideo, Uruguay. · <a href="#" data-terminos>Términos y Condiciones</a></p>
+</footer>
+
+<section class="modal-overlay" id="estadisticasOverlay" hidden>
+  <article class="login-modal" role="dialog" aria-modal="true" aria-labelledby="estadisticasTitulo">
+    <button class="modal-close" id="estadisticasClose" type="button" aria-label="Cerrar">✕</button>
+    <h3 id="estadisticasTitulo">Estadísticas</h3>
+    <p id="estadisticasSubtitulo" class="login-nota"></p>
+    <div class="estadisticas-grid" id="estadisticasGrid"></div>
+  </article>
+</section>
+
+<section class="modal-overlay" id="confirmarOverlay" hidden>
+  <article class="login-modal" role="alertdialog" aria-modal="true" aria-labelledby="confirmarTexto">
+    <p id="confirmarTexto" class="confirmar-texto"></p>
+    <div class="confirmar-botones">
+      <button type="button" class="btn btn-ghost" id="btnConfirmarCancelar">Cancelar</button>
+      <button type="button" class="btn btn-primary" id="btnConfirmarAceptar">Confirmar</button>
+    </div>
+  </article>
+</section>
+
+<section class="modal-overlay" id="restablecerOverlay" hidden>
+  <article class="login-modal" role="dialog" aria-modal="true" aria-labelledby="restablecerTitulo">
+    <button class="modal-close" id="restablecerClose" type="button" aria-label="Cerrar">✕</button>
+    <h3 id="restablecerTitulo">Elegí tu nueva contraseña</h3>
+    <p class="login-mensaje" id="restablecerMensaje" aria-live="polite"></p>
+
+    <form class="form-auth" id="formRestablecer">
+      <label for="restablecerPassword">Contraseña nueva (mínimo 6 caracteres)</label>
+      <input id="restablecerPassword" type="password" minlength="6" autocomplete="new-password" required>
+      <button class="btn btn-primary" type="submit">Guardar contraseña nueva</button>
+    </form>
+  </article>
+</section>
+
+<section class="modal-overlay" id="loginOverlay" hidden>
+  <article class="login-modal" role="dialog" aria-modal="true" aria-labelledby="loginTitulo">
+    <button class="modal-close" id="loginClose" type="button" aria-label="Cerrar">✕</button>
+
+    <nav class="login-tabs" aria-label="Elegir acción">
+      <button type="button" class="login-tab is-active" data-tab="login">Iniciar sesión</button>
+      <button type="button" class="login-tab" data-tab="registro">Registrarme</button>
+    </nav>
+
+    <h3 id="loginTitulo" class="sr-only">Acceso a tu cuenta</h3>
+    <p class="login-mensaje" id="loginMensaje" aria-live="polite"></p>
+
+    <form class="form-auth" id="formLogin">
+      <label for="loginEmail">Email</label>
+      <input id="loginEmail" type="email" autocomplete="email" required>
+      <label for="loginPassword">Contraseña</label>
+      <input id="loginPassword" type="password" autocomplete="current-password" required>
+      <button class="btn btn-primary" type="submit">Iniciar sesión</button>
+      <button type="button" class="link-olvide" id="btnOlvidePassword">¿Olvidaste tu contraseña?</button>
+    </form>
+
+    <form class="form-auth" id="formOlvidePassword" hidden>
+      <p class="login-nota">Ingresá tu email y te vamos a mandar un link para elegir una contraseña nueva.</p>
+      <label for="olvideEmail">Email</label>
+      <input id="olvideEmail" type="email" autocomplete="email" required>
+      <button class="btn btn-primary" type="submit">Enviar link de recuperación</button>
+      <button type="button" class="link-olvide" id="btnVolverALogin">Volver a iniciar sesión</button>
+    </form>
+
+    <form class="form-auth" id="formRegistro" hidden>
+      <label for="registroNombre">Nombre</label>
+      <input id="registroNombre" type="text" autocomplete="name" required>
+      <label for="registroEmail">Email</label>
+      <input id="registroEmail" type="email" autocomplete="email" required>
+      <label for="registroCedula">Cédula de identidad</label>
+      <input id="registroCedula" type="text" placeholder="1.234.567-8" required>
+      <label for="registroPassword">Contraseña (mínimo 6 caracteres)</label>
+      <input id="registroPassword" type="password" minlength="6" autocomplete="new-password" required>
+      <label class="login-checkbox">
+        <input id="registroTerminos" type="checkbox" required>
+        Acepto los <a href="#" data-terminos>Términos y Condiciones</a>
+      </label>
+      <button class="btn btn-primary" type="submit">Crear cuenta</button>
+      <p class="login-nota">Te registrás como público general, para ofertar por los lotes. Tu cuenta queda pendiente hasta que un administrador la apruebe. Las cuentas de rematador o administrador las crea un administrador.</p>
+    </form>
+
+    <form class="form-auth" id="formVerificarCodigo" hidden>
+      <p class="login-nota">Te mandamos un código de 6 dígitos a <strong id="verificarEmailTexto"></strong>. Ingresalo acá abajo para confirmar tu cuenta.</p>
+      <label for="verificarCodigoInput">Código de verificación</label>
+      <input id="verificarCodigoInput" type="text" inputmode="numeric" maxlength="6" placeholder="123456" required>
+      <button class="btn btn-primary" type="submit">Verificar</button>
+      <button type="button" class="link-olvide" id="btnReenviarCodigo">¿No te llegó? Reenviar código</button>
+    </form>
+  </article>
+</section>
+
+<section class="modal-overlay" id="modalOverlay" hidden>
+  <article class="lote-modal" id="loteModal" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+    <button class="modal-close" id="modalClose" type="button" aria-label="Cerrar">✕</button>
+
+    <p class="modal-img" role="img" id="modalImg">FOTO</p>
+    <ul class="modal-galeria" id="modalGaleria" hidden></ul>
+
+    <p class="modal-numero" id="modalNumero"></p>
+    <h3 id="modalTitulo"></h3>
+    <p class="modal-categoria" id="modalCategoria"></p>
+    <p class="modal-descripcion" id="modalDescripcion"></p>
+    <ul class="ficha-tecnica" id="modalFichaTecnica" hidden></ul>
+
+    <p class="modal-precio">
+      <span id="modalEstadoPrecio">Precio inicial</span>:
+      <strong id="modalPrecio"></strong>
+    </p>
+    <p class="modal-cantidad-ofertas" id="modalCantidadOfertas"></p>
+    <p class="lote-insignia" id="modalInsigniaEstado" hidden></p>
+    <p class="modal-cierre">
+      <span id="modalEstadoCierre">Tiempo restante</span>:
+      <strong id="modalCuentaRegresiva"></strong>
+    </p>
+
+    <form class="form-oferta" id="formOferta">
+      <label class="sr-only" for="montoOferta">Tu oferta</label>
+      <input id="montoOferta" type="number" step="100" min="0" placeholder="Tu oferta ($)">
+      <button class="btn btn-primary" type="submit">Ofertar</button>
+    </form>
+    <p class="oferta-mensaje" id="ofertaMensaje" aria-live="polite"></p>
+
+    <details class="oferta-auto-detalle">
+      <summary>¿Preferís no estar pendiente? Configurá una oferta automática</summary>
+      <p class="login-nota">Poné el monto máximo que estás dispuesto a pagar. El sistema va a ir ofertando de a poco por vos cada vez que alguien te supere, sin pasarse de ese máximo.</p>
+      <form class="form-oferta" id="formOfertaAuto">
+        <label class="sr-only" for="montoMaximo">Tu monto máximo</label>
+        <input id="montoMaximo" type="number" step="100" min="0" placeholder="Monto máximo ($)">
+        <button class="btn btn-ghost" type="submit">Activar</button>
+      </form>
+      <p class="oferta-mensaje" id="ofertaAutoMensaje" aria-live="polite"></p>
+    </details>
+
+    <button class="btn-favorito" id="btnFavorito" type="button">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg> Agregar a favoritos
+    </button>
+    <button class="btn-favorito" id="btnCompartirLote" type="button">
+      🔗 Copiar link de este lote
+    </button>
+
+    <p class="modal-terminos">
+      Comisión del 18,3% IVA incluido. Pago en 72 hs hábiles, retiro en 72 hs hábiles
+      (6 días para envíos al interior). Si se recibe una oferta en el último minuto,
+      el cierre se extiende un minuto más.
+    </p>
+  </article>
+</section>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
