@@ -1052,17 +1052,16 @@ function crearTarjetaLote(lote) {
     img.setAttribute("aria-label", `Foto del lote ${lote.numero}`);
     img.textContent = "FOTO";
   }
-  img.style.cursor = "zoom-in";
-  img.addEventListener("click", (e) => { e.stopPropagation(); abrirModal(lote); });
+  img.style.cursor = "pointer";
+  img.addEventListener("click", (e) => { e.stopPropagation(); abrirLightbox(fotos, 0); });
 
   let contenedorFoto = img;
   if (fotos.length > 1) {
     contenedorFoto = document.createElement("div");
     contenedorFoto.className = "subasta-img-carrusel";
-    contenedorFoto.style.cursor = "zoom-in";
+    contenedorFoto.style.cursor = "pointer";
     contenedorFoto.addEventListener("click", (e) => {
-      // solo abrir modal si no se tocó una flecha
-      if (!e.target.closest(".carrusel-flecha")) abrirModal(lote);
+      if (!e.target.closest(".carrusel-flecha")) abrirLightbox(fotos, indiceFoto);
     });
     let indiceFoto = 0;
     let autoplaySuspendido = false;
@@ -1506,6 +1505,60 @@ function formatoTiempoRestante(ms, urgente) {
 }
 setInterval(actualizarCuentasRegresivas, 1000);
 // Además, mientras el modal de un lote está abierto, se refresca cada 1s (ver abrirModal)
+
+// ===== Lightbox de fotos =====
+{
+  const overlay = document.getElementById("lightboxOverlay");
+  const imgEl = document.getElementById("lightboxImg");
+  const contador = document.getElementById("lightboxContador");
+  const btnClose = document.getElementById("lightboxClose");
+  const btnPrev = document.getElementById("lightboxPrev");
+  const btnNext = document.getElementById("lightboxNext");
+  let fotosLightbox = [];
+  let indiceActual = 0;
+
+  function mostrarFoto(i) {
+    indiceActual = (i + fotosLightbox.length) % fotosLightbox.length;
+    imgEl.src = fotosLightbox[indiceActual];
+    contador.textContent = fotosLightbox.length > 1 ? `${indiceActual + 1} / ${fotosLightbox.length}` : "";
+    btnPrev.hidden = fotosLightbox.length <= 1;
+    btnNext.hidden = fotosLightbox.length <= 1;
+  }
+
+  window.abrirLightbox = function(fotos, indice) {
+    fotosLightbox = fotos;
+    overlay.hidden = false;
+    document.body.style.overflow = "hidden";
+    mostrarFoto(indice);
+    btnClose.focus();
+  };
+
+  function cerrarLightbox() {
+    overlay.hidden = true;
+    document.body.style.overflow = "";
+  }
+
+  btnClose.addEventListener("click", cerrarLightbox);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) cerrarLightbox(); });
+  btnPrev.addEventListener("click", (e) => { e.stopPropagation(); mostrarFoto(indiceActual - 1); });
+  btnNext.addEventListener("click", (e) => { e.stopPropagation(); mostrarFoto(indiceActual + 1); });
+
+  // Swipe en lightbox
+  let touchStartX = 0;
+  overlay.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  overlay.addEventListener("touchend", (e) => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) mostrarFoto(indiceActual + (diff > 0 ? 1 : -1));
+  }, { passive: true });
+
+  // Teclado
+  document.addEventListener("keydown", (e) => {
+    if (overlay.hidden) return;
+    if (e.key === "Escape") cerrarLightbox();
+    if (e.key === "ArrowRight") mostrarFoto(indiceActual + 1);
+    if (e.key === "ArrowLeft") mostrarFoto(indiceActual - 1);
+  });
+}
 
 // ===== Favoritos (siguen siendo locales del navegador, no requieren login) =====
 function leerFavoritos() {

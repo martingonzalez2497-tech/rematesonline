@@ -401,6 +401,17 @@
   <p class="footer-bottom">© <span id="anio"></span> Remate Directo — Montevideo, Uruguay. · <a href="#" data-terminos>Términos y Condiciones</a></p>
 </footer>
 
+<!-- Lightbox de fotos -->
+<div class="lightbox-overlay" id="lightboxOverlay" hidden aria-modal="true" role="dialog" aria-label="Foto ampliada">
+  <button class="lightbox-close" id="lightboxClose" aria-label="Cerrar">✕</button>
+  <button class="lightbox-flecha lightbox-prev" id="lightboxPrev" aria-label="Anterior">‹</button>
+  <div class="lightbox-contenido">
+    <img class="lightbox-img" id="lightboxImg" src="" alt="">
+    <p class="lightbox-contador" id="lightboxContador"></p>
+  </div>
+  <button class="lightbox-flecha lightbox-next" id="lightboxNext" aria-label="Siguiente">›</button>
+</div>
+
 <section class="modal-overlay" id="estadisticasOverlay" hidden>
   <article class="login-modal" role="dialog" aria-modal="true" aria-labelledby="estadisticasTitulo">
     <button class="modal-close" id="estadisticasClose" type="button" aria-label="Cerrar">✕</button>

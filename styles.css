@@ -836,6 +836,42 @@ ul { list-style: none; margin: 0; padding: 0; }
 .lote-oferta-inline-mensaje.error { color: #A3402F; }
 
 /* ===== Modal de lote ===== */
+/* ===== Lightbox ===== */
+.lightbox-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.93);
+  display: flex; align-items: center; justify-content: center;
+  gap: 1rem; padding: 1rem;
+}
+.lightbox-overlay[hidden] { display: none; }
+.lightbox-contenido {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  max-width: calc(100vw - 8rem); max-height: 100vh;
+}
+.lightbox-img {
+  max-width: 100%; max-height: calc(100vh - 4rem);
+  object-fit: contain; border-radius: 6px;
+  user-select: none; -webkit-user-drag: none;
+}
+.lightbox-contador {
+  color: rgba(255,255,255,0.6); font-size: 0.85rem; margin: 0.5rem 0 0; text-align: center;
+}
+.lightbox-close {
+  position: fixed; top: 1rem; right: 1rem;
+  background: rgba(255,255,255,0.15); border: none; color: #fff;
+  width: 2.5rem; height: 2.5rem; border-radius: 50%; font-size: 1.2rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s; z-index: 1;
+}
+.lightbox-close:hover { background: rgba(255,255,255,0.3); }
+.lightbox-flecha {
+  background: rgba(255,255,255,0.12); border: none; color: #fff;
+  width: 2.8rem; height: 2.8rem; border-radius: 50%; font-size: 2rem; line-height: 1;
+  cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.lightbox-flecha:hover { background: rgba(255,255,255,0.25); }
+
 .modal-overlay {
   position: fixed; inset: 0;
   background: rgba(10,16,28,0.55);
