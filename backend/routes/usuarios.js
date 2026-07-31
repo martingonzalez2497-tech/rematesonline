@@ -113,4 +113,21 @@ router.delete("/:id", requireAuth, requireRole("administrador"), (req, res) => {
   res.json({ ok: true });
 });
 
+// Exportar todos los usuarios a CSV — solo admin
+router.get("/exportar", requireAuth, requireRole("administrador"), (req, res) => {
+  const usuarios = db.prepare(
+    `SELECT nombre, email, cedula, telefono, rol, aprobado, bloqueado, creado_en
+     FROM usuarios ORDER BY creado_en DESC`
+  ).all();
+
+  let csv = "Nombre,Email,Cédula,Teléfono,Rol,Aprobado,Bloqueado,Fecha registro\n";
+  usuarios.forEach(u => {
+    csv += `"${u.nombre}","${u.email}","${u.cedula || ""}","${u.telefono || ""}","${u.rol}","${u.aprobado ? "Sí" : "No"}","${u.bloqueado ? "Sí" : "No"}","${u.creado_en?.split("T")[0] || ""}"\n`;
+  });
+
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", `attachment; filename="usuarios-${new Date().toISOString().split("T")[0]}.csv"`);
+  res.send("\uFEFF" + csv);
+});
+
 module.exports = router;

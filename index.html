@@ -394,6 +394,7 @@
     </form>
 
     <h4>Todos los usuarios</h4>
+    <button type="button" class="btn btn-ghost" id="btnExportarUsuarios" style="margin-bottom:0.75rem;font-size:0.85rem">⬇ Exportar usuarios (CSV)</button>
     <ul class="panel-lista" id="usuariosLista"></ul>
 </section>
 
@@ -858,6 +859,21 @@
       (6 días para envíos al interior). Si se recibe una oferta en el último minuto,
       el cierre se extiende un minuto más.
     </p>
+
+    <!-- Reseña del comprador — solo visible si el usuario ganó este lote -->
+    <div class="resena-wrap" id="resenaWrap" hidden>
+      <h4 class="resena-titulo">¿Cómo fue tu experiencia?</h4>
+      <div class="resena-estrellas" id="resenaEstrellas">
+        <button type="button" data-val="1">★</button>
+        <button type="button" data-val="2">★</button>
+        <button type="button" data-val="3">★</button>
+        <button type="button" data-val="4">★</button>
+        <button type="button" data-val="5">★</button>
+      </div>
+      <textarea id="resenaComentario" placeholder="Contanos cómo fue (opcional)" rows="2" style="width:100%;margin-top:0.5rem;padding:0.5rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--bg-2);color:var(--fg);font:inherit;resize:vertical"></textarea>
+      <button type="button" class="btn btn-ghost" id="btnEnviarResena" style="margin-top:0.5rem">Enviar reseña</button>
+      <p id="resenaMensaje" style="font-size:0.82rem;color:var(--accent);margin-top:0.25rem"></p>
+    </div>
   </article>
 </section>
 

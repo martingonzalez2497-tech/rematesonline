@@ -296,4 +296,36 @@ router.post("/lote/:loteId/vista", (req, res) => {
   res.json({ vistas: total });
 });
 
+// Reseñas de compradores
+router.post("/resenas", requireAuth, requireRole("publico"), (req, res) => {
+  const { loteId, calificacion, comentario } = req.body;
+  if (!loteId || !calificacion || calificacion < 1 || calificacion > 5) {
+    return res.status(400).json({ error: "Calificación inválida (1-5)." });
+  }
+  // Solo puede reseñar quien ganó el lote
+  const lote = db.prepare("SELECT * FROM lotes WHERE id = ? AND ganador_id = ? AND estado = 'finalizada'").get(loteId, req.usuario.id);
+  if (!lote) return res.status(403).json({ error: "Solo podés reseñar lotes que ganaste." });
+
+  try {
+    db.prepare(
+      `INSERT INTO resenas (lote_id, usuario_id, calificacion, comentario)
+       VALUES (?, ?, ?, ?)
+       ON CONFLICT(lote_id, usuario_id) DO UPDATE SET calificacion = excluded.calificacion, comentario = excluded.comentario`
+    ).run(loteId, req.usuario.id, calificacion, comentario || null);
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: "No se pudo guardar la reseña." });
+  }
+});
+
+router.get("/resenas/:loteId", (req, res) => {
+  const resenas = db.prepare(
+    `SELECT resenas.calificacion, resenas.comentario, resenas.creado_en,
+            usuarios.nombre AS autor
+     FROM resenas JOIN usuarios ON usuarios.id = resenas.usuario_id
+     WHERE resenas.lote_id = ? ORDER BY resenas.creado_en DESC`
+  ).all(req.params.loteId);
+  res.json(resenas);
+});
+
 module.exports = router;

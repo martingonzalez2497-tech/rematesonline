@@ -49,6 +49,22 @@ document.getElementById("anio").textContent = new Date().getFullYear();
   }
 }
 
+// ===== Animación de conteo del precio =====
+function animarConteoMonto(el, desde, hasta, moneda, tieneOfertas) {
+  const duracion = 800;
+  const inicio = performance.now();
+  const prefijo = tieneOfertas ? "Oferta actual: " : "Precio inicial: ";
+  const tick = (ahora) => {
+    const progreso = Math.min((ahora - inicio) / duracion, 1);
+    const ease = 1 - Math.pow(1 - progreso, 3);
+    const actual = Math.round(desde + (hasta - desde) * ease);
+    el.textContent = `${prefijo}${formatoMonto(actual, moneda)}`;
+    if (progreso < 1) requestAnimationFrame(tick);
+    else el.textContent = `Oferta actual: ${formatoMonto(hasta, moneda)}`;
+  };
+  requestAnimationFrame(tick);
+}
+
 // ===== Toggle de modo oscuro =====
 const root = document.documentElement;
 const themeToggle = document.getElementById("themeToggle");
@@ -63,8 +79,8 @@ function actualizarIconoTema() {
 if (savedTheme) {
   root.setAttribute("data-theme", savedTheme);
 } else {
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  if (prefersDark) root.setAttribute("data-theme", "dark");
+  // Default: modo oscuro siempre (identidad del sitio)
+  root.setAttribute("data-theme", "dark");
 }
 actualizarIconoTema();
 
@@ -2024,6 +2040,24 @@ function abrirModal(lote) {
   // Mostrar botón push
   actualizarBtnPush(lote);
 
+  // Mostrar formulario de reseña si ganó este lote
+  const sesion = leerSesion();
+  const resenaWrap = document.getElementById("resenaWrap");
+  if (resenaWrap) {
+    const gano = sesion && loteEstaCerrado(lote) && lote.ganador_id && String(lote.ganador_id) === String(sesion.usuario.id);
+    resenaWrap.hidden = !gano;
+    if (gano) {
+      // Cargar reseña existente si la hay
+      fetch(`${API_URL}/ofertas/resenas/${lote.id}`).then(r => r.json()).then(resenas => {
+        const mia = resenas[0]; // la primera es la del ganador (solo hay una por lote)
+        if (mia) {
+          document.getElementById("resenaMensaje").textContent = `✅ Ya dejaste tu reseña: ${"★".repeat(mia.calificacion)}`;
+          document.getElementById("btnEnviarResena").hidden = true;
+        }
+      }).catch(() => {});
+    }
+  }
+
   if (lote.estado !== "finalizada") {
     document.getElementById("montoOferta").focus();
   } else {
@@ -2188,10 +2222,12 @@ async function enviarOferta(lote, monto, onMensaje) {
     const tarjeta = document.querySelector(`.subasta-card[data-lote-id="${lote.id}"]`);
     if (tarjeta) {
       const precioEl = tarjeta.querySelector(".lote-precio");
-      precioEl.textContent = `Oferta actual: ${formatoMonto(data.ofertaActual)}`;
+      const montoAnterior = lote.oferta_actual;
       precioEl.classList.remove("lote-precio-destello");
-      void precioEl.offsetWidth; // fuerza el reinicio de la animación si ya se había disparado
+      void precioEl.offsetWidth;
       precioEl.classList.add("lote-precio-destello");
+      // Animación de conteo del precio
+      animarConteoMonto(precioEl, montoAnterior, data.ofertaActual, lote.remate_moneda, lote.cantidad_ofertas > 0);
       tarjeta.querySelector(".lote-cuenta").dataset.cierre = data.cierre;
       const contadorOfertas = tarjeta.querySelector(".lote-cantidad-ofertas");
       if (contadorOfertas) {
@@ -3064,6 +3100,13 @@ function renderPanelLista() {
           acciones.appendChild(btnFinalizar);
         }
 
+        // Duplicar lote — disponible en cualquier estado
+        const btnDuplicar = document.createElement("button");
+        btnDuplicar.type = "button";
+        btnDuplicar.textContent = "Duplicar";
+        btnDuplicar.addEventListener("click", () => duplicarLote(lote));
+        acciones.appendChild(btnDuplicar);
+
         if (lote.estado === "finalizada" && lote.ganador_id) {
           const estadoPago = document.createElement("span");
           estadoPago.className = "estado-pago " + (
@@ -3189,6 +3232,46 @@ formNuevoLote.addEventListener("submit", async (event) => {
     panelMensaje.className = "panel-mensaje error";
   }
 });
+
+async function duplicarLote(lote) {
+  const confirmado = await confirmarEnPagina(`¿Duplicar el lote "${lote.titulo}"? Se va a crear una copia activa en el mismo remate, con precio inicial y datos iguales, sin ofertas.`);
+  if (!confirmado) return;
+
+  const sesion = leerSesion();
+  if (!sesion) return;
+
+  try {
+    const resp = await fetch(`${API_URL}/lotes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${sesion.token}` },
+      body: JSON.stringify({
+        remateId: lote.remate_id,
+        titulo: `${lote.titulo} (copia)`,
+        descripcion: lote.descripcion || "",
+        precioInicial: lote.precio_inicial || lote.oferta_actual,
+        cierre: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 días por default
+        condicion: lote.condicion,
+        marcaModelo: lote.marca_modelo,
+        material: lote.material,
+        dimensiones: lote.dimensiones,
+        anio: lote.anio,
+      }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      panelMensaje.textContent = data.error || "No se pudo duplicar el lote.";
+      panelMensaje.className = "panel-mensaje error";
+      return;
+    }
+    panelMensaje.textContent = `✅ Lote duplicado. Podés editarlo para ajustar el cierre y las fotos.`;
+    panelMensaje.className = "panel-mensaje exito";
+    cargarLotes();
+    renderPanelLista();
+  } catch (e) {
+    panelMensaje.textContent = "No se pudo conectar con el servidor.";
+    panelMensaje.className = "panel-mensaje error";
+  }
+}
 
 async function finalizarLotePanel(loteId) {
   const sesion = leerSesion();
@@ -3885,6 +3968,68 @@ document.querySelectorAll("[data-terminos]").forEach((link) => {
     mostrarSoloSeccion("terminos");
   });
 });
+document.getElementById("btnExportarUsuarios")?.addEventListener("click", async () => {
+  const sesion = leerSesion();
+  if (!sesion) return;
+  try {
+    const resp = await fetch(`${API_URL}/usuarios/exportar`, {
+      headers: { Authorization: `Bearer ${sesion.token}` },
+    });
+    if (!resp.ok) { alert("No se pudo exportar."); return; }
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `usuarios-${new Date().toISOString().split("T")[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    alert("Error al exportar.");
+  }
+});
+
+// ===== Reseñas de compradores =====
+let calificacionSeleccionada = 0;
+document.getElementById("resenaEstrellas")?.addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-val]");
+  if (!btn) return;
+  calificacionSeleccionada = Number(btn.dataset.val);
+  document.querySelectorAll("#resenaEstrellas button").forEach((b, i) => {
+    b.style.color = i < calificacionSeleccionada ? "#F5A623" : "var(--fg-muted)";
+  });
+});
+
+document.getElementById("btnEnviarResena")?.addEventListener("click", async () => {
+  if (!loteAbierto || calificacionSeleccionada === 0) {
+    document.getElementById("resenaMensaje").textContent = "Seleccioná una calificación.";
+    return;
+  }
+  const sesion = leerSesion();
+  if (!sesion) return;
+  try {
+    const resp = await fetch(`${API_URL}/ofertas/resenas`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${sesion.token}` },
+      body: JSON.stringify({
+        loteId: loteAbierto.id,
+        calificacion: calificacionSeleccionada,
+        comentario: document.getElementById("resenaComentario").value,
+      }),
+    });
+    const data = await resp.json();
+    if (resp.ok) {
+      document.getElementById("resenaMensaje").textContent = `✅ ¡Gracias por tu reseña!`;
+      document.getElementById("btnEnviarResena").hidden = true;
+    } else {
+      document.getElementById("resenaMensaje").textContent = data.error || "No se pudo enviar.";
+    }
+  } catch (e) {
+    document.getElementById("resenaMensaje").textContent = "Error de conexión.";
+  }
+});
+
 document.getElementById("btnCerrarTerminos").addEventListener("click", volverAHome);
 document.getElementById("btnCerrarComoFunciona")?.addEventListener("click", volverAHome);
 
