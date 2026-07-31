@@ -11,4 +11,8 @@ function avisarActualizacion() {
   if (ioInstance) ioInstance.emit("actualizar");
 }
 
-module.exports = { setIO, avisarActualizacion };
+function avisarNuevoUsuarioPendiente(nombre) {
+  if (ioInstance) ioInstance.emit("nuevo_usuario_pendiente", { nombre });
+}
+
+module.exports = { setIO, avisarActualizacion, avisarNuevoUsuarioPendiente };

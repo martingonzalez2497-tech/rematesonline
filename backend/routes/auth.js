@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const db = require("../db");
 const { requireAuth, requireRole } = require("../middleware/auth");
 const { enviarEmail } = require("../email");
+const { avisarNuevoUsuarioPendiente } = require("../socket");
 
 const router = express.Router();
 
@@ -68,6 +69,8 @@ router.post("/registro", async (req, res) => {
   db.prepare(
     "INSERT INTO usuarios (nombre, email, password_hash, rol, cedula, aprobado, email_verificado) VALUES (?, ?, ?, 'publico', ?, 0, 1)"
   ).run(nombre, email.toLowerCase(), hash, cedulaLimpia);
+
+  avisarNuevoUsuarioPendiente(nombre);
 
   // Sin verificación de email — el usuario queda pendiente de aprobación del admin
   res.status(201).json({

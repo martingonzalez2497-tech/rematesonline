@@ -23,6 +23,12 @@ if (typeof io !== "undefined") {
       cargarLotes();
     }, 400);
   });
+
+  socket.on("nuevo_usuario_pendiente", ({ nombre }) => {
+    const sesion = leerSesion();
+    if (!sesion || sesion.usuario.rol !== "administrador") return;
+    agregarNotificacionAdmin(`Nuevo registro pendiente: ${nombre}`);
+  });
 }
 
 // ===== Año en el footer =====
@@ -451,6 +457,17 @@ function renderCuentaArea() {
   panelNavItem.hidden = !["rematador", "administrador"].includes(sesion.usuario.rol);
   document.getElementById("usuariosNavItem").hidden = sesion.usuario.rol !== "administrador";
   document.getElementById("misOfertasNavItem").hidden = sesion.usuario.rol !== "publico";
+
+  // Si es admin, verificar si hay usuarios pendientes de aprobación
+  if (sesion.usuario.rol === "administrador") {
+    fetch(`${API_URL}/usuarios`, { headers: { Authorization: `Bearer ${sesion.token}` } })
+      .then((r) => r.json())
+      .then((usuarios) => {
+        const pendientes = usuarios.filter((u) => !u.aprobado);
+        pendientes.forEach((u) => agregarNotificacionAdmin(`Registro pendiente de aprobación: ${u.nombre}`));
+      })
+      .catch(() => {});
+  }
 }
 
 // ===== Modal de login/registro =====
@@ -894,6 +911,35 @@ function formatoMonto(valor, moneda) {
   return simbolo + Number(valor).toLocaleString("es-UY");
 }
 
+
+// Notificaciones para el administrador (ej. nuevos registros pendientes)
+const notificacionesAdmin = [];
+function agregarNotificacionAdmin(texto) {
+  notificacionesAdmin.push(texto);
+  const sesion = leerSesion();
+  if (!sesion || sesion.usuario.rol !== "administrador") return;
+  const wrap = document.getElementById("notificacionesWrap");
+  const menu = document.getElementById("notificacionesMenu");
+  const contador = document.getElementById("notificacionesCount");
+  wrap.hidden = false;
+  contador.hidden = false;
+  contador.textContent = notificacionesAdmin.length;
+  menu.innerHTML = "";
+  notificacionesAdmin.forEach((t) => {
+    const li = document.createElement("li");
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "notificacion-item notificacion-alerta";
+    btn.textContent = t;
+    btn.addEventListener("click", () => {
+      menu.classList.remove("is-open");
+      document.getElementById("btnNotificaciones").setAttribute("aria-expanded", "false");
+      mostrarSoloSeccion("usuarios");
+    });
+    li.appendChild(btn);
+    menu.appendChild(li);
+  });
+}
 
 function actualizarAvisoSuperado() {
   const aviso = document.getElementById("avisoSuperado");
