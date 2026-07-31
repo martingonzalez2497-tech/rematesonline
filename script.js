@@ -639,6 +639,7 @@ formRegistro.addEventListener("submit", async (event) => {
   const nombre = document.getElementById("registroNombre").value;
   const email = document.getElementById("registroEmail").value;
   const cedula = document.getElementById("registroCedula").value;
+  const telefono = document.getElementById("registroTelefono")?.value || "";
   const password = document.getElementById("registroPassword").value;
   const aceptaTerminos = document.getElementById("registroTerminos").checked;
 
@@ -646,7 +647,7 @@ formRegistro.addEventListener("submit", async (event) => {
     const resp = await fetch(`${API_URL}/auth/registro`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nombre, email, cedula, password, aceptaTerminos }),
+      body: JSON.stringify({ nombre, email, cedula, telefono, password, aceptaTerminos }),
     });
     const data = await resp.json();
 
@@ -3205,7 +3206,7 @@ async function renderUsuariosLista() {
 
         const info = document.createElement("p");
         info.className = "panel-lote-info";
-        info.innerHTML = `<strong>${usuario.nombre}</strong>${usuario.email} · CI: ${usuario.cedula || "—"}`;
+        info.innerHTML = `<strong>${usuario.nombre}</strong>${usuario.email} · CI: ${usuario.cedula || "—"}${usuario.telefono ? ` · 📱 ${usuario.telefono}` : ""}`;
 
         const acciones = document.createElement("p");
         acciones.className = "panel-lote-acciones";
@@ -3214,7 +3215,9 @@ async function renderUsuariosLista() {
         btnAprobar.type = "button";
         btnAprobar.className = "btn btn-primary";
         btnAprobar.textContent = "Aprobar";
-        btnAprobar.addEventListener("click", () => aprobarUsuario(usuario.id));
+        btnAprobar.addEventListener("click", async () => {
+          await aprobarUsuario(usuario.id, usuario.nombre, usuario.email);
+        });
 
         const btnRechazar = document.createElement("button");
         btnRechazar.type = "button";
@@ -3222,7 +3225,20 @@ async function renderUsuariosLista() {
         btnRechazar.textContent = "Rechazar";
         btnRechazar.addEventListener("click", () => rechazarUsuario(usuario.id));
 
-        acciones.append(btnAprobar, btnRechazar);
+        // Botón WhatsApp — si tiene teléfono va directo, si no abre chat nuevo
+        const btnWA = document.createElement("a");
+        btnWA.className = "btn btn-ghost";
+        btnWA.style.color = "#25D366";
+        btnWA.target = "_blank";
+        btnWA.rel = "noopener";
+        const msgWA = encodeURIComponent(`Hola ${usuario.nombre}! Te escribimos de ¿Quién Da Más? — Canal 10. Tu cuenta en nuestra plataforma de remates online fue *aprobada* ✅\n\nYa podés ingresar con tu email (${usuario.email}) y empezar a ofertar en:\n${location.origin}\n\nCualquier duda escribinos acá. ¡Buena suerte en los remates!`);
+        const telLimpio = usuario.telefono ? usuario.telefono.replace(/\D/g, "") : "";
+        btnWA.href = telLimpio
+          ? `https://wa.me/598${telLimpio.replace(/^0/, "")}?text=${msgWA}`
+          : `https://wa.me/?text=${msgWA}`;
+        btnWA.textContent = "📱 Avisar por WA";
+
+        acciones.append(btnAprobar, btnRechazar, btnWA);
         li.append(info, acciones);
         lista.appendChild(li);
       });
@@ -3314,7 +3330,7 @@ formNuevoUsuario.addEventListener("submit", async (event) => {
   }
 });
 
-async function aprobarUsuario(usuarioId) {
+async function aprobarUsuario(usuarioId, nombre = "", email = "") {
   const sesion = leerSesion();
   if (!sesion) return;
   try {
@@ -3328,8 +3344,13 @@ async function aprobarUsuario(usuarioId) {
       usuariosMensaje.className = "panel-mensaje error";
       return;
     }
-    usuariosMensaje.textContent = "Cuenta aprobada.";
+    usuariosMensaje.textContent = `✅ Cuenta de ${nombre || "usuario"} aprobada. Acordate de avisarle.`;
     usuariosMensaje.className = "panel-mensaje exito";
+
+    // Abrir WhatsApp con mensaje pre-armado para avisar al usuario
+    const msg = encodeURIComponent(`Hola ${nombre}! Te escribimos de ¿Quién Da Más? — Canal 10.\n\nTu cuenta en nuestra plataforma de remates online fue *aprobada* ✅\n\nYa podés ingresar con tu email (${email}) y empezar a ofertar en:\n${location.origin}\n\nCualquier duda escribinos acá. ¡Buena suerte en los remates!`);
+    window.open(`https://wa.me/?text=${msg}`, "_blank", "noopener");
+
     renderUsuariosLista();
   } catch (err) {
     usuariosMensaje.textContent = "No se pudo conectar con el servidor.";

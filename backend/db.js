@@ -98,7 +98,10 @@ db.exec(`
 
 // Migración simple: si la base de datos ya existía de una versión anterior
 // (sin esta columna), se la agrega ahora en vez de fallar.
-const columnasRemates = db.prepare("PRAGMA table_info(remates)").all().map((c) => c.name);
+const columnasUsuarios = db.prepare("PRAGMA table_info(usuarios)").all().map((c) => c.name);
+if (!columnasUsuarios.includes("telefono")) {
+  db.exec("ALTER TABLE usuarios ADD COLUMN telefono TEXT");
+}
 if (!columnasRemates.includes("moneda")) {
   db.exec("ALTER TABLE remates ADD COLUMN moneda TEXT NOT NULL DEFAULT 'UYU'");
 }

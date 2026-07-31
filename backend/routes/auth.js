@@ -39,7 +39,7 @@ function cedulaUruguayaValida(cedulaTexto) {
 // aprobación por un administrador (no pueden ofertar hasta ser aprobados).
 // Rematadores y administradores se crean aparte (ver /api/usuarios), nunca acá.
 router.post("/registro", async (req, res) => {
-  const { nombre, email, password, cedula, aceptaTerminos } = req.body;
+  const { nombre, email, password, cedula, telefono, aceptaTerminos } = req.body;
 
   if (!nombre || !email || !password || !cedula) {
     return res.status(400).json({ error: "Faltan datos: nombre, email, cédula y password son obligatorios." });
@@ -67,8 +67,8 @@ router.post("/registro", async (req, res) => {
 
   const hash = await bcrypt.hash(password, 10);
   db.prepare(
-    "INSERT INTO usuarios (nombre, email, password_hash, rol, cedula, aprobado, email_verificado) VALUES (?, ?, ?, 'publico', ?, 0, 1)"
-  ).run(nombre, email.toLowerCase(), hash, cedulaLimpia);
+    "INSERT INTO usuarios (nombre, email, password_hash, rol, cedula, telefono, aprobado, email_verificado) VALUES (?, ?, ?, 'publico', ?, ?, 0, 1)"
+  ).run(nombre, email.toLowerCase(), hash, cedulaLimpia, telefono || null);
 
   avisarNuevoUsuarioPendiente(nombre);
 
