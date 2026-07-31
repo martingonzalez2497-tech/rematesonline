@@ -125,9 +125,9 @@
         <option value="con-ofertas">Con ofertas</option>
       </select>
       <div class="filtro-precio">
-        <input type="number" id="filtroPrecioMin" class="filtro-input filtro-precio-input" placeholder="Precio mín.">
+        <input type="number" id="filtroPrecioMin" class="filtro-input filtro-precio-input" placeholder="Precio mín." min="0" step="1000" inputmode="numeric">
         <span>—</span>
-        <input type="number" id="filtroPrecioMax" class="filtro-input filtro-precio-input" placeholder="Precio máx.">
+        <input type="number" id="filtroPrecioMax" class="filtro-input filtro-precio-input" placeholder="Precio máx." min="0" step="1000" inputmode="numeric">
       </div>
       <button type="button" class="btn btn-ghost filtro-limpiar" id="btnLimpiarFiltros" hidden>✕ Limpiar</button>
     </div>
@@ -147,23 +147,23 @@
     <ul class="confianza-lista">
       <li>
         <span class="confianza-icono"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
-        <h3>+25 años en el rubro</h3>
-        <p>Experiencia real en subastas, no una empresa que recién arranca de la nada.</p>
+        <h3>25 años en Canal 10</h3>
+        <p>¿Quién Da Más? es el programa de remates más reconocido de Uruguay, al aire cada sábado 11:55hs.</p>
       </li>
       <li>
         <span class="confianza-icono"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
         <h3>Local físico en Montevideo</h3>
-        <p>Podés venir a ver los artículos en persona antes de ofertar, no somos solo una web.</p>
+        <p>Venís a ver los artículos en persona antes de ofertar. Felipe Sanguinetti 2400, Lun–Vie 10–18hs.</p>
       </li>
       <li>
         <span class="confianza-icono"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-        <h3>Contacto directo</h3>
-        <p>Teléfono y WhatsApp reales, atendidos por una persona — no un bot ni un formulario perdido.</p>
+        <h3>Atención real</h3>
+        <p>WhatsApp 099 924 004 — respondido por personas, no bots. También por teléfono en horario de oficina.</p>
       </li>
       <li>
         <span class="confianza-icono"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
-        <h3>Condiciones claras</h3>
-        <p>Comisión fija del 18,3% con IVA incluido, sin costos ocultos. Todo detallado en Términos y Condiciones.</p>
+        <h3>Comisión única</h3>
+        <p>18,3% IVA incluido sobre el precio final. Sin costos de registro, sin sorpresas, sin letra chica.</p>
       </li>
     </ul>
   </section>
@@ -654,9 +654,8 @@
       <h2 class="sr-only">Contáctanos</h2>
       <address>
         <p><a href="https://www.google.com/maps/search/?api=1&query=Felipe+Sanguinetti+2400+Montevideo+Uruguay" target="_blank" rel="noopener">Felipe Sanguinetti 2400, Mvd.</a></p>
-        <p><a href="tel:+59899924004">099 924 004</a></p>
-        <p>Lun–Vie 10:00–18:00</p>
         <p><a href="https://wa.me/59899924004" target="_blank" rel="noopener">WhatsApp: 099 924 004</a></p>
+        <p>Lun–Vie 10:00–18:00</p>
       </address>
     </section>
 

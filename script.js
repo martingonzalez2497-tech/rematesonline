@@ -125,7 +125,7 @@ function tiempoRelativo(fechaTexto) {
   if (minutos < 60) return `hace ${minutos} min`;
   const horas = Math.floor(minutos / 60);
   if (horas < 24) return `hace ${horas} hs`;
-  return `hace ${Math.floor(horas / 24)} día(s)`;
+  return `hace ${Math.floor(horas / 24)} ${Math.floor(horas / 24) === 1 ? "día" : "días"}`;
 }
 
 setInterval(renderOfertasRecientes, 20000); // se refresca solo, ya que no tenemos tiempo real de verdad (websockets)
@@ -1675,7 +1675,9 @@ function formatoTiempoRestante(ms, urgente) {
   const horas = Math.floor(ms / (1000 * 60 * 60));
   const minutos = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
   const segundos = Math.floor((ms % (1000 * 60)) / 1000);
-  if (horas >= 24) return `Faltan ${Math.floor(horas / 24)} día(s) ${horas % 24} hs`;
+  const dias = Math.floor(horas / 24);
+  const plural = (n, s) => `${n} ${s}${n !== 1 ? "s" : ""}`;
+  if (horas >= 24) return `Faltan ${plural(dias, "día")} ${horas % 24} hs`;
   if (urgente) return `<span class="icono-inline">${SVG_RELOJ}</span> Faltan ${minutos} min ${segundos} s`;
   return `Faltan ${horas} hs ${minutos} min`;
 }
@@ -1926,12 +1928,13 @@ function actualizarCuentaModal() {
 }
 
 function cerrarModal() {
+  const scrollY = window.scrollY;
   modalOverlay.hidden = true;
   if (intervaloModal) clearInterval(intervaloModal);
   loteAbierto = null;
-  // Restaurar URL y título
   window.history.pushState({}, "¿Quién Da Más?", "/");
   document.title = "¿Quién Da Más? — Remates Online · Canal 10";
+  window.scrollTo(0, scrollY);
   if (elementoAntesDelModal) elementoAntesDelModal.focus();
 }
 modalClose.addEventListener("click", cerrarModal);
@@ -2093,6 +2096,11 @@ document.getElementById("formOferta").addEventListener("submit", async (event) =
       input.min = String(nuevoMinimo);
       input.placeholder = `Mín. ${formatoMonto(nuevoMinimo, loteAbierto.remate_moneda)}`;
       document.getElementById("montoMaximo").placeholder = `Tu tope máximo (mín. ${formatoMonto(nuevoMinimo, loteAbierto.remate_moneda)})`;
+      // Mensaje permanente hasta que el usuario vuelva a escribir
+      input.addEventListener("input", () => { mensaje.textContent = ""; mensaje.className = "oferta-mensaje"; }, { once: true });
+    } else {
+      // Error: limpiar después de 5 segundos
+      setTimeout(() => { mensaje.textContent = ""; mensaje.className = "oferta-mensaje"; }, 5000);
     }
   });
 });

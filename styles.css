@@ -175,9 +175,10 @@ ul { list-style: none; margin: 0; padding: 0; }
 /* El item de cerrar sesión mobile se oculta en desktop */
 #cerrarSesionMobileItem { display: none; }
 .cuenta-rol {
-  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.03em;
-  background: var(--accent-bg); color: var(--accent);
-  padding: 0.15rem 0.5rem; border-radius: 999px;
+  font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em;
+  background: var(--bg-2); color: var(--fg-muted);
+  border: 1px solid var(--line);
+  padding: 0.1rem 0.4rem; border-radius: 4px;
 }
 .link-salir {
   background: none; border: none; font: inherit; font-size: 0.85rem;
