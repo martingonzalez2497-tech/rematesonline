@@ -1456,7 +1456,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 /* ===== Contenido (Cómo Ofertar / Términos) ===== */
 .contenido {
   max-width: 42rem;
-  margin: var(--space-l) auto;
+  margin: var(--space-m) auto;
   padding: 0 var(--space-m);
 }
 .contenido h2 {
