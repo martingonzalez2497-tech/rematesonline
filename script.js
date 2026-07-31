@@ -525,10 +525,11 @@ formRegistro.addEventListener("submit", async (event) => {
       return;
     }
 
-    // Ya no se loguea automático: primero hay que verificar el código, y
-    // después esperar la aprobación del administrador.
+    // Sin verificación de email: mostrar mensaje de aprobación pendiente
     formRegistro.reset();
-    mostrarFormularioVerificacion(email);
+    cambiarTabLogin("login");
+    loginMensaje.textContent = "¡Registro exitoso! Un administrador tiene que aprobar tu cuenta antes de que puedas ingresar.";
+    loginMensaje.className = "login-mensaje exito";
   } catch (err) {
     loginMensaje.textContent = "No se pudo conectar con el servidor. ¿Está corriendo el backend?";
     loginMensaje.className = "login-mensaje error";

@@ -65,20 +65,15 @@ router.post("/registro", async (req, res) => {
   }
 
   const hash = await bcrypt.hash(password, 10);
-  const resultado = db
-    .prepare(
-      "INSERT INTO usuarios (nombre, email, password_hash, rol, cedula, aprobado, email_verificado) VALUES (?, ?, ?, 'publico', ?, 0, 0)"
-    )
-    .run(nombre, email.toLowerCase(), hash, cedulaLimpia);
+  db.prepare(
+    "INSERT INTO usuarios (nombre, email, password_hash, rol, cedula, aprobado, email_verificado) VALUES (?, ?, ?, 'publico', ?, 0, 1)"
+  ).run(nombre, email.toLowerCase(), hash, cedulaLimpia);
 
-  await generarYEnviarCodigo(resultado.lastInsertRowid, email.toLowerCase(), nombre);
-
-  // A diferencia de antes, NO se devuelve token: primero hay que verificar
-  // el email con el código, y después esperar la aprobación del administrador.
+  // Sin verificación de email — el usuario queda pendiente de aprobación del admin
   res.status(201).json({
     ok: true,
-    requiereVerificacion: true,
-    mensaje: "¡Listo! Te mandamos un código de 6 dígitos a tu email para confirmar la cuenta.",
+    requiereVerificacion: false,
+    mensaje: "¡Listo! Tu cuenta está pendiente de aprobación por un administrador.",
   });
 });
 
