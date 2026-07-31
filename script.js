@@ -3776,7 +3776,7 @@ document.getElementById("btnNavInicio")?.addEventListener("click", (event) => {
   volverAHome();
   cerrarPanelLateral();
 });
-document.getElementById("btnAbrirTodosLosLotes").addEventListener("click", () => {
+document.getElementById("btnAbrirTodosLosLotes")?.addEventListener("click", () => {
   mostrarSoloSeccion("todosLosLotesSeccion");
   renderTodosLosLotesPagina();
 });

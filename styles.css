@@ -139,18 +139,18 @@ ul { list-style: none; margin: 0; padding: 0; }
   font: inherit;
 }
 .search-form button {
-  border: 1px solid var(--accent);
-  background: var(--accent);
-  color: var(--white);
-  padding: 0 1rem;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  color: var(--fg-muted);
+  padding: 0 0.9rem;
   border-radius: 0 var(--radius) var(--radius) 0;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
-  line-height: 1;
+  transition: color 0.15s, border-color 0.15s;
 }
+.search-form button:hover { color: var(--accent); border-color: var(--accent); }
 
 .header-icons { display: flex; align-items: center; gap: var(--space-m); margin-inline-start: auto; }
 .header-icons a { text-decoration: none; font-weight: 500; white-space: nowrap; }
@@ -2011,7 +2011,12 @@ ul { list-style: none; margin: 0; padding: 0; }
   .contacto-grid { grid-template-columns: 1fr; }
 }
 
-/* ===== Banda Canal 10 ===== */
+/* Separador visual en el nav */
+.nav-separador {
+  width: 1px; background: var(--line);
+  margin: 0 0.25rem; align-self: stretch;
+}
+/* Banda Canal 10 con borde superior para separar del header */
 .banda-canal10 {
   background: var(--ink);
   color: rgba(255,255,255,0.85);

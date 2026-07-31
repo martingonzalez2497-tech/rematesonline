@@ -29,8 +29,10 @@
 
     <form class="search-form" role="search" aria-label="Buscar subastas">
       <label class="sr-only" for="buscar">Buscar por</label>
-      <input id="buscar" type="search" name="q" placeholder="Buscar por…">
-      <button type="submit" aria-label="Buscar">⌕</button>
+      <input id="buscar" type="search" name="q" placeholder="Buscar lotes…">
+      <button type="submit" aria-label="Buscar" class="btn-buscar-sutil">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </button>
     </form>
 
     <nav class="header-icons" aria-label="Cuenta y carrito">
@@ -59,18 +61,18 @@
   <nav class="site-nav" aria-label="Navegación principal">
     <ul id="navLista">
       <li><a href="#top" id="btnNavInicio">Inicio</a></li>
+      <li><a href="#activas">Remates en curso</a></li>
       <li class="has-dropdown">
         <button class="dropdown-toggle" id="rubrosToggle" aria-expanded="false" aria-controls="rubrosMenu">
           Rubros
         </button>
         <ul class="dropdown-menu" id="rubrosMenu"></ul>
       </li>
+      <li><button type="button" class="link-cuenta" id="btnAbrirFinalizadas">Finalizadas</button></li>
+      <li class="nav-separador" aria-hidden="true"></li>
       <li><a href="#como-ofertar-detalle">¿Cómo ofertar?</a></li>
       <li><button type="button" class="link-cuenta" id="btnAbrirNosotros">Quiénes somos</button></li>
       <li><button type="button" class="link-cuenta" id="btnAbrirContacto">Contacto</button></li>
-      <li><a href="#activas">Subastas activas</a></li>
-      <li><button type="button" class="link-cuenta" id="btnAbrirTodosLosLotes">Todos los lotes</button></li>
-      <li><button type="button" class="link-cuenta" id="btnAbrirFinalizadas">Finalizadas</button></li>
       <li id="panelNavItem" hidden><button type="button" class="link-cuenta" id="btnAbrirPanel">Panel</button></li>
       <li id="usuariosNavItem" hidden><button type="button" class="link-cuenta" id="btnAbrirUsuarios">Usuarios</button></li>
       <li id="misOfertasNavItem" hidden><button type="button" class="link-cuenta" id="btnAbrirMisOfertas">Mis ofertas <span class="aviso-superado" id="avisoSuperado" hidden></span></button></li>
@@ -108,7 +110,7 @@
   </section>
 
   <section class="subastas" id="activas" aria-labelledby="activas-heading">
-    <h2 id="activas-heading">Subastas activas</h2>
+    <h2 id="activas-heading">Remates en curso</h2>
 
     <!-- Barra de filtros -->
     <div class="filtros-barra" id="filtrosBarra">
