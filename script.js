@@ -306,7 +306,18 @@ function iniciarFiltros() {
 iniciarFiltros();
 document.querySelector(".search-form").addEventListener("submit", (event) => {
   event.preventDefault();
-  buscarLotes();
+  const texto = document.getElementById("buscar").value.trim();
+  if (!texto) return;
+  // Sincronizar con el filtro de subastas activas
+  const filtroTexto = document.getElementById("filtroTexto");
+  if (filtroTexto) {
+    filtroTexto.value = texto;
+    mostrarSoloSeccion("activas");
+    aplicarFiltros();
+    document.getElementById("activas").scrollIntoView({ behavior: "smooth" });
+  } else {
+    buscarLotes();
+  }
 });
 
 // ===== Búsqueda mobile =====
@@ -1565,6 +1576,55 @@ function renderFinalizadasPagina() {
     finalizadasGrid.innerHTML = `<li class="aviso-backend">Todavía no hay subastas finalizadas.</li>`;
   }
   activarScrollReveal(finalizadasGrid);
+}
+
+function renderGaleria() {
+  const grid = document.getElementById("galeriaGrid");
+  grid.innerHTML = "";
+
+  const rematesFinalizados = REMATES.filter(r =>
+    LOTES.some(l => l.remate_id === r.id && loteEstaCerrado(l))
+  );
+
+  if (rematesFinalizados.length === 0) {
+    grid.innerHTML = `
+      <li class="subastas-vacias" style="grid-column:1/-1">
+        <div class="subastas-vacias-icono">🏆</div>
+        <h3>Próximamente</h3>
+        <p>Acá vas a poder ver los remates que ya cerramos con los precios obtenidos.</p>
+      </li>`;
+    return;
+  }
+
+  rematesFinalizados.forEach(remate => {
+    const lotesDel = LOTES.filter(l => l.remate_id === remate.id && loteEstaCerrado(l));
+    const totalRecaudado = lotesDel.reduce((s, l) => s + (l.oferta_actual || 0), 0);
+    const totalOfertas = lotesDel.reduce((s, l) => s + (l.cantidad_ofertas || 0), 0);
+
+    const li = document.createElement("li");
+    li.className = "galeria-card";
+
+    const portada = remate.imagen_portada || (lotesDel.find(l => l.imagen)?.imagen);
+    if (portada) {
+      const img = document.createElement("img");
+      img.src = portada;
+      img.alt = remate.titulo;
+      img.className = "galeria-card-img";
+      li.appendChild(img);
+    }
+
+    li.innerHTML += `
+      <div class="galeria-card-info">
+        <h3 class="galeria-card-titulo">${remate.titulo}</h3>
+        <div class="galeria-card-stats">
+          <span>${lotesDel.length} lote${lotesDel.length !== 1 ? "s" : ""}</span>
+          <span>${totalOfertas} oferta${totalOfertas !== 1 ? "s" : ""}</span>
+          <span class="galeria-card-total">${formatoMonto(totalRecaudado, remate.moneda)} recaudados</span>
+        </div>
+      </div>`;
+    grid.appendChild(li);
+  });
+  activarScrollReveal(grid);
 }
 
 function renderTodosLosLotesPagina() {
@@ -3712,6 +3772,13 @@ document.getElementById("btnCerrarNosotros")?.addEventListener("click", volverAH
 
 // ===== Galería de remates pasados =====
 document.getElementById("btnCerrarGaleria")?.addEventListener("click", volverAHome);
+
+function abrirGaleria() {
+  mostrarSoloSeccion("galeriaSeccion");
+  renderGaleria();
+  cerrarPanelLateral();
+}
+document.getElementById("btnAbrirGaleria")?.addEventListener("click", abrirGaleria);
 
 // ===== Contacto =====
 document.getElementById("btnAbrirContacto")?.addEventListener("click", () => {
