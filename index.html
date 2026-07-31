@@ -18,9 +18,10 @@
     <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="navLista" aria-label="Abrir menú">
       <span aria-hidden="true">☰</span>
     </button>
-    <a class="brand" href="#top">
-      <span class="brand-mark" aria-hidden="true">⚒</span>
-      <span class="brand-name">Remate&nbsp;Directo</span>
+    <a class="brand" href="#top" id="linkInicio">
+      <img class="brand-logo" src="fotos/logo.png" alt="Remate Directo" onerror="this.style.display='none';document.getElementById('brandMark').style.display='inline';document.getElementById('brandName').style.display='inline'">
+      <span class="brand-mark" id="brandMark" aria-hidden="true" style="display:none">⚒</span>
+      <span class="brand-name" id="brandName" style="display:none">Remate&nbsp;Directo</span>
     </a>
 
     <form class="search-form" role="search" aria-label="Buscar subastas">
@@ -272,33 +273,71 @@
   <section class="contenido" id="terminos" aria-labelledby="terminos-heading" hidden>
     <button type="button" class="btn-volver" id="btnCerrarTerminos"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Volver</button>
     <h2 id="terminos-heading">Términos y Condiciones</h2>
+    <p class="terminos-intro">Estos términos regulan el uso de la plataforma <strong>Remate Directo</strong>, operada desde Montevideo, Uruguay. Al registrarte o participar en una subasta, aceptás las condiciones detalladas a continuación.</p>
 
     <ul class="terminos-lista">
       <li class="terminos-item">
-        <h3>Comisión</h3>
-        <p>La comisión sobre el precio de venta de cada lote es del 18,3%, IVA incluido, sin costos ocultos adicionales.</p>
+        <h3>1. Registro y cuenta</h3>
+        <p>Para ofertar necesitás crear una cuenta gratuita con nombre, email y número de cédula de identidad. Los datos deben ser verídicos. Una vez registrado, un administrador aprueba tu cuenta antes de que puedas participar. Cada persona puede tener solo una cuenta activa.</p>
       </li>
 
       <li class="terminos-item">
-        <h3>Formas de pago</h3>
-        <p>Aceptamos pago por transferencia bancaria o en efectivo en nuestro local.</p>
+        <h3>2. Cómo funciona la subasta</h3>
+        <p>Las subastas son progresivas: el precio sube a medida que los participantes ofertan. El incremento mínimo por oferta es del 6% del precio actual. Gana quien tenga la oferta más alta al momento del cierre. Si se recibe una oferta en el último minuto antes del cierre, el tiempo se extiende automáticamente 1 minuto más, garantizando igualdad de oportunidades para todos los participantes.</p>
       </li>
 
       <li class="terminos-item">
-        <h3>Plazos de pago y retiro</h3>
-        <p>Una vez finalizada la subasta y notificado como ganador del lote, el pago debe realizarse dentro de las 72 horas hábiles. El retiro de la mercadería puede hacerse en nuestro local dentro del mismo plazo, o coordinarse el envío al interior del país.</p>
+        <h3>3. Oferta automática</h3>
+        <p>El sistema permite configurar un monto máximo. El sistema ofertará automáticamente por vos, de a poco, solo lo necesario para mantenerte ganando, sin superar nunca el tope que definiste. La oferta automática no garantiza ganar el lote si otro participante supera tu tope máximo.</p>
       </li>
 
       <li class="terminos-item">
-        <h3>Exhibición</h3>
-        <p>Podés acercarte a ver los artículos en persona durante el período de exhibición abierta, previo a que finalice cada subasta.</p>
+        <h3>4. Comisión del comprador</h3>
+        <p>La comisión sobre el precio de adjudicación de cada lote es del <strong>18,3% IVA incluido</strong>. Esta comisión se suma al precio final de adjudicación y es responsabilidad del comprador. No hay costos ocultos adicionales.</p>
       </li>
 
       <li class="terminos-item">
-        <h3>Extensión por última oferta</h3>
-        <p>Si se recibe una oferta durante el último minuto de una subasta, el cierre se extiende automáticamente un minuto más, y así sucesivamente, para garantizar que todos los interesados puedan participar.</p>
+        <h3>5. Plazos de pago</h3>
+        <p>El ganador de un lote tiene <strong>72 horas hábiles</strong> desde el cierre de la subasta para realizar el pago. El incumplimiento puede resultar en la suspensión de la cuenta y la pérdida del derecho de adjudicación.</p>
+      </li>
+
+      <li class="terminos-item">
+        <h3>6. Formas de pago</h3>
+        <p>Aceptamos efectivo, transferencia bancaria y tarjeta de crédito o débito en nuestro local de Felipe Sanguinetti 2400, Montevideo. Para coordinar el pago contactar al <a href="tel:+59899924004">099 924 004</a> o por <a href="https://wa.me/59899924004" target="_blank" rel="noopener">WhatsApp</a>.</p>
+      </li>
+
+      <li class="terminos-item">
+        <h3>7. Retiro de mercadería</h3>
+        <p>El retiro debe realizarse dentro de las <strong>72 horas hábiles</strong> posteriores al pago en nuestro local, de lunes a viernes de 10:00 a 18:00 hs. Para envíos al interior del país, el plazo es de <strong>6 días hábiles</strong>. Los costos de envío son a cargo del comprador.</p>
+      </li>
+
+      <li class="terminos-item">
+        <h3>8. Exhibición de artículos</h3>
+        <p>Los artículos pueden verse en persona en nuestro local durante el período de exhibición abierta, previo al cierre de la subasta. Se recomienda inspeccionarlos antes de ofertar. Los artículos se venden en el estado en que se encuentran.</p>
+      </li>
+
+      <li class="terminos-item">
+        <h3>9. Responsabilidad sobre los artículos</h3>
+        <p>Remate Directo actúa como intermediario entre vendedor y comprador. Las descripciones e imágenes de los lotes son orientativas. No nos responsabilizamos por diferencias entre la descripción y el estado real del artículo más allá de lo observado en la exhibición.</p>
+      </li>
+
+      <li class="terminos-item">
+        <h3>10. Cancelación y suspensión</h3>
+        <p>Remate Directo se reserva el derecho de cancelar lotes, suspender cuentas o anular ofertas ante situaciones de fraude, error técnico, o incumplimiento de estos términos. Los usuarios que no retiren o paguen los artículos adjudicados podrán ser suspendidos.</p>
+      </li>
+
+      <li class="terminos-item">
+        <h3>11. Privacidad de datos</h3>
+        <p>Los datos personales recabados (nombre, email, cédula) se usan exclusivamente para gestionar tu participación en subastas. No se comparten con terceros. Podés solicitar la eliminación de tu cuenta y datos escribiéndonos a <a href="https://wa.me/59899924004" target="_blank" rel="noopener">WhatsApp</a>.</p>
+      </li>
+
+      <li class="terminos-item">
+        <h3>12. Contacto</h3>
+        <p>Felipe Sanguinetti 2400, Montevideo, Uruguay · <a href="tel:+59899924004">099 924 004</a> · Lunes a viernes 10:00–18:00 hs · <a href="https://wa.me/59899924004" target="_blank" rel="noopener">WhatsApp</a></p>
       </li>
     </ul>
+
+    <p class="terminos-fecha">Última actualización: julio 2026</p>
   </section>
 
 <section class="contenido" id="usuariosSeccion" aria-labelledby="usuariosTitulo" hidden>

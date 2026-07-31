@@ -442,10 +442,16 @@ function revisarLandingDeRubro() {
     document.getElementById("activas").scrollIntoView();
   }
 
-  const loteId = params.get("lote");
+  // Soporte para URL limpia /lote/123 Y param ?lote=123
+  const pathMatch = window.location.pathname.match(/^\/lote\/(\d+)$/);
+  const loteId = pathMatch ? pathMatch[1] : params.get("lote");
   if (loteId) {
     const lote = LOTES.find((l) => String(l.id) === loteId);
-    if (lote) abrirModal(lote);
+    if (lote) {
+      abrirModal(lote);
+      // Normalizar URL a formato limpio
+      window.history.replaceState({}, "", `/lote/${lote.id}`);
+    }
   }
 }
 
@@ -1281,7 +1287,7 @@ function crearTarjetaLote(lote) {
   }
 
   // Botón compartir redes sociales
-  const urlLote = `${location.origin}?lote=${lote.id}`;
+  const urlLote = `${location.origin}/lote/${lote.id}`;
   const textoCompartir = `🔨 *${lote.titulo}* — Lote ${lote.numero}\n💰 ${formatoMonto(lote.oferta_actual, lote.remate_moneda)}\n\nVer en Remate Directo: ${urlLote}`;
   const textoEncoded = encodeURIComponent(textoCompartir);
   const urlEncoded = encodeURIComponent(urlLote);
@@ -1775,6 +1781,9 @@ function abrirModal(lote) {
   btnFav.classList.toggle("is-activo", esFavorito);
 
   modalOverlay.hidden = false;
+  // Actualizar URL a formato limpio /lote/id
+  window.history.pushState({ loteId: lote.id }, `Lote ${lote.numero} — ${lote.titulo}`, `/lote/${lote.id}`);
+  document.title = `${lote.titulo} — Remate Directo`;
   if (lote.estado !== "finalizada") {
     document.getElementById("montoMaximo").focus();
   } else {
@@ -1815,11 +1824,23 @@ function cerrarModal() {
   modalOverlay.hidden = true;
   if (intervaloModal) clearInterval(intervaloModal);
   loteAbierto = null;
+  // Restaurar URL y título
+  window.history.pushState({}, "Remate Directo", "/");
+  document.title = "Remate Directo";
   if (elementoAntesDelModal) elementoAntesDelModal.focus();
 }
 modalClose.addEventListener("click", cerrarModal);
 modalOverlay.addEventListener("click", (event) => {
   if (event.target === modalOverlay) cerrarModal();
+});
+// Cerrar modal al presionar atrás en el navegador
+window.addEventListener("popstate", () => {
+  if (!modalOverlay.hidden) {
+    modalOverlay.hidden = true;
+    if (intervaloModal) clearInterval(intervaloModal);
+    loteAbierto = null;
+    document.title = "Remate Directo";
+  }
 });
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
@@ -2064,7 +2085,7 @@ document.getElementById("btnFavorito").addEventListener("click", () => {
 document.getElementById("btnCompartirLote").addEventListener("click", async () => {
   if (!loteAbierto) return;
   const btn = document.getElementById("btnCompartirLote");
-  const url = `${window.location.origin}${window.location.pathname}?lote=${loteAbierto.id}`;
+  const url = `${window.location.origin}/lote/${loteAbierto.id}`;
   try {
     await navigator.clipboard.writeText(url);
     btn.textContent = "✅ Link copiado";
