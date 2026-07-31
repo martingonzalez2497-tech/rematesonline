@@ -108,7 +108,7 @@ async function renderOfertasRecientes() {
 
       const texto = document.createElement("span");
       texto.className = "ofertas-recientes-texto";
-      texto.innerHTML = `${oferta.usuario_nombre} ofertó <strong>${formatoMonto(oferta.monto)}</strong> por "${oferta.lote_titulo}"
+      texto.innerHTML = `${sanitizar(oferta.usuario_nombre)} ofertó <strong>${formatoMonto(oferta.monto)}</strong> por "${sanitizar(oferta.lote_titulo)}"
         <span class="ofertas-recientes-tiempo">${tiempoRelativo(oferta.fecha)}</span>`;
 
       li.append(avatar, texto);
@@ -1484,7 +1484,7 @@ function renderGridComoListaDeLotes(grid, titulo, descripcion, lotes) {
   if (descripcion) {
     const descripcionLi = document.createElement("li");
     descripcionLi.className = "remate-detalle-encabezado";
-    descripcionLi.innerHTML = `<p class="remate-grupo-descripcion">${descripcion}</p>`;
+    descripcionLi.innerHTML = `<p class="remate-grupo-descripcion">${sanitizar(descripcion)}</p>`;
     grid.appendChild(descripcionLi);
   }
 
@@ -1822,6 +1822,17 @@ setInterval(actualizarCuentasRegresivas, 1000);
 }
 
 // ===== Favoritos (siguen siendo locales del navegador, no requieren login) =====
+// ===== Sanitización HTML — previene XSS =====
+function sanitizar(texto) {
+  if (!texto) return "";
+  return String(texto)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 // Favoritos: localStorage para usuarios anónimos, backend para logueados
 function leerFavoritos() {
   try {
@@ -2865,7 +2876,7 @@ async function cargarDashboardGanadores() {
   const contenido = document.getElementById("dashboardContenido");
 
   const misRemates_ = misRemates();
-  select.innerHTML = misRemates_.map(r => `<option value="${r.id}">${r.titulo}</option>`).join("");
+  select.innerHTML = misRemates_.map(r => `<option value="${r.id}">${sanitizar(r.titulo)}</option>`).join("");
   if (misRemates_.length === 0) { contenido.innerHTML = "<p style='color:var(--fg-muted)'>No tenés remates creados.</p>"; return; }
 
   const cargar = async (remateId) => {
@@ -2941,7 +2952,7 @@ async function cargarEstadisticasAdmin() {
     d.lotesTop.forEach((l, i) => {
       const li = document.createElement("li");
       li.className = "panel-item";
-      li.innerHTML = `<span style="font-weight:700;color:var(--accent)">#${i + 1}</span> ${l.titulo} <span style="color:var(--fg-muted);font-size:0.85rem">(${l.remate_titulo})</span> — <strong>${l.total_ofertas} ofertas</strong>`;
+      li.innerHTML = `<span style="font-weight:700;color:var(--accent)">#${i + 1}</span> ${sanitizar(l.titulo)} <span style="color:var(--fg-muted);font-size:0.85rem">(${sanitizar(l.remate_titulo)})</span> — <strong>${l.total_ofertas} ofertas</strong>`;
       topLotes.appendChild(li);
     });
   } catch (e) {
@@ -2989,7 +3000,7 @@ function renderPanelLista() {
 
     const encabezadoFila = document.createElement("p");
     encabezadoFila.className = "panel-lote-info panel-remate-encabezado";
-    encabezadoFila.innerHTML = `<strong>${remate.titulo}</strong>${remate.rubro}`;
+    encabezadoFila.innerHTML = `<strong>${sanitizar(remate.titulo)}</strong>${sanitizar(remate.rubro)}`;
 
     const btnEditarRemate = document.createElement("button");
     btnEditarRemate.type = "button";
@@ -3034,7 +3045,7 @@ function renderPanelLista() {
 
         const info = document.createElement("p");
         info.className = "panel-lote-info";
-        info.innerHTML = `<strong>Lote ${lote.numero} — ${lote.titulo}</strong>${lote.estado === "finalizada" ? "Finalizada" : `Activa · ${formatoMonto(lote.oferta_actual, lote.remate_moneda)}`}`;
+        info.innerHTML = `<strong>Lote ${sanitizar(lote.numero)} — ${sanitizar(lote.titulo)}</strong>${lote.estado === "finalizada" ? "Finalizada" : `Activa · ${formatoMonto(lote.oferta_actual, lote.remate_moneda)}`}`;
 
         const acciones = document.createElement("p");
         acciones.className = "panel-lote-acciones";
@@ -3291,7 +3302,7 @@ async function renderUsuariosLista() {
 
         const info = document.createElement("p");
         info.className = "panel-lote-info";
-        info.innerHTML = `<strong>${usuario.nombre}</strong>${usuario.email} · CI: ${usuario.cedula || "—"}${usuario.telefono ? ` · 📱 ${usuario.telefono}` : ""}`;
+        info.innerHTML = `<strong>${sanitizar(usuario.nombre)}</strong>${sanitizar(usuario.email)} · CI: ${sanitizar(usuario.cedula || "—")}${usuario.telefono ? ` · 📱 ${sanitizar(usuario.telefono)}` : ""}`;
 
         const acciones = document.createElement("p");
         acciones.className = "panel-lote-acciones";
@@ -3746,7 +3757,7 @@ async function renderMisOfertas(pagina = 1) {
         const info = document.createElement("p");
         info.className = "panel-lote-info";
         const estado = tipo === "ganando" ? "🥇 Vas ganando" : tipo === "ganada" ? "✅ Ganaste" : tipo === "perdida" ? "❌ No ganaste" : "⏳ En juego";
-        info.innerHTML = `<strong>Lote ${o.numero} — ${o.titulo}</strong>${estado} · Tu oferta: ${formatoMonto(o.monto, o.remate_moneda || "UYU")}`;
+        info.innerHTML = `<strong>Lote ${sanitizar(o.numero)} — ${sanitizar(o.titulo)}</strong>${estado} · Tu oferta: ${formatoMonto(o.monto, o.remate_moneda || "UYU")}`;
         li.appendChild(info);
         if (lote && !loteEstaCerrado(lote)) {
           const btn = document.createElement("button");
@@ -3801,7 +3812,7 @@ function renderMisFavoritos() {
 
     const info = document.createElement("p");
     info.className = "panel-lote-info";
-    info.innerHTML = `<strong>Lote ${lote.numero} — ${lote.titulo}</strong>${lote.estado === "finalizada" ? "Finalizada" : `Activa · ${formatoMonto(lote.oferta_actual, lote.remate_moneda)}`}`;
+    info.innerHTML = `<strong>Lote ${sanitizar(lote.numero)} — ${sanitizar(lote.titulo)}</strong>${lote.estado === "finalizada" ? "Finalizada" : `Activa · ${formatoMonto(lote.oferta_actual, lote.remate_moneda)}`}`;
 
     const acciones = document.createElement("p");
     acciones.className = "panel-lote-acciones";
