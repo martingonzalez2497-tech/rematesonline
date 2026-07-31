@@ -1052,11 +1052,18 @@ function crearTarjetaLote(lote) {
     img.setAttribute("aria-label", `Foto del lote ${lote.numero}`);
     img.textContent = "FOTO";
   }
+  img.style.cursor = "zoom-in";
+  img.addEventListener("click", (e) => { e.stopPropagation(); abrirModal(lote); });
 
   let contenedorFoto = img;
   if (fotos.length > 1) {
     contenedorFoto = document.createElement("div");
     contenedorFoto.className = "subasta-img-carrusel";
+    contenedorFoto.style.cursor = "zoom-in";
+    contenedorFoto.addEventListener("click", (e) => {
+      // solo abrir modal si no se tocó una flecha
+      if (!e.target.closest(".carrusel-flecha")) abrirModal(lote);
+    });
     let indiceFoto = 0;
     let autoplaySuspendido = false;
 
@@ -1223,6 +1230,13 @@ function crearGrupoRemate(remate, lotesDelRemate) {
   li.className = "subasta-card remate-tarjeta-portada";
   li.dataset.remateId = remate.id;
   li.dataset.rubro = remate.rubro;
+  li.style.cursor = "pointer";
+  li.setAttribute("role", "button");
+  li.setAttribute("tabindex", "0");
+  li.setAttribute("aria-label", `Ver lotes de ${remate.titulo}`);
+  const abrir = () => abrirRemateDetalle(remate, lotesDelRemate, li);
+  li.addEventListener("click", abrir);
+  li.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); abrir(); } });
 
   const primerLote = lotesDelRemate.find((l) => l.imagen) || lotesDelRemate[0];
   const portada = document.createElement(primerLote && primerLote.imagen ? "img" : "p");
@@ -1247,13 +1261,7 @@ function crearGrupoRemate(remate, lotesDelRemate) {
   cantidad.className = "lote-cantidad-ofertas";
   cantidad.textContent = lotesDelRemate.length === 1 ? "1 lote" : `${lotesDelRemate.length} lotes`;
 
-  const boton = document.createElement("button");
-  boton.type = "button";
-  boton.className = "btn btn-primary";
-  boton.textContent = "Ver lotes";
-  boton.addEventListener("click", () => abrirRemateDetalle(remate, lotesDelRemate, li));
-
-  li.append(portada, titulo, rubro, cantidad, boton);
+  li.append(portada, titulo, rubro, cantidad);
   return li;
 }
 
