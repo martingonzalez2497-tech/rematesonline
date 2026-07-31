@@ -178,6 +178,7 @@ router.patch("/:id/pago", requireAuth, requireRole("rematador", "administrador")
 
   const { pagado } = req.body;
   db.prepare("UPDATE lotes SET pago_confirmado = ? WHERE id = ?").run(pagado ? 1 : 0, lote.id);
+  avisarActualizacion(); // notificar al ganador en tiempo real
   res.json({ ok: true });
 });
 

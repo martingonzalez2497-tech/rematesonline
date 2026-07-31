@@ -109,7 +109,16 @@ if (!columnasRemates.includes("fecha_inicio")) {
   db.exec("ALTER TABLE remates ADD COLUMN fecha_inicio TEXT");
 }
 
-// Tabla de suscriptores al newsletter
+// Tabla de favoritos de usuarios
+db.exec(`
+  CREATE TABLE IF NOT EXISTS favoritos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario_id INTEGER NOT NULL REFERENCES usuarios(id),
+    lote_id INTEGER NOT NULL REFERENCES lotes(id),
+    creado_en TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(usuario_id, lote_id)
+  );
+`);
 db.exec(`
   CREATE TABLE IF NOT EXISTS newsletter (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

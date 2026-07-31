@@ -230,16 +230,52 @@ router.get("/lote/:loteId", (req, res) => {
   res.json(ofertas);
 });
 
-// Mis ofertas — el usuario logueado ve su propio historial
+// Mis ofertas — con paginación
 router.get("/mias", requireAuth, (req, res) => {
+  const pagina = parseInt(req.query.pagina) || 1;
+  const porPagina = 20;
+  const offset = (pagina - 1) * porPagina;
+
+  const total = db.prepare(
+    `SELECT COUNT(DISTINCT lote_id) AS n FROM ofertas WHERE usuario_id = ?`
+  ).get(req.usuario.id).n;
+
   const ofertas = db
     .prepare(
-      `SELECT ofertas.*, lotes.titulo, lotes.numero, lotes.imagen
+      `SELECT ofertas.*, lotes.titulo, lotes.numero, lotes.imagen, lotes.estado AS lote_estado,
+              lotes.cierre, lotes.ganador_id, lotes.remate_moneda
        FROM ofertas JOIN lotes ON lotes.id = ofertas.lote_id
-       WHERE ofertas.usuario_id = ? ORDER BY ofertas.fecha DESC`
+       WHERE ofertas.usuario_id = ?
+       GROUP BY ofertas.lote_id
+       ORDER BY ofertas.fecha DESC
+       LIMIT ? OFFSET ?`
     )
-    .all(req.usuario.id);
-  res.json(ofertas);
+    .all(req.usuario.id, porPagina, offset);
+
+  res.json({ ofertas, total, pagina, porPagina, totalPaginas: Math.ceil(total / porPagina) });
+});
+
+// Favoritos — GET lista, POST toggle
+router.get("/favoritos", requireAuth, (req, res) => {
+  const favs = db.prepare(
+    `SELECT lote_id FROM favoritos WHERE usuario_id = ?`
+  ).all(req.usuario.id).map(r => r.lote_id);
+  res.json(favs);
+});
+
+router.post("/favoritos/:loteId", requireAuth, (req, res) => {
+  const { loteId } = req.params;
+  const existe = db.prepare(
+    "SELECT id FROM favoritos WHERE usuario_id = ? AND lote_id = ?"
+  ).get(req.usuario.id, loteId);
+
+  if (existe) {
+    db.prepare("DELETE FROM favoritos WHERE usuario_id = ? AND lote_id = ?").run(req.usuario.id, loteId);
+    res.json({ esFavorito: false });
+  } else {
+    db.prepare("INSERT OR IGNORE INTO favoritos (usuario_id, lote_id) VALUES (?, ?)").run(req.usuario.id, loteId);
+    res.json({ esFavorito: true });
+  }
 });
 
 // Registrar vista de un lote (contador en vivo)

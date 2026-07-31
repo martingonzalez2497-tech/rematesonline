@@ -577,6 +577,9 @@ function renderCuentaArea() {
   document.getElementById("usuariosNavItem").hidden = sesion.usuario.rol !== "administrador";
   document.getElementById("misOfertasNavItem").hidden = sesion.usuario.rol !== "publico";
 
+  // Cargar favoritos del servidor
+  cargarFavoritosDelServidor();
+
   // Si es admin, verificar si hay usuarios pendientes de aprobación
   if (sesion.usuario.rol === "administrador") {
     fetch(`${API_URL}/usuarios`, { headers: { Authorization: `Bearer ${sesion.token}` } })
@@ -1288,7 +1291,7 @@ function crearTarjetaLote(lote) {
   const btnFavCard = document.createElement("button");
   btnFavCard.type = "button";
   btnFavCard.className = "lote-fav-btn";
-  const esFav = leerFavoritos().includes(lote.id);
+  const esFav = esFavorito(lote.id);
   btnFavCard.innerHTML = esFav ? SVG_ESTRELLA_LLENA : SVG_ESTRELLA_VACIA;
   btnFavCard.classList.toggle("is-activo", esFav);
   btnFavCard.setAttribute("aria-label", esFav ? "Quitar de favoritos" : "Agregar a favoritos");
@@ -1821,6 +1824,7 @@ setInterval(actualizarCuentasRegresivas, 1000);
 }
 
 // ===== Favoritos (siguen siendo locales del navegador, no requieren login) =====
+// Favoritos: localStorage para usuarios anónimos, backend para logueados
 function leerFavoritos() {
   try {
     return JSON.parse(localStorage.getItem("favoritos") || "[]");
@@ -1828,7 +1832,45 @@ function leerFavoritos() {
     return [];
   }
 }
-function toggleFavorito(loteId) {
+
+let favoritosCache = null; // cache de favoritos del servidor
+
+async function cargarFavoritosDelServidor() {
+  const sesion = leerSesion();
+  if (!sesion) { favoritosCache = null; return; }
+  try {
+    const resp = await fetch(`${API_URL}/ofertas/favoritos`, {
+      headers: { Authorization: `Bearer ${sesion.token}` },
+    });
+    if (resp.ok) favoritosCache = await resp.json();
+  } catch (e) {}
+}
+
+function esFavorito(loteId) {
+  if (favoritosCache !== null) return favoritosCache.includes(loteId);
+  return leerFavoritos().includes(loteId);
+}
+
+async function toggleFavorito(loteId) {
+  const sesion = leerSesion();
+  if (sesion) {
+    // Usuario logueado: sincronizar con backend
+    try {
+      const resp = await fetch(`${API_URL}/ofertas/favoritos/${loteId}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${sesion.token}` },
+      });
+      const { esFavorito: nuevoEstado } = await resp.json();
+      if (favoritosCache === null) favoritosCache = [];
+      if (nuevoEstado) {
+        if (!favoritosCache.includes(loteId)) favoritosCache.push(loteId);
+      } else {
+        favoritosCache = favoritosCache.filter(id => id !== loteId);
+      }
+      return nuevoEstado;
+    } catch (e) {}
+  }
+  // Fallback: localStorage
   const favoritos = leerFavoritos();
   const index = favoritos.indexOf(loteId);
   if (index === -1) favoritos.push(loteId);
@@ -3649,47 +3691,41 @@ async function abrirMisOfertas() {
   renderMisFavoritos();
 }
 
-async function renderMisOfertas() {
+async function renderMisOfertas(pagina = 1) {
   const sesion = leerSesion();
   const lista = document.getElementById("misOfertasLista");
   if (!sesion) return;
 
   lista.innerHTML = `<li class="panel-lote-info">Cargando…</li>`;
   try {
-    const resp = await fetch(`${API_URL}/ofertas/mias`, {
+    const resp = await fetch(`${API_URL}/ofertas/mias?pagina=${pagina}`, {
       headers: { Authorization: `Bearer ${sesion.token}` },
     });
-    const ofertas = await resp.json();
-    if (!resp.ok) throw new Error(ofertas.error || "No se pudo cargar tu historial.");
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || "Error al cargar.");
 
-    if (ofertas.length === 0) {
+    const { ofertas, total, totalPaginas } = data;
+
+    if (ofertas.length === 0 && pagina === 1) {
       lista.innerHTML = `<li class="panel-lote-info">Todavía no hiciste ninguna oferta.</li>`;
       return;
     }
 
-    // Cruzar con LOTES para saber estado actual
-    const ofertasPorLote = {};
-    ofertas.forEach((o) => {
-      if (!ofertasPorLote[o.lote_id] || o.monto > ofertasPorLote[o.lote_id].monto) {
-        ofertasPorLote[o.lote_id] = o;
-      }
-    });
-    const misLotes = Object.values(ofertasPorLote);
-    const activas = misLotes.filter((o) => {
-      const lote = LOTES.find((l) => l.id === o.lote_id);
+    const activas = ofertas.filter(o => {
+      const lote = LOTES.find(l => l.id === o.lote_id);
       return lote && !loteEstaCerrado(lote) && estadoDeMiOferta(lote) !== "ganando";
     });
-    const ganando = misLotes.filter((o) => {
-      const lote = LOTES.find((l) => l.id === o.lote_id);
+    const ganando = ofertas.filter(o => {
+      const lote = LOTES.find(l => l.id === o.lote_id);
       return lote && !loteEstaCerrado(lote) && estadoDeMiOferta(lote) === "ganando";
     });
-    const ganadas = misLotes.filter((o) => {
-      const lote = LOTES.find((l) => l.id === o.lote_id);
-      return lote && loteEstaCerrado(lote) && lote.ganador_nombre === sesion.usuario.nombre;
+    const ganadas = ofertas.filter(o => {
+      const lote = LOTES.find(l => l.id === o.lote_id);
+      return lote && loteEstaCerrado(lote) && lote.ganador_id && String(lote.ganador_id) === String(sesion.usuario.id);
     });
-    const perdidas = misLotes.filter((o) => {
-      const lote = LOTES.find((l) => l.id === o.lote_id);
-      return lote && loteEstaCerrado(lote) && lote.ganador_nombre !== sesion.usuario.nombre;
+    const perdidas = ofertas.filter(o => {
+      const lote = LOTES.find(l => l.id === o.lote_id);
+      return lote && loteEstaCerrado(lote) && (!lote.ganador_id || String(lote.ganador_id) !== String(sesion.usuario.id));
     });
 
     lista.innerHTML = "";
@@ -3706,7 +3742,7 @@ async function renderMisOfertas() {
         li.className = "panel-lote-item mis-ofertas-item";
         if (o.imagen) {
           const img = document.createElement("img");
-          img.src = o.imagen; img.alt = ""; img.className = "mis-ofertas-img";
+          img.src = o.imagen; img.alt = ""; img.className = "mis-ofertas-img"; img.loading = "lazy";
           img.onerror = () => { img.style.display = "none"; };
           li.appendChild(img);
         }
@@ -3732,6 +3768,21 @@ async function renderMisOfertas() {
     seccion("✅ Subastas ganadas", ganadas, "ganada");
     seccion("📋 Historial (no ganaste)", perdidas, "perdida");
 
+    // Paginación
+    if (totalPaginas > 1) {
+      const paginacion = document.createElement("li");
+      paginacion.className = "mis-ofertas-paginacion";
+      paginacion.innerHTML = `
+        <span>Página ${pagina} de ${totalPaginas} · ${total} lotes totales</span>
+        <div>
+          ${pagina > 1 ? `<button type="button" class="btn btn-ghost" id="btnPagAnterior">← Anterior</button>` : ""}
+          ${pagina < totalPaginas ? `<button type="button" class="btn btn-ghost" id="btnPagSiguiente">Siguiente →</button>` : ""}
+        </div>`;
+      lista.appendChild(paginacion);
+      document.getElementById("btnPagAnterior")?.addEventListener("click", () => renderMisOfertas(pagina - 1));
+      document.getElementById("btnPagSiguiente")?.addEventListener("click", () => renderMisOfertas(pagina + 1));
+    }
+
   } catch (err) {
     lista.innerHTML = `<li class="panel-lote-info">No se pudo conectar con el servidor.</li>`;
   }
@@ -3739,8 +3790,7 @@ async function renderMisOfertas() {
 
 function renderMisFavoritos() {
   const lista = document.getElementById("misFavoritosLista");
-  const favoritos = leerFavoritos();
-  const lotesFavoritos = LOTES.filter((l) => favoritos.includes(l.id));
+  const lotesFavoritos = LOTES.filter(l => esFavorito(l.id));
 
   if (lotesFavoritos.length === 0) {
     lista.innerHTML = `<li class="panel-lote-info">Todavía no marcaste ningún lote como favorito.</li>`;

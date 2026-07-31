@@ -2106,3 +2106,45 @@ ul { list-style: none; margin: 0; padding: 0; }
   font-size: 0.8rem; color: var(--fg-muted);
 }
 .galeria-card-total { color: var(--accent); font-weight: 700; }
+
+/* ===== Banner EN VIVO ===== */
+.banner-en-vivo {
+  background: #C0392B;
+  color: #fff;
+  font-size: 0.85rem; font-weight: 700;
+  padding: 0.55rem 1.5rem;
+  display: flex; align-items: center; gap: 0.75rem;
+  justify-content: center;
+  animation: pulsoEnVivo 2s ease-in-out infinite;
+}
+.en-vivo-dot {
+  width: 0.55rem; height: 0.55rem; border-radius: 50%;
+  background: #fff; flex-shrink: 0;
+  animation: parpadeoUrgente 1s ease-in-out infinite;
+}
+.en-vivo-link {
+  color: rgba(255,255,255,0.85); text-decoration: underline;
+  margin-left: auto; white-space: nowrap;
+}
+.en-vivo-link:hover { color: #fff; }
+@keyframes pulsoEnVivo {
+  0%, 100% { background: #C0392B; }
+  50% { background: #E74C3C; }
+}
+
+/* ===== Contador de caracteres ===== */
+.campo-contador {
+  font-size: 0.75rem; color: var(--fg-muted);
+  font-weight: 400; float: right;
+}
+
+/* ===== Paginación mis ofertas ===== */
+.mis-ofertas-paginacion {
+  list-style: none;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 0; margin-top: 0.5rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.82rem; color: var(--fg-muted);
+  gap: 0.5rem; flex-wrap: wrap;
+}
+.mis-ofertas-paginacion div { display: flex; gap: 0.5rem; }
