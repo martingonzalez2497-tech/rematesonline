@@ -1916,6 +1916,9 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 
 /* ===== Quiénes somos ===== */
+#nosotrosSeccion.contenido { max-width: 72rem; }
+#nosotrosSeccion.contenido h2 { text-align: left; }
+#galeriaSeccion.contenido, #contactoSeccion.contenido { max-width: 72rem; }
 .nosotros-hero {
   display: grid; grid-template-columns: 1fr auto;
   gap: 2rem; align-items: center;
