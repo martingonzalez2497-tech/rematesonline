@@ -836,6 +836,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   z-index: 100;
 }
 .modal-overlay[hidden] { display: none; }
+#confirmarOverlay { z-index: 200; }
 .lote-modal {
   position: relative;
   background: var(--bg);
