@@ -40,6 +40,8 @@ const remateRoutes = require("./routes/remates");
 const ofertasRoutes = require("./routes/ofertas");
 const usuariosRoutes = require("./routes/usuarios");
 const uploadsRoutes = require("./routes/uploads");
+const newsletterRoutes = require("./routes/newsletter");
+const contactoRoutes = require("./routes/contacto");
 
 const app = express();
 
@@ -103,6 +105,8 @@ app.use("/api/lotes", lotesRoutes);
 app.use("/api/ofertas", ofertasRoutes);
 app.use("/api/usuarios", usuariosRoutes);
 app.use("/api/uploads", uploadsRoutes);
+app.use("/api/newsletter", newsletterRoutes);
+app.use("/api/contacto", contactoRoutes);
 const path = require("path");
 const uploadsDir = process.env.UPLOADS_PATH || path.join(__dirname, "uploads");
 app.use("/uploads", express.static(uploadsDir));

@@ -3624,6 +3624,78 @@ document.querySelectorAll("[data-terminos]").forEach((link) => {
 });
 document.getElementById("btnCerrarTerminos").addEventListener("click", volverAHome);
 document.getElementById("btnCerrarComoFunciona")?.addEventListener("click", volverAHome);
+
+// ===== Quiénes somos =====
+document.getElementById("btnAbrirNosotros")?.addEventListener("click", () => {
+  mostrarSoloSeccion("nosotrosSeccion");
+  cerrarPanelLateral();
+});
+document.getElementById("btnCerrarNosotros")?.addEventListener("click", volverAHome);
+
+// ===== Galería de remates pasados =====
+document.getElementById("btnCerrarGaleria")?.addEventListener("click", volverAHome);
+
+// ===== Contacto =====
+document.getElementById("btnAbrirContacto")?.addEventListener("click", () => {
+  mostrarSoloSeccion("contactoSeccion");
+  cerrarPanelLateral();
+});
+document.getElementById("btnCerrarContacto")?.addEventListener("click", volverAHome);
+
+document.getElementById("formContacto")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector("button[type=submit]");
+  const resp = document.getElementById("contactoMensajeResp");
+  btn.disabled = true;
+  btn.textContent = "Enviando…";
+  try {
+    const r = await fetch(`${API_URL}/contacto`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nombre: document.getElementById("contactoNombre").value,
+        email: document.getElementById("contactoEmail").value,
+        mensaje: document.getElementById("contactoMensaje").value,
+      }),
+    });
+    const d = await r.json();
+    if (r.ok) {
+      resp.textContent = "✅ ¡Mensaje enviado! Te respondemos a la brevedad.";
+      resp.className = "panel-mensaje exito";
+      e.target.reset();
+    } else {
+      resp.textContent = d.error || "No se pudo enviar.";
+      resp.className = "panel-mensaje error";
+    }
+  } catch {
+    resp.textContent = "No se pudo conectar con el servidor.";
+    resp.className = "panel-mensaje error";
+  }
+  btn.disabled = false;
+  btn.textContent = "Enviar mensaje";
+});
+
+// ===== Newsletter =====
+document.querySelector(".form-newsletter")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const input = document.getElementById("newsletter-email");
+  const btn = e.target.querySelector("button");
+  btn.disabled = true;
+  btn.textContent = "Enviando…";
+  try {
+    const r = await fetch(`${API_URL}/newsletter/suscribir`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: input.value }),
+    });
+    const d = await r.json();
+    btn.textContent = r.ok ? "✅ ¡Listo!" : "Error";
+    if (r.ok) input.value = "";
+    setTimeout(() => { btn.textContent = "Suscribir"; btn.disabled = false; }, 3000);
+  } catch {
+    btn.textContent = "Error"; btn.disabled = false;
+  }
+});
 document.getElementById("btnAbrirFinalizadas").addEventListener("click", () => {
   mostrarSoloSeccion("finalizadasSeccion");
   renderFinalizadasPagina();

@@ -1897,3 +1897,96 @@ ul { list-style: none; margin: 0; padding: 0; }
   .filtro-precio { flex-wrap: wrap; }
   .filtro-precio-input { width: calc(50% - 1rem); }
 }
+
+/* ===== Quiénes somos ===== */
+.nosotros-hero {
+  display: grid; grid-template-columns: 1fr auto;
+  gap: 2rem; align-items: center;
+  background: linear-gradient(135deg, var(--accent-bg) 0%, var(--bg-2) 100%);
+  border-radius: var(--radius-lg); padding: 2.5rem; margin-bottom: 2.5rem;
+}
+.nosotros-tag {
+  display: inline-block; font-size: 0.75rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--accent); background: var(--accent-bg);
+  border: 1px solid var(--accent); padding: 0.25rem 0.75rem;
+  border-radius: 999px; margin-bottom: 0.75rem;
+}
+.nosotros-hero-texto h2 { margin: 0 0 0.75rem; font-size: clamp(1.6rem, 3vw, 2.2rem); letter-spacing: -0.02em; text-align: left; }
+.nosotros-bajada { color: var(--fg-muted); line-height: 1.7; margin: 0 0 1.5rem; font-size: 1rem; text-align: left; }
+.nosotros-stats { display: flex; gap: 2rem; }
+.nosotros-stat { display: flex; flex-direction: column; }
+.nosotros-stat strong { font-size: 1.6rem; font-weight: 800; color: var(--accent); line-height: 1; }
+.nosotros-stat span { font-size: 0.78rem; color: var(--fg-muted); margin-top: 0.2rem; }
+.nosotros-canal-badge {
+  display: flex; align-items: center; gap: 1rem;
+  background: var(--bg); border: 2px solid var(--accent);
+  border-radius: var(--radius-lg); padding: 1rem 1.5rem;
+  box-shadow: 0 8px 24px rgba(232,76,30,0.15);
+}
+.nosotros-canal-numero {
+  font-size: 3rem; font-weight: 900; color: var(--accent);
+  font-family: var(--font-display); line-height: 1; letter-spacing: -0.04em;
+}
+.nosotros-canal-texto { font-size: 0.9rem; font-weight: 700; line-height: 1.4; }
+.nosotros-canal-texto small { font-weight: 400; color: var(--fg-muted); }
+
+.nosotros-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1rem; margin-bottom: 2rem; text-align: left;
+}
+.nosotros-card {
+  background: var(--bg-2); border: 1px solid var(--line);
+  border-radius: var(--radius-lg); padding: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.nosotros-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); }
+.nosotros-card-icono { font-size: 2rem; margin-bottom: 0.75rem; }
+.nosotros-card h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+.nosotros-card p { color: var(--fg-muted); margin: 0 0 1rem; font-size: 0.88rem; line-height: 1.6; }
+.nosotros-redes { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.nosotros-red {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.4rem 0.9rem; border-radius: 999px;
+  font-size: 0.82rem; font-weight: 700; text-decoration: none;
+  border: 1px solid; transition: opacity 0.15s ease;
+}
+.nosotros-red:hover { opacity: 0.8; }
+.nosotros-red-ig { color: #E1306C; border-color: #E1306C; background: rgba(225,48,108,0.06); }
+.nosotros-red-tt { color: var(--fg); border-color: var(--line); background: var(--bg); }
+
+/* ===== Galería ===== */
+.galeria-subtitulo { color: var(--fg-muted); margin: -0.5rem 0 1.5rem; text-align: left; }
+
+/* ===== Contacto ===== */
+.contacto-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2.5rem; text-align: left;
+}
+.contacto-info h3, .contacto-form-wrap h3 { margin: 0 0 1rem; font-size: 1.1rem; }
+.contacto-lista { list-style: none; padding: 0; margin: 0 0 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.contacto-lista li { display: flex; align-items: flex-start; gap: 0.75rem; }
+.contacto-lista svg { flex-shrink: 0; color: var(--accent); margin-top: 0.1rem; }
+.contacto-lista div { display: flex; flex-direction: column; gap: 0.1rem; }
+.contacto-lista strong { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); font-weight: 700; }
+.contacto-lista span, .contacto-lista a { font-size: 0.95rem; color: var(--fg); text-decoration: none; }
+.contacto-lista a:hover { color: var(--accent); }
+.contacto-redes { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.contacto-mapa { border-radius: var(--radius-lg); overflow: hidden; }
+.contacto-form { display: flex; flex-direction: column; gap: 0.75rem; }
+.contacto-form label { font-size: 0.85rem; color: var(--fg-muted); font-weight: 600; }
+.contacto-form input, .contacto-form textarea {
+  padding: 0.65rem 0.9rem; border: 1px solid var(--line);
+  border-radius: var(--radius); background: var(--bg-2); color: var(--fg);
+  font: inherit; font-size: 0.95rem; width: 100%;
+}
+.contacto-form input:focus, .contacto-form textarea:focus {
+  outline: 2px solid var(--accent); border-color: transparent;
+}
+.contacto-form textarea { resize: vertical; min-height: 8rem; }
+
+@media (max-width: 48rem) {
+  .nosotros-hero { grid-template-columns: 1fr; }
+  .nosotros-canal-badge { display: none; }
+  .contacto-grid { grid-template-columns: 1fr; }
+}

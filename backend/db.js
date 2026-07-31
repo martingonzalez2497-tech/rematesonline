@@ -109,8 +109,14 @@ if (!columnasRemates.includes("fecha_inicio")) {
   db.exec("ALTER TABLE remates ADD COLUMN fecha_inicio TEXT");
 }
 
-// Tabla de vistas de lotes (para contador en vivo)
+// Tabla de suscriptores al newsletter
 db.exec(`
+  CREATE TABLE IF NOT EXISTS newsletter (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL UNIQUE,
+    creado_en TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+`);
   CREATE TABLE IF NOT EXISTS vistas_lote (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     lote_id INTEGER NOT NULL REFERENCES lotes(id),
