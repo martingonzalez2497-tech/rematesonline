@@ -93,10 +93,17 @@
   <h1 class="sr-only">¿Quién Da Más? — Remates Online · Canal 10 Uruguay</h1>
 
   <!-- Banda Canal 10 -->
-  <div class="banda-canal10">
+  <div class="banda-canal10" id="bandaCanal10">
     <span class="banda-canal10-dot"></span>
     <span>📺 <strong>¿Quién Da Más?</strong> — Sábados 11:55hs por <strong>Canal 10</strong></span>
     <a href="https://www.instagram.com/quiendamas10/" target="_blank" rel="noopener" class="banda-canal10-link">@quiendamas10</a>
+  </div>
+
+  <!-- Banner EN VIVO (aparece automáticamente los sábados 11:55-13:00) -->
+  <div class="banner-en-vivo" id="bannerEnVivo" hidden>
+    <span class="en-vivo-dot"></span>
+    <strong>EN VIVO AHORA</strong> — ¿Quién Da Más? está al aire por Canal 10
+    <a href="https://www.canal10.com.uy" target="_blank" rel="noopener" class="en-vivo-link">Ver en Canal 10 →</a>
   </div>
 
   <section class="hero-banner" aria-roledescription="carrusel" aria-label="Subastas destacadas">
@@ -446,8 +453,8 @@
       <label for="panelTitulo2">Título</label>
       <input id="panelTitulo2" type="text" required>
 
-      <label for="panelDescripcion">Descripción</label>
-      <textarea id="panelDescripcion" rows="2"></textarea>
+      <label for="panelDescripcion">Descripción <span class="campo-contador" id="contadorDesc"></span></label>
+      <textarea id="panelDescripcion" rows="2" maxlength="1000"></textarea>
 
       <p class="ficha-tecnica-titulo">Ficha técnica (opcional)</p>
       <label for="panelCondicion">Estado</label>
@@ -465,12 +472,12 @@
       <label for="panelAnio">Año / Antigüedad</label>
       <input id="panelAnio" type="text" placeholder="Ej: 2019">
 
-      <label for="panelImagen">Fotos del lote (opcional, podés elegir varias)</label>
+      <label for="panelImagen">Fotos del lote (opcional, podés elegir varias · máx 10MB c/u)</label>
       <input id="panelImagen" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
       <p class="panel-imagen-preview-nota" id="panelImagenNota"></p>
 
       <label for="panelPrecio">Precio inicial ($)</label>
-      <input id="panelPrecio" type="number" min="0" step="100" required>
+      <input id="panelPrecio" type="number" min="1" step="100" required>
 
       <label for="panelCierre">Fecha y hora de cierre</label>
       <input id="panelCierre" type="datetime-local" required>

@@ -21,6 +21,8 @@ if (typeof io !== "undefined") {
     clearTimeout(debounceActualizar);
     debounceActualizar = setTimeout(() => {
       cargarLotes();
+      const hayActividad = LOTES.some(l => !loteEstaCerrado(l) && l.cantidad_ofertas > 0);
+      actualizarFavicon(hayActividad);
     }, 400);
   });
 
@@ -175,12 +177,14 @@ function renderHeroDesdeLotes() {
       imgFondo.alt = "";
       imgFondo.className = "hero-slide-fondo";
       imgFondo.setAttribute("aria-hidden", "true");
+      if (i > 0) imgFondo.loading = "lazy";
       li.appendChild(imgFondo);
 
       const imgPrincipal = document.createElement("img");
       imgPrincipal.src = lote.imagen;
       imgPrincipal.alt = "";
       imgPrincipal.className = "hero-slide-img";
+      if (i > 0) imgPrincipal.loading = "lazy";
       li.appendChild(imgPrincipal);
     }
     const caption = document.createElement("p");
@@ -304,21 +308,38 @@ function iniciarFiltros() {
   });
 }
 iniciarFiltros();
+// ===== Búsqueda desde cualquier sección =====
 document.querySelector(".search-form").addEventListener("submit", (event) => {
   event.preventDefault();
   const texto = document.getElementById("buscar").value.trim();
   if (!texto) return;
-  // Sincronizar con el filtro de subastas activas
   const filtroTexto = document.getElementById("filtroTexto");
   if (filtroTexto) {
     filtroTexto.value = texto;
     mostrarSoloSeccion("activas");
     aplicarFiltros();
     document.getElementById("activas").scrollIntoView({ behavior: "smooth" });
-  } else {
-    buscarLotes();
   }
 });
+
+// ===== Banner EN VIVO (sábados 11:55 a 13:00hs Uruguay, UTC-3) =====
+function verificarEnVivo() {
+  const ahora = new Date();
+  const diaSemana = ahora.getDay(); // 6 = sábado
+  const hora = ahora.getHours();
+  const minuto = ahora.getMinutes();
+  const enVivo = diaSemana === 6 && (
+    (hora === 11 && minuto >= 55) ||
+    (hora === 12) ||
+    (hora === 13 && minuto === 0)
+  );
+  const banner = document.getElementById("bannerEnVivo");
+  const banda = document.getElementById("bandaCanal10");
+  if (banner) banner.hidden = !enVivo;
+  if (banda) banda.hidden = enVivo; // reemplaza la banda normal cuando está en vivo
+}
+verificarEnVivo();
+setInterval(verificarEnVivo, 60000); // verificar cada minuto
 
 // ===== Búsqueda mobile =====
 (function() {
@@ -1155,7 +1176,7 @@ function crearTarjetaLote(lote) {
   const img = document.createElement(fotos[0] ? "img" : "p");
   img.className = "subasta-img";
   if (fotos[0]) {
-    img.src = fotos[0];
+    img.src = fotos[0]; img.loading = "lazy";
     img.alt = `Foto del lote ${lote.numero} — ${lote.titulo}`;
     img.onerror = () => { img.style.display = "none"; };
   } else {
@@ -1415,7 +1436,7 @@ function crearGrupoRemate(remate, lotesDelRemate) {
   const portada = document.createElement(srcPortada ? "img" : "p");
   portada.className = "subasta-img";
   if (srcPortada) {
-    portada.src = srcPortada;
+    portada.src = srcPortada; portada.loading = "lazy";
     portada.alt = `Foto de portada de ${remate.titulo}`;
   } else {
     portada.setAttribute("role", "img");
@@ -1842,6 +1863,7 @@ async function cargarGaleriaModal(lote) {
       const img = document.createElement("img");
       img.src = foto.url;
       img.alt = "Miniatura";
+      img.loading = "lazy";
       img.addEventListener("click", () => {
         document.querySelector("#modalImg img").src = foto.url;
       });
@@ -2391,6 +2413,19 @@ async function comprimirImagen(archivo, maxWidth = 1400, calidad = 0.82) {
   });
 }
 
+// Contador de caracteres en descripción
+const panelDesc = document.getElementById("panelDescripcion");
+const contadorDesc = document.getElementById("contadorDesc");
+if (panelDesc && contadorDesc) {
+  const actualizarContador = () => {
+    const resto = 1000 - panelDesc.value.length;
+    contadorDesc.textContent = `${panelDesc.value.length}/1000`;
+    contadorDesc.style.color = resto < 100 ? "var(--danger)" : "var(--fg-muted)";
+  };
+  panelDesc.addEventListener("input", actualizarContador);
+  actualizarContador();
+}
+
 document.getElementById("panelImagen").addEventListener("change", async (event) => {
   ignorarProximoEscape = true;
   setTimeout(() => { ignorarProximoEscape = false; }, 500);
@@ -2398,6 +2433,17 @@ document.getElementById("panelImagen").addEventListener("change", async (event) 
   const archivos = Array.from(event.target.files);
   const nota = document.getElementById("panelImagenNota");
   if (archivos.length === 0) return;
+
+  // Validar tamaño máximo 10MB por foto
+  const MAX_MB = 10;
+  const archivosGrandes = archivos.filter(f => f.size > MAX_MB * 1024 * 1024);
+  if (archivosGrandes.length > 0) {
+    nota.textContent = `❌ ${archivosGrandes.map(f => f.name).join(", ")} supera los ${MAX_MB}MB. Elegí una foto más liviana.`;
+    nota.style.color = "var(--danger)";
+    event.target.value = "";
+    return;
+  }
+  nota.style.color = "";
 
   const sesion = leerSesion();
   if (!sesion) return;
@@ -3921,6 +3967,33 @@ function actualizarBtnPush(lote) {
     btn.disabled = false;
   }
 }
+// ===== Favicon dinámico =====
+function actualizarFavicon(tieneActividad) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 32; canvas.height = 32;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#E84C1E";
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(0, 0, 32, 32, 6);
+  else ctx.rect(0, 0, 32, 32);
+  ctx.fill();
+  ctx.fillStyle = "#fff";
+  ctx.font = "bold 9px Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("QDM", 16, 17);
+  if (tieneActividad) {
+    ctx.fillStyle = "#fff";
+    ctx.beginPath(); ctx.arc(26, 6, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#C0392B";
+    ctx.beginPath(); ctx.arc(26, 6, 3.5, 0, Math.PI * 2); ctx.fill();
+  }
+  let link = document.querySelector("link[rel~='icon']");
+  if (!link) { link = document.createElement("link"); link.rel = "icon"; document.head.appendChild(link); }
+  link.href = canvas.toDataURL();
+}
+setTimeout(() => actualizarFavicon(false), 500);
+
 const VAPID_PUBLIC_KEY = "BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDkBNinBuaZRoAo0RHrMkSK0-LwFzFnFVpM4rNF1K8ac"; // placeholder — reemplazar con clave real
 
 async function solicitarPermisoPush() {
