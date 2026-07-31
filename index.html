@@ -263,6 +263,7 @@
     <nav class="login-tabs" aria-label="Elegir sección">
       <button type="button" class="login-tab is-active" data-paneltab="remates">Remates</button>
       <button type="button" class="login-tab" data-paneltab="lotes">Lotes</button>
+      <button type="button" class="login-tab" data-paneltab="estadisticas-admin" id="tabEstadisticasAdmin">📊 Stats</button>
     </nav>
 
     <form class="form-panel" id="formNuevoRemate">
@@ -353,6 +354,14 @@
 
     <h4>Mis remates y sus lotes</h4>
     <ul class="panel-lista" id="panelLista"></ul>
+
+    <!-- Estadísticas generales — solo admin -->
+    <div id="panelEstadisticasAdmin" hidden>
+      <h4>Estadísticas generales</h4>
+      <div class="estadisticas-admin-grid" id="estadisticasAdminGrid"></div>
+      <h4 style="margin-top:1.5rem">Top 5 lotes más ofertados</h4>
+      <ul class="panel-lista" id="estadisticasTopLotes"></ul>
+    </div>
 </section>
 
 </main>

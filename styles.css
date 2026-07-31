@@ -1038,6 +1038,19 @@ ul { list-style: none; margin: 0; padding: 0; }
 .estadistica-tarjeta strong { display: block; font-size: 1.3rem; color: var(--accent); margin-bottom: 0.3rem; }
 .estadistica-tarjeta span { font-size: 0.78rem; color: var(--fg-muted); line-height: 1.3; }
 
+/* Estadísticas generales admin */
+.estadisticas-admin-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.75rem; margin: 1rem 0;
+}
+.stat-card {
+  background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 1rem; text-align: center; display: flex; flex-direction: column; gap: 0.3rem;
+}
+.stat-card-highlight { border-color: var(--accent); background: var(--accent-bg); }
+.stat-valor { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 0.78rem; color: var(--fg-muted); line-height: 1.3; }
+
 .puntaje-badge {
   display: inline-flex; align-items: center; justify-content: center;
   min-width: 1.8rem; height: 1.8rem; padding: 0 0.4rem; border-radius: 999px;

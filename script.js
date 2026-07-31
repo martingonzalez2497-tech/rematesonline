@@ -2269,13 +2269,75 @@ function cambiarPanelTab(tab) {
   });
   document.getElementById("formNuevoRemate").hidden = tab !== "remates";
   document.getElementById("formNuevoLote").hidden = tab !== "lotes";
+  document.getElementById("importarLotesDetalle") && (document.getElementById("importarLotesDetalle").hidden = tab !== "lotes");
+  document.getElementById("panelEstadisticasAdmin").hidden = tab !== "estadisticas-admin";
+  document.getElementById("panelLista").hidden = tab === "estadisticas-admin";
   if (tab === "lotes") autocompletarProximoNumeroDeLote();
+  if (tab === "estadisticas-admin") cargarEstadisticasAdmin();
 }
 document.querySelectorAll('[data-paneltab]').forEach((btn) => {
   btn.addEventListener("click", () => cambiarPanelTab(btn.dataset.paneltab));
 });
 function cerrarPanel() {
   volverAHome();
+}
+
+async function cargarEstadisticasAdmin() {
+  const sesion = leerSesion();
+  if (!sesion) return;
+  const grid = document.getElementById("estadisticasAdminGrid");
+  const topLotes = document.getElementById("estadisticasTopLotes");
+  grid.innerHTML = "<p>Cargando…</p>";
+  topLotes.innerHTML = "";
+  try {
+    const resp = await fetch(`${API_URL}/remates/estadisticas-generales`, {
+      headers: { Authorization: `Bearer ${sesion.token}` },
+    });
+    const d = await resp.json();
+    grid.innerHTML = `
+      <div class="stat-card"><span class="stat-valor">${d.totalUsuarios}</span><span class="stat-label">Usuarios registrados</span></div>
+      <div class="stat-card"><span class="stat-valor">${d.usuariosActivos}</span><span class="stat-label">Activos últimos 30 días</span></div>
+      <div class="stat-card"><span class="stat-valor">${d.totalRemates}</span><span class="stat-label">Remates creados</span></div>
+      <div class="stat-card"><span class="stat-valor">${d.totalLotes}</span><span class="stat-label">Lotes publicados</span></div>
+      <div class="stat-card"><span class="stat-valor">${d.totalOfertas}</span><span class="stat-label">Ofertas totales</span></div>
+      <div class="stat-card stat-card-highlight"><span class="stat-valor">$ ${d.totalRecaudado.toLocaleString("es-UY")}</span><span class="stat-label">Total recaudado</span></div>
+      <div class="stat-card"><span class="stat-valor">$ ${d.comisionTotal.toLocaleString("es-UY")}</span><span class="stat-label">Comisión generada (18,3%)</span></div>
+    `;
+    topLotes.innerHTML = "";
+    if (d.lotesTop.length === 0) {
+      topLotes.innerHTML = "<li style='padding:1rem;color:var(--fg-muted)'>Sin datos aún.</li>";
+    }
+    d.lotesTop.forEach((l, i) => {
+      const li = document.createElement("li");
+      li.className = "panel-item";
+      li.innerHTML = `<span style="font-weight:700;color:var(--accent)">#${i + 1}</span> ${l.titulo} <span style="color:var(--fg-muted);font-size:0.85rem">(${l.remate_titulo})</span> — <strong>${l.total_ofertas} ofertas</strong>`;
+      topLotes.appendChild(li);
+    });
+  } catch (e) {
+    grid.innerHTML = "<p style='color:var(--error)'>No se pudieron cargar las estadísticas.</p>";
+  }
+}
+
+async function exportarGanadoresCSV(remateId, remaTitulo) {
+  const sesion = leerSesion();
+  if (!sesion) return;
+  try {
+    const resp = await fetch(`${API_URL}/remates/${remateId}/exportar-ganadores`, {
+      headers: { Authorization: `Bearer ${sesion.token}` },
+    });
+    if (!resp.ok) { alert("No se pudo exportar."); return; }
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ganadores-${remaTitulo.replace(/\s+/g, "-")}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    alert("Error al exportar.");
+  }
 }
 
 function renderPanelLista() {
@@ -2308,9 +2370,14 @@ function renderPanelLista() {
     btnEstadisticas.textContent = "📊 Ver estadísticas";
     btnEstadisticas.addEventListener("click", () => abrirEstadisticasRemate(remate));
 
+    const btnExportar = document.createElement("button");
+    btnExportar.type = "button";
+    btnExportar.textContent = "⬇ Exportar ganadores";
+    btnExportar.addEventListener("click", () => exportarGanadoresCSV(remate.id, remate.titulo));
+
     const filaEncabezado = document.createElement("p");
     filaEncabezado.className = "panel-lote-acciones";
-    filaEncabezado.append(btnEditarRemate, btnEstadisticas);
+    filaEncabezado.append(btnEditarRemate, btnEstadisticas, btnExportar);
 
     liRemate.append(encabezadoFila, filaEncabezado);
 

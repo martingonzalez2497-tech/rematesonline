@@ -126,4 +126,49 @@ router.get("/:id/estadisticas", requireAuth, requireRole("rematador", "administr
   });
 });
 
+// Estadísticas generales del administrador
+router.get("/estadisticas-generales", requireAuth, requireRole("administrador"), (req, res) => {
+  const totalUsuarios = db.prepare("SELECT COUNT(*) AS n FROM usuarios WHERE rol = 'publico'").get().n;
+  const usuariosActivos = db.prepare("SELECT COUNT(DISTINCT usuario_id) AS n FROM ofertas WHERE fecha > datetime('now', '-30 days')").get().n;
+  const totalRemates = db.prepare("SELECT COUNT(*) AS n FROM remates").get().n;
+  const totalLotes = db.prepare("SELECT COUNT(*) AS n FROM lotes").get().n;
+  const totalOfertas = db.prepare("SELECT COUNT(*) AS n FROM ofertas").get().n;
+  const lotesVendidos = db.prepare("SELECT * FROM lotes WHERE estado = 'finalizada' AND ganador_id IS NOT NULL").all();
+  const totalRecaudado = lotesVendidos.reduce((s, l) => s + (l.oferta_actual || 0), 0);
+  const comisionTotal = Math.round(totalRecaudado * 0.183);
+  const lotesTop = db.prepare(`
+    SELECT l.titulo, l.numero, COUNT(o.id) AS total_ofertas, l.oferta_actual, r.titulo AS remate_titulo, r.moneda
+    FROM lotes l
+    LEFT JOIN ofertas o ON o.lote_id = l.id
+    LEFT JOIN remates r ON r.id = l.remate_id
+    GROUP BY l.id ORDER BY total_ofertas DESC LIMIT 5
+  `).all();
+
+  res.json({ totalUsuarios, usuariosActivos, totalRemates, totalLotes, totalOfertas, totalRecaudado, comisionTotal, lotesTop });
+});
+
+// Exportar ganadores de un remate como CSV
+router.get("/:id/exportar-ganadores", requireAuth, requireRole("rematador", "administrador"), (req, res) => {
+  const remate = db.prepare("SELECT * FROM remates WHERE id = ?").get(req.params.id);
+  if (!remate) return res.status(404).json({ error: "Remate no encontrado." });
+
+  const lotes = db.prepare(`
+    SELECT l.numero, l.titulo, l.oferta_actual, l.moneda, u.nombre AS ganador_nombre, u.email AS ganador_email, u.cedula AS ganador_cedula
+    FROM lotes l
+    LEFT JOIN usuarios u ON u.id = l.ganador_id
+    WHERE l.remate_id = ? AND l.estado = 'finalizada' AND l.ganador_id IS NOT NULL
+    ORDER BY CAST(REPLACE(REPLACE(l.numero, '#', ''), ' ', '') AS INTEGER) ASC
+  `).all(req.params.id);
+
+  const moneda = remate.moneda === "USD" ? "US$" : "$";
+  let csv = "Lote,Título,Monto ganador,Ganador,Email,Cédula\n";
+  lotes.forEach((l) => {
+    csv += `"${l.numero}","${l.titulo}","${moneda} ${l.oferta_actual.toLocaleString("es-UY")}","${l.ganador_nombre}","${l.ganador_email}","${l.ganador_cedula}"\n`;
+  });
+
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", `attachment; filename="ganadores-${remate.titulo.replace(/\s+/g, "-")}.csv"`);
+  res.send("\uFEFF" + csv); // BOM para que Excel lo abra bien
+});
+
 module.exports = router;
