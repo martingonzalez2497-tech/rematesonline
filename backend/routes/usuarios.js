@@ -98,4 +98,19 @@ router.patch("/:id/rol", requireAuth, requireRole("administrador"), (req, res) =
   res.json({ ok: true });
 });
 
+// Eliminar cualquier usuario — solo administrador. No se puede eliminar a un administrador.
+router.delete("/:id", requireAuth, requireRole("administrador"), (req, res) => {
+  const usuario = db.prepare("SELECT rol FROM usuarios WHERE id = ?").get(req.params.id);
+  if (!usuario) return res.status(404).json({ error: "Usuario no encontrado." });
+  if (usuario.rol === "administrador") {
+    return res.status(400).json({ error: "No se puede eliminar a un administrador." });
+  }
+  db.prepare("DELETE FROM ofertas WHERE usuario_id = ?").run(req.params.id);
+  db.prepare("DELETE FROM ofertas_automaticas WHERE usuario_id = ?").run(req.params.id);
+  db.prepare("DELETE FROM codigos_verificacion WHERE usuario_id = ?").run(req.params.id);
+  db.prepare("DELETE FROM recuperaciones_password WHERE usuario_id = ?").run(req.params.id);
+  db.prepare("DELETE FROM usuarios WHERE id = ?").run(req.params.id);
+  res.json({ ok: true });
+});
+
 module.exports = router;

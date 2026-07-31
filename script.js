@@ -2551,6 +2551,14 @@ async function renderUsuariosLista() {
           usuario.bloqueado ? desbloquearUsuario(usuario.id) : bloquearUsuario(usuario.id)
         );
         acciones.appendChild(btnBloquear);
+
+        const btnEliminar = document.createElement("button");
+        btnEliminar.type = "button";
+        btnEliminar.className = "btn btn-ghost";
+        btnEliminar.style.color = "#c0392b";
+        btnEliminar.textContent = "Eliminar";
+        btnEliminar.addEventListener("click", () => eliminarUsuario(usuario.id, usuario.nombre));
+        acciones.appendChild(btnEliminar);
       }
 
       li.append(info, acciones);
@@ -2660,6 +2668,31 @@ async function bloquearUsuario(usuarioId) {
 
 async function desbloquearUsuario(usuarioId) {
   await accionSobreUsuario(usuarioId, "desbloquear", "Cuenta desbloqueada.");
+}
+
+async function eliminarUsuario(usuarioId, nombre) {
+  const confirmado = await confirmarEnPagina(`¿Eliminar la cuenta de "${nombre}"? Esta acción no se puede deshacer.`);
+  if (!confirmado) return;
+  const sesion = leerSesion();
+  if (!sesion) return;
+  try {
+    const resp = await fetch(`${API_URL}/usuarios/${usuarioId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${sesion.token}` },
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      usuariosMensaje.textContent = data.error || "No se pudo eliminar la cuenta.";
+      usuariosMensaje.className = "panel-mensaje error";
+      return;
+    }
+    usuariosMensaje.textContent = `Cuenta de "${nombre}" eliminada.`;
+    usuariosMensaje.className = "panel-mensaje exito";
+    renderUsuariosLista();
+  } catch (err) {
+    usuariosMensaje.textContent = "No se pudo conectar con el servidor.";
+    usuariosMensaje.className = "panel-mensaje error";
+  }
 }
 
 async function accionSobreUsuario(usuarioId, accion, mensajeExito) {
