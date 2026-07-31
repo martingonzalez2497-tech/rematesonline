@@ -1495,7 +1495,7 @@ function abrirModal(lote) {
   const form = document.getElementById("formOferta");
   const minimoModal = lote.oferta_actual + incrementoParaFrontend(lote.oferta_actual);
   document.getElementById("montoOferta").placeholder = `Mín. ${formatoMonto(minimoModal, lote.remate_moneda)}`;
-  document.getElementById("montoMaximo").placeholder = `Mín. ${formatoMonto(minimoModal, lote.remate_moneda)}`;
+  document.getElementById("montoMaximo").placeholder = `Tu tope máximo (mín. ${formatoMonto(minimoModal, lote.remate_moneda)})`;
 
   document.getElementById("modalCantidadOfertas").textContent =
     lote.cantidad_ofertas === 1 ? "1 oferta" : `${lote.cantidad_ofertas} ofertas`;
@@ -1723,7 +1723,7 @@ document.getElementById("formOferta").addEventListener("submit", async (event) =
       const nuevoMinimo = loteAbierto.oferta_actual + incrementoParaFrontend(loteAbierto.oferta_actual);
       input.min = String(nuevoMinimo);
       input.placeholder = `Mín. ${formatoMonto(nuevoMinimo, loteAbierto.remate_moneda)}`;
-      document.getElementById("montoMaximo").placeholder = `Mín. ${formatoMonto(nuevoMinimo, loteAbierto.remate_moneda)}`;
+      document.getElementById("montoMaximo").placeholder = `Tu tope máximo (mín. ${formatoMonto(nuevoMinimo, loteAbierto.remate_moneda)})`;
     }
   });
 });
