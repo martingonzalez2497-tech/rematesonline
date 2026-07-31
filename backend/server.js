@@ -161,5 +161,38 @@ const io = new Server(servidorHttp, {
 setIO(io);
 
 servidorHttp.listen(PORT, () => {
-  console.log(`Backend de Remate Directo escuchando en http://localhost:${PORT}`);
+  console.log(`Backend escuchando en http://localhost:${PORT}`);
 });
+
+// ===== Cierre automático de lotes =====
+// Cada minuto revisa si hay lotes cuya fecha de cierre ya pasó
+// y los finaliza automáticamente asignando el ganador.
+function cerrarLotesVencidos() {
+  const ahora = new Date().toISOString();
+  const lotesVencidos = db.prepare(
+    `SELECT * FROM lotes WHERE estado = 'activa' AND cierre <= ?`
+  ).all(ahora);
+
+  if (lotesVencidos.length === 0) return;
+
+  lotesVencidos.forEach((lote) => {
+    const mejorOferta = db.prepare(
+      `SELECT usuario_id, monto FROM ofertas WHERE lote_id = ? ORDER BY monto DESC, id DESC LIMIT 1`
+    ).get(lote.id);
+
+    db.prepare(
+      `UPDATE lotes SET estado = 'finalizada', ganador_id = ? WHERE id = ?`
+    ).run(mejorOferta ? mejorOferta.usuario_id : null, lote.id);
+
+    console.log(`Lote #${lote.numero} "${lote.titulo}" cerrado automáticamente. Ganador: ${mejorOferta ? `usuario ${mejorOferta.usuario_id} con $${mejorOferta.monto}` : "sin ofertas"}`);
+  });
+
+  if (lotesVencidos.length > 0) {
+    const { avisarActualizacion } = require("./socket");
+    avisarActualizacion();
+  }
+}
+
+// Ejecutar al arrancar y luego cada minuto
+cerrarLotesVencidos();
+setInterval(cerrarLotesVencidos, 60 * 1000);

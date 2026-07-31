@@ -1170,9 +1170,7 @@ function crearTarjetaLote(lote) {
   const gano = cerrado && estadoDeMiOferta(lote) === "ganando";
   li.className = "subasta-card" + (cerrado ? " is-cerrada" : "") + (gano ? " is-ganada" : "");
   li.dataset.loteId = lote.id;
-
-  const favoritos = leerFavoritos();
-  if (favoritos.includes(lote.id)) li.style.borderColor = "var(--accent)";
+  if (esFavorito(lote.id)) li.style.borderColor = "var(--accent)";
 
   const fotos = [lote.imagen, ...(lote.fotos_extra ? lote.fotos_extra.split("|") : [])].filter(Boolean);
 
@@ -1295,9 +1293,9 @@ function crearTarjetaLote(lote) {
   btnFavCard.innerHTML = esFav ? SVG_ESTRELLA_LLENA : SVG_ESTRELLA_VACIA;
   btnFavCard.classList.toggle("is-activo", esFav);
   btnFavCard.setAttribute("aria-label", esFav ? "Quitar de favoritos" : "Agregar a favoritos");
-  btnFavCard.addEventListener("click", (e) => {
+  btnFavCard.addEventListener("click", async (e) => {
     e.stopPropagation();
-    const activo = toggleFavorito(lote.id);
+    const activo = await toggleFavorito(lote.id);
     btnFavCard.innerHTML = activo ? SVG_ESTRELLA_LLENA : SVG_ESTRELLA_VACIA;
     btnFavCard.classList.toggle("is-activo", activo);
     btnFavCard.setAttribute("aria-label", activo ? "Quitar de favoritos" : "Agregar a favoritos");
@@ -1996,11 +1994,10 @@ function abrirModal(lote) {
     intervaloModal = setInterval(actualizarCuentaModal, 1000);
   }
 
-  const favoritos = leerFavoritos();
   const btnFav = document.getElementById("btnFavorito");
-  const esFavorito = favoritos.includes(lote.id);
-  btnFav.innerHTML = esFavorito ? `${SVG_ESTRELLA_LLENA} En tus favoritos` : `${SVG_ESTRELLA_VACIA} Agregar a favoritos`;
-  btnFav.classList.toggle("is-activo", esFavorito);
+  const esFav = esFavorito(lote.id);
+  btnFav.innerHTML = esFav ? `${SVG_ESTRELLA_LLENA} En tus favoritos` : `${SVG_ESTRELLA_VACIA} Agregar a favoritos`;
+  btnFav.classList.toggle("is-activo", esFav);
 
   modalOverlay.hidden = false;
   // Actualizar URL a formato limpio /lote/id
@@ -2309,15 +2306,15 @@ document.getElementById("formOfertaAuto").addEventListener("submit", async (even
 });
 
 // ===== Favoritos: botón del modal =====
-document.getElementById("btnFavorito").addEventListener("click", () => {
+document.getElementById("btnFavorito").addEventListener("click", async () => {
   if (!loteAbierto) return;
   const btn = document.getElementById("btnFavorito");
-  const esFavorito = toggleFavorito(loteAbierto.id);
-  btn.innerHTML = esFavorito ? `${SVG_ESTRELLA_LLENA} En tus favoritos` : `${SVG_ESTRELLA_VACIA} Agregar a favoritos`;
-  btn.classList.toggle("is-activo", esFavorito);
+  const esFav = await toggleFavorito(loteAbierto.id);
+  btn.innerHTML = esFav ? `${SVG_ESTRELLA_LLENA} En tus favoritos` : `${SVG_ESTRELLA_VACIA} Agregar a favoritos`;
+  btn.classList.toggle("is-activo", esFav);
 
   const tarjeta = document.querySelector(`.subasta-card[data-lote-id="${loteAbierto.id}"]`);
-  if (tarjeta) tarjeta.style.borderColor = esFavorito ? "var(--accent)" : "var(--line)";
+  if (tarjeta) tarjeta.style.borderColor = esFav ? "var(--accent)" : "var(--line)";
 });
 
 document.getElementById("btnCompartirLote").addEventListener("click", async () => {
