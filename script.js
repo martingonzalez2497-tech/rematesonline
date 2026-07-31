@@ -276,13 +276,17 @@ const panelLateralFondo = document.getElementById("panelLateralFondo");
 
 function abrirPanelLateral() {
   navLista.classList.add("is-open");
+  navLista.style.display = "flex"; // forzar visible aunque site-nav tenga display:none
   panelLateralFondo.classList.add("is-open");
+  navToggle.classList.add("is-open");
   navToggle.setAttribute("aria-expanded", "true");
   document.body.style.overflow = "hidden";
 }
 function cerrarPanelLateral() {
   navLista.classList.remove("is-open");
+  navLista.style.display = ""; // volver a dejar que el CSS controle
   panelLateralFondo.classList.remove("is-open");
+  navToggle.classList.remove("is-open");
   navToggle.setAttribute("aria-expanded", "false");
   document.body.style.overflow = "";
 }
