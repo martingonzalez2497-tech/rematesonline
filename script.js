@@ -996,6 +996,7 @@ function crearTarjetaLote(lote) {
     contenedorFoto = document.createElement("div");
     contenedorFoto.className = "subasta-img-carrusel";
     let indiceFoto = 0;
+    let autoplaySuspendido = false;
 
     const irAFoto = (nuevoIndice, evento) => {
       if (evento) evento.stopPropagation();
@@ -1008,14 +1009,27 @@ function crearTarjetaLote(lote) {
     btnAnterior.className = "carrusel-flecha carrusel-flecha-izq";
     btnAnterior.setAttribute("aria-label", "Foto anterior");
     btnAnterior.innerHTML = "‹";
-    btnAnterior.addEventListener("click", (e) => irAFoto(indiceFoto - 1, e));
+    btnAnterior.addEventListener("click", (e) => { autoplaySuspendido = true; irAFoto(indiceFoto - 1, e); });
 
     const btnSiguiente = document.createElement("button");
     btnSiguiente.type = "button";
     btnSiguiente.className = "carrusel-flecha carrusel-flecha-der";
     btnSiguiente.setAttribute("aria-label", "Foto siguiente");
     btnSiguiente.innerHTML = "›";
-    btnSiguiente.addEventListener("click", (e) => irAFoto(indiceFoto + 1, e));
+    btnSiguiente.addEventListener("click", (e) => { autoplaySuspendido = true; irAFoto(indiceFoto + 1, e); });
+
+    // Autoplay: solo si hay 3 o más fotos
+    if (fotos.length >= 3) {
+      const intervalo = setInterval(() => {
+        if (autoplaySuspendido) { clearInterval(intervalo); return; }
+        irAFoto(indiceFoto + 1, null);
+      }, 5000);
+      // Detener el intervalo cuando el elemento se elimina del DOM
+      const observer = new MutationObserver(() => {
+        if (!document.contains(contenedorFoto)) { clearInterval(intervalo); observer.disconnect(); }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
 
     contenedorFoto.append(img, btnAnterior, btnSiguiente);
   }
