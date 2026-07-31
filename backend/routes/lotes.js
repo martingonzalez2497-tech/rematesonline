@@ -16,7 +16,8 @@ router.get("/", (req, res) => {
            remates.titulo AS remate_titulo, remates.rubro AS remate_rubro, remates.moneda AS remate_moneda,
            (SELECT COUNT(*) FROM ofertas WHERE ofertas.lote_id = lotes.id) AS cantidad_ofertas,
            (SELECT ofertas.usuario_id FROM ofertas WHERE ofertas.lote_id = lotes.id
-             ORDER BY ofertas.monto DESC, ofertas.id DESC LIMIT 1) AS ganador_actual_id
+             ORDER BY ofertas.monto DESC, ofertas.id DESC LIMIT 1) AS ganador_actual_id,
+           (SELECT GROUP_CONCAT(url, '|') FROM fotos_lote WHERE fotos_lote.lote_id = lotes.id) AS fotos_extra
     FROM lotes
     JOIN usuarios ON usuarios.id = lotes.rematador_id
     JOIN remates ON remates.id = lotes.remate_id

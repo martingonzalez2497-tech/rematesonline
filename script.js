@@ -912,16 +912,47 @@ function crearTarjetaLote(lote) {
   const favoritos = leerFavoritos();
   if (favoritos.includes(lote.id)) li.style.borderColor = "var(--accent)";
 
-  const img = document.createElement(lote.imagen ? "img" : "p");
+  const fotos = [lote.imagen, ...(lote.fotos_extra ? lote.fotos_extra.split("|") : [])].filter(Boolean);
+
+  const img = document.createElement(fotos[0] ? "img" : "p");
   img.className = "subasta-img";
-  if (lote.imagen) {
-    img.src = lote.imagen;
+  if (fotos[0]) {
+    img.src = fotos[0];
     img.alt = `Foto del lote ${lote.numero} — ${lote.titulo}`;
     img.onerror = () => { img.style.display = "none"; };
   } else {
     img.setAttribute("role", "img");
     img.setAttribute("aria-label", `Foto del lote ${lote.numero}`);
     img.textContent = "FOTO";
+  }
+
+  let contenedorFoto = img;
+  if (fotos.length > 1) {
+    contenedorFoto = document.createElement("div");
+    contenedorFoto.className = "subasta-img-carrusel";
+    let indiceFoto = 0;
+
+    const irAFoto = (nuevoIndice, evento) => {
+      if (evento) evento.stopPropagation();
+      indiceFoto = (nuevoIndice + fotos.length) % fotos.length;
+      img.src = fotos[indiceFoto];
+    };
+
+    const btnAnterior = document.createElement("button");
+    btnAnterior.type = "button";
+    btnAnterior.className = "carrusel-flecha carrusel-flecha-izq";
+    btnAnterior.setAttribute("aria-label", "Foto anterior");
+    btnAnterior.innerHTML = "‹";
+    btnAnterior.addEventListener("click", (e) => irAFoto(indiceFoto - 1, e));
+
+    const btnSiguiente = document.createElement("button");
+    btnSiguiente.type = "button";
+    btnSiguiente.className = "carrusel-flecha carrusel-flecha-der";
+    btnSiguiente.setAttribute("aria-label", "Foto siguiente");
+    btnSiguiente.innerHTML = "›";
+    btnSiguiente.addEventListener("click", (e) => irAFoto(indiceFoto + 1, e));
+
+    contenedorFoto.append(img, btnAnterior, btnSiguiente);
   }
 
   const numero = document.createElement("p");
@@ -976,7 +1007,7 @@ function crearTarjetaLote(lote) {
   li.style.position = "relative";
   li.appendChild(btnFavCard);
 
-  li.append(img, numero, titulo, precio, cantidadOfertas);
+  li.append(contenedorFoto, numero, titulo, precio, cantidadOfertas);
   if (insigniaEstado) li.appendChild(insigniaEstado);
   li.appendChild(cuenta);
 
