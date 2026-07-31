@@ -767,9 +767,10 @@ ul { list-style: none; margin: 0; padding: 0; }
 .lote-insignia-perdiendo { background: rgba(163, 64, 47, 0.12); color: #A3402F; }
 
 .lote-cuenta-urgente {
-  color: #A3402F !important;
+  color: #c0392b !important;
   font-weight: 700;
-  animation: parpadeoUrgente 1.2s ease-in-out infinite;
+  font-size: 1rem;
+  animation: parpadeoUrgente 1s ease-in-out infinite;
 }
 .lote-cuenta-vencida {
   color: var(--fg-muted) !important;
@@ -777,8 +778,18 @@ ul { list-style: none; margin: 0; padding: 0; }
   animation: none;
 }
 @keyframes parpadeoUrgente {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.04); }
+}
+/* Card completa pulsa cuando es urgente */
+.subasta-item:has(.lote-cuenta-urgente) {
+  outline: 2px solid #c0392b;
+  outline-offset: -2px;
+  animation: pulsarCard 2s ease-in-out infinite;
+}
+@keyframes pulsarCard {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(192,57,43,0); }
+  50% { box-shadow: 0 0 0 6px rgba(192,57,43,0.18); }
 }
 
 .lote-fav-btn {
@@ -923,6 +934,13 @@ ul { list-style: none; margin: 0; padding: 0; }
   background: none; border: none; color: var(--accent); text-decoration: underline;
   font-size: 0.75rem; font-weight: 700; text-align: left; cursor: pointer; padding: 0;
 }
+.lote-link-whatsapp {
+  display: flex; align-items: center; gap: 0.35rem;
+  width: calc(100% - 2 * var(--space-s)); margin: 0 var(--space-s) var(--space-s);
+  font-size: 0.78rem; color: #25D366; text-decoration: none; font-weight: 700;
+  transition: opacity 0.15s ease;
+}
+.lote-link-whatsapp:hover { opacity: 0.75; }
 
 .oferta-mensaje {
   margin: -0.25rem 0 var(--space-s);

@@ -1221,6 +1221,17 @@ function crearTarjetaLote(lote) {
     li.appendChild(linkAuto);
   }
 
+  // Botón compartir WhatsApp
+  const btnWhatsApp = document.createElement("a");
+  btnWhatsApp.className = "lote-link-whatsapp";
+  btnWhatsApp.target = "_blank";
+  btnWhatsApp.rel = "noopener";
+  const urlLote = `${location.origin}?lote=${lote.id}`;
+  const textoWA = encodeURIComponent(`🔨 *${lote.titulo}* — Lote ${lote.numero}\n💰 ${formatoMonto(lote.oferta_actual, lote.remate_moneda)}\n\nVer en Remate Directo: ${urlLote}`);
+  btnWhatsApp.href = `https://wa.me/?text=${textoWA}`;
+  btnWhatsApp.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Compartir por WhatsApp`;
+  li.appendChild(btnWhatsApp);
+
   return li;
 }
 
@@ -3007,27 +3018,71 @@ async function renderMisOfertas() {
       return;
     }
 
-    lista.innerHTML = "";
-    ofertas.forEach((oferta) => {
-      const li = document.createElement("li");
-      li.className = "panel-lote-item mis-ofertas-item";
-
-      if (oferta.imagen) {
-        const img = document.createElement("img");
-        img.src = oferta.imagen;
-        img.alt = `Foto del lote ${oferta.numero}`;
-        img.className = "mis-ofertas-img";
-        img.onerror = () => { img.style.display = "none"; };
-        li.appendChild(img);
+    // Cruzar con LOTES para saber estado actual
+    const ofertasPorLote = {};
+    ofertas.forEach((o) => {
+      if (!ofertasPorLote[o.lote_id] || o.monto > ofertasPorLote[o.lote_id].monto) {
+        ofertasPorLote[o.lote_id] = o;
       }
-
-      const info = document.createElement("p");
-      info.className = "panel-lote-info";
-      const fecha = new Date(oferta.fecha).toLocaleString("es-UY");
-      info.innerHTML = `<strong>Lote ${oferta.numero} — ${oferta.titulo}</strong>${formatoMonto(oferta.monto)} · ${fecha}`;
-      li.appendChild(info);
-      lista.appendChild(li);
     });
+    const misLotes = Object.values(ofertasPorLote);
+    const activas = misLotes.filter((o) => {
+      const lote = LOTES.find((l) => l.id === o.lote_id);
+      return lote && !loteEstaCerrado(lote) && estadoDeMiOferta(lote) !== "ganando";
+    });
+    const ganando = misLotes.filter((o) => {
+      const lote = LOTES.find((l) => l.id === o.lote_id);
+      return lote && !loteEstaCerrado(lote) && estadoDeMiOferta(lote) === "ganando";
+    });
+    const ganadas = misLotes.filter((o) => {
+      const lote = LOTES.find((l) => l.id === o.lote_id);
+      return lote && loteEstaCerrado(lote) && lote.ganador_nombre === sesion.usuario.nombre;
+    });
+    const perdidas = misLotes.filter((o) => {
+      const lote = LOTES.find((l) => l.id === o.lote_id);
+      return lote && loteEstaCerrado(lote) && lote.ganador_nombre !== sesion.usuario.nombre;
+    });
+
+    lista.innerHTML = "";
+
+    const seccion = (titulo, items, tipo) => {
+      if (items.length === 0) return;
+      const h = document.createElement("li");
+      h.className = "panel-lote-info";
+      h.innerHTML = `<strong style="font-size:1rem;color:var(--accent)">${titulo}</strong>`;
+      lista.appendChild(h);
+      items.forEach((o) => {
+        const lote = LOTES.find((l) => l.id === o.lote_id);
+        const li = document.createElement("li");
+        li.className = "panel-lote-item mis-ofertas-item";
+        if (o.imagen) {
+          const img = document.createElement("img");
+          img.src = o.imagen; img.alt = ""; img.className = "mis-ofertas-img";
+          img.onerror = () => { img.style.display = "none"; };
+          li.appendChild(img);
+        }
+        const info = document.createElement("p");
+        info.className = "panel-lote-info";
+        const estado = tipo === "ganando" ? "🥇 Vas ganando" : tipo === "ganada" ? "✅ Ganaste" : tipo === "perdida" ? "❌ No ganaste" : "⏳ En juego";
+        info.innerHTML = `<strong>Lote ${o.numero} — ${o.titulo}</strong>${estado} · Tu oferta: ${formatoMonto(o.monto, o.remate_moneda || "UYU")}`;
+        li.appendChild(info);
+        if (lote && !loteEstaCerrado(lote)) {
+          const btn = document.createElement("button");
+          btn.type = "button"; btn.className = "btn btn-ghost"; btn.textContent = "Ver lote";
+          btn.style.fontSize = "0.8rem";
+          btn.addEventListener("click", () => { mostrarSoloSeccion("activas"); abrirModal(lote); });
+          const acc = document.createElement("p"); acc.className = "panel-lote-acciones";
+          acc.appendChild(btn); li.appendChild(acc);
+        }
+        lista.appendChild(li);
+      });
+    };
+
+    seccion("🥇 Vas ganando", ganando, "ganando");
+    seccion("⏳ En juego (te superaron)", activas, "activa");
+    seccion("✅ Subastas ganadas", ganadas, "ganada");
+    seccion("📋 Historial (no ganaste)", perdidas, "perdida");
+
   } catch (err) {
     lista.innerHTML = `<li class="panel-lote-info">No se pudo conectar con el servidor.</li>`;
   }
