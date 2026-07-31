@@ -55,7 +55,8 @@ app.use("/api/ofertas", ofertasRoutes);
 app.use("/api/usuarios", usuariosRoutes);
 app.use("/api/uploads", uploadsRoutes);
 const path = require("path");
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+const uploadsDir = process.env.UPLOADS_PATH || path.join(__dirname, "uploads");
+app.use("/uploads", express.static(uploadsDir));
 
 // Servir el frontend (index.html, styles.css, script.js, fotos/) desde el
 // mismo servidor, así al desplegar es un solo lugar y no hace falta CORS.
