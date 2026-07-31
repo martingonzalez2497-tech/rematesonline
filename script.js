@@ -1549,8 +1549,18 @@ function renderCarruselesPorRubro() {
     link.textContent = "Ver rubro completo";
     link.addEventListener("click", (e) => {
       e.preventDefault();
+      // Mostrar todos los lotes del rubro directamente en la sección activas
       mostrarSoloSeccion("activas");
-      filtrarPorRubro(rubro);
+      const activasGrid = document.getElementById("activasGrid");
+      const lotesDelRubroActivos = LOTES.filter(l => !loteEstaCerrado(l) && (l.remate_rubro || l.rubro) === rubro);
+      renderGridComoListaDeLotes(activasGrid, rubro, "", lotesDelRubroActivos);
+      const resultado = document.getElementById("filtrosResultado");
+      if (resultado) {
+        resultado.hidden = false;
+        resultado.textContent = `${lotesDelRubroActivos.length} lote${lotesDelRubroActivos.length !== 1 ? "s" : ""} en ${rubro}`;
+      }
+      const btnLimpiar = document.getElementById("btnLimpiarFiltros");
+      if (btnLimpiar) btnLimpiar.hidden = false;
       setTimeout(() => {
         document.getElementById("activas").scrollIntoView({ behavior: "smooth" });
       }, 50);
