@@ -1345,3 +1345,51 @@ ul { list-style: none; margin: 0; padding: 0; }
   }
   .search-expandida button { padding: 0.55rem 0.9rem; }
 }
+
+/* ===== CORRECCIONES MOBILE v2 ===== */
+@media (max-width: 30rem) {
+
+  /* --- Barra búsqueda: oculta por defecto, JS la muestra --- */
+  .search-expandida { display: none; }
+
+  /* --- Encabezado de remate: evitar superposición título / botón volver --- */
+  .remate-volver {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+  .remate-detalle-titulo {
+    position: static;
+    transform: none;
+    font-size: 1.1rem;
+    text-align: left;
+  }
+
+  /* --- Lotes: 1 columna sin mínimo fijo --- */
+  .lotes-subgrid {
+    grid-template-columns: 1fr;
+  }
+
+  /* --- Tarjeta de lote: ancho completo sin margen --- */
+  .subasta-card {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* --- Remate grupo: padding más chico --- */
+  .remate-grupo {
+    padding: 0.75rem;
+  }
+
+  /* --- Grid de activas: 1 columna sin mínimo fijo --- */
+  .subastas-grid {
+    grid-template-columns: 1fr;
+    min-width: 0;
+  }
+
+  /* --- Evitar overflow horizontal en todo el body --- */
+  body, main, section, article, .remate-grupo, .subastas {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+}
