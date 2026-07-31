@@ -1343,7 +1343,7 @@ function crearTarjetaLote(lote) {
 
   // Botón compartir redes sociales
   const urlLote = `${location.origin}/lote/${lote.id}`;
-  const textoCompartir = `🔨 *${lote.titulo}* — Lote ${lote.numero}\n💰 ${formatoMonto(lote.oferta_actual, lote.remate_moneda)}\n\nVer en Remate Directo: ${urlLote}`;
+  const textoCompartir = `🔨 *${lote.titulo}* — Lote ${lote.numero}\n💰 ${formatoMonto(lote.oferta_actual, lote.remate_moneda)}\n\nVer en ¿Quién Da Más?: ${urlLote}`;
   const textoEncoded = encodeURIComponent(textoCompartir);
   const urlEncoded = encodeURIComponent(urlLote);
 
@@ -2007,7 +2007,7 @@ window.addEventListener("popstate", () => {
     modalOverlay.hidden = true;
     if (intervaloModal) clearInterval(intervaloModal);
     loteAbierto = null;
-    document.title = "Remate Directo";
+    document.title = "¿Quién Da Más?";
   }
 });
 document.addEventListener("keydown", (event) => {

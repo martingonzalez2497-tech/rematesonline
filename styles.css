@@ -2017,6 +2017,13 @@ ul { list-style: none; margin: 0; padding: 0; }
   width: 1px; background: var(--line);
   margin: 0 0.25rem; align-self: stretch;
 }
+/* En mobile el separador es horizontal */
+@media (max-width: 48rem) {
+  .nav-separador {
+    width: auto; height: 1px;
+    margin: 0.25rem 0; align-self: auto;
+  }
+}
 /* Banda Canal 10 con borde superior para separar del header */
 .banda-canal10 {
   background: var(--ink);
