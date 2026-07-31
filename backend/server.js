@@ -2,8 +2,10 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
+const bcrypt = require("bcryptjs");
 const { Server } = require("socket.io");
 const { setIO } = require("./socket");
+const db = require("./db");
 
 process.on("unhandledRejection", (err) => {
   console.error("UNHANDLED REJECTION:", err);
@@ -11,6 +13,26 @@ process.on("unhandledRejection", (err) => {
 process.on("uncaughtException", (err) => {
   console.error("UNCAUGHT EXCEPTION:", err);
 });
+
+// Si no hay ningún administrador todavía y hay credenciales cargadas como
+// variables de entorno (útil en hosting sin acceso a consola, como el plan
+// gratis de Render), se crea automáticamente al arrancar.
+async function crearAdminSiNoExiste() {
+  const yaHayAdmin = db.prepare("SELECT id FROM usuarios WHERE rol = 'administrador'").get();
+  if (yaHayAdmin) return;
+
+  const { ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_NOMBRE } = process.env;
+  if (!ADMIN_EMAIL || !ADMIN_PASSWORD) return;
+
+  const hash = await bcrypt.hash(ADMIN_PASSWORD, 10);
+  db.prepare("INSERT INTO usuarios (nombre, email, password_hash, rol) VALUES (?, ?, ?, 'administrador')").run(
+    ADMIN_NOMBRE || "Admin",
+    ADMIN_EMAIL.toLowerCase(),
+    hash
+  );
+  console.log(`✅ Admin creado automáticamente: ${ADMIN_EMAIL}`);
+}
+crearAdminSiNoExiste();
 
 const authRoutes = require("./routes/auth");
 const lotesRoutes = require("./routes/lotes");
