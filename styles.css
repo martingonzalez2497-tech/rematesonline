@@ -1710,11 +1710,22 @@ ul { list-style: none; margin: 0; padding: 0; }
 
   /* --- Hero: borde a borde, sin padding lateral --- */
   .hero-banner { padding: 0; margin-top: 0; }
-  .hero-slides { border-radius: 0; aspect-ratio: 3 / 2; max-height: 16rem; }
-  .hero-mensaje { padding: 0.9rem 1rem; }
-  .hero-mensaje-titulo { font-size: 1.15rem; }
-  .hero-mensaje-sub { font-size: 0.8rem; margin-bottom: 0.6rem; }
-  .hero-mensaje-cta { font-size: 0.8rem; padding: 0.5rem 1rem; }
+  .hero-slides { border-radius: 0; aspect-ratio: 4 / 3; max-height: 18rem; }
+  .hero-mensaje {
+    padding: 1.5rem 1.25rem;
+    justify-content: flex-end;
+    background: none;
+  }
+  .hero-slide::after {
+    background: linear-gradient(180deg, rgba(5,10,20,0) 30%, rgba(5,10,20,0.88) 100%);
+  }
+  .hero-mensaje-titulo { font-size: 1.25rem; margin-bottom: 0.4rem; }
+  .hero-mensaje-sub { display: none; }
+  .hero-mensaje-tag { display: none; }
+  .hero-mensaje-cta { font-size: 0.88rem; padding: 0.6rem 1.2rem; margin-top: 0.5rem; }
+
+  /* Cards de portada: ancho completo en slider mobile */
+  .grid-slider > li.remate-tarjeta-portada { width: calc(100vw - 3rem); min-width: 0; }
 
   /* --- Subastas activas --- */
   .subastas { padding: 0 0.75rem; margin-top: 1.5rem; }
@@ -1852,15 +1863,16 @@ ul { list-style: none; margin: 0; padding: 0; }
     max-height: 14rem;
   }
 
-  /* Precio más grande en mobile */
+  /* Precio más grande en mobile — pero sin que se corte en dos líneas */
   .subasta-card .lote-precio {
-    font-size: 1.4rem;
-    margin: 0.5rem var(--space-s) 0;
+    font-size: 1.1rem;
+    margin: 0.4rem var(--space-s) 0;
+    word-break: break-word;
   }
 
   /* Botones más altos y fáciles de tocar */
-  .lote-oferta-inline input { min-height: 2.8rem; font-size: 1rem; }
-  .lote-oferta-inline button { min-height: 2.8rem; font-size: 1rem; padding: 0.7rem 1.2rem; }
+  .lote-oferta-inline input { min-height: 2.8rem; font-size: 0.95rem; }
+  .lote-oferta-inline button { min-height: 2.8rem; font-size: 0.95rem; padding: 0.7rem 1rem; }
   .btn { min-height: 2.75rem; }
 
   /* --- Remate grupo: padding más chico --- */
