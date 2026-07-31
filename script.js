@@ -1154,7 +1154,6 @@ function crearTarjetaLote(lote) {
     linkAuto.addEventListener("click", (e) => {
       e.stopPropagation();
       abrirModal(lote);
-      document.querySelector(".oferta-auto-detalle").open = true;
     });
     li.appendChild(linkAuto);
   }
