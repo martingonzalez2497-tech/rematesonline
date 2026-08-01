@@ -243,8 +243,10 @@ router.get("/mias", requireAuth, (req, res) => {
   const ofertas = db
     .prepare(
       `SELECT ofertas.*, lotes.titulo, lotes.numero, lotes.imagen, lotes.estado AS lote_estado,
-              lotes.cierre, lotes.ganador_id, lotes.remate_moneda
-       FROM ofertas JOIN lotes ON lotes.id = ofertas.lote_id
+              lotes.cierre, lotes.ganador_id, remates.moneda AS remate_moneda
+       FROM ofertas
+       JOIN lotes ON lotes.id = ofertas.lote_id
+       JOIN remates ON remates.id = lotes.remate_id
        WHERE ofertas.usuario_id = ?
        GROUP BY ofertas.lote_id
        ORDER BY ofertas.fecha DESC
