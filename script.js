@@ -79,8 +79,8 @@ function actualizarIconoTema() {
 if (savedTheme) {
   root.setAttribute("data-theme", savedTheme);
 } else {
-  // Default: modo oscuro siempre (identidad del sitio)
-  root.setAttribute("data-theme", "dark");
+  // Default: modo claro — la paleta crema/navy transmite confianza
+  root.removeAttribute("data-theme");
 }
 actualizarIconoTema();
 
@@ -4176,7 +4176,7 @@ function actualizarFavicon(tieneActividad) {
   const canvas = document.createElement("canvas");
   canvas.width = 32; canvas.height = 32;
   const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "#E84C1E";
+  ctx.fillStyle = "#1A3A6B";
   ctx.beginPath();
   if (ctx.roundRect) ctx.roundRect(0, 0, 32, 32, 6);
   else ctx.rect(0, 0, 32, 32);
@@ -4189,7 +4189,7 @@ function actualizarFavicon(tieneActividad) {
   if (tieneActividad) {
     ctx.fillStyle = "#fff";
     ctx.beginPath(); ctx.arc(26, 6, 5, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "#C0392B";
+    ctx.fillStyle = "#C4973A";
     ctx.beginPath(); ctx.arc(26, 6, 3.5, 0, Math.PI * 2); ctx.fill();
   }
   let link = document.querySelector("link[rel~='icon']");

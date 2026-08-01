@@ -1,23 +1,24 @@
 /* ===== Tokens ===== */
 :root {
-  --dorado: #C9963A;
+  --dorado: #C4973A;           /* Dorado cálido — valor, prestige */
+  --dorado-light: #F5EDD6;     /* Dorado suave para fondos */
   --white: #FFFFFF;
-  --off-white: #F4F6FA;
-  --ink: #0D1117;
-  --navy: #0F2A4A;
-  --navy-light: #E8F1FF;
-  --line: #E2E8F0;
-  --danger: #C0392B;
-  --success: #1A9E5C;
+  --off-white: #F7F5F0;        /* Crema cálida — papel, elegancia */
+  --ink: #1A1612;              /* Casi negro cálido */
+  --navy: #1A3A6B;             /* Azul profundo — confianza, institución */
+  --navy-light: #EBF1FA;       /* Azul muy suave */
+  --line: #DDD8CF;             /* Línea crema */
+  --danger: #B91C1C;
+  --success: #166534;
 
   --bg: var(--white);
-  --bg-2: var(--off-white);
+  --bg-2: var(--off-white);    /* Crema suave */
   --fg: var(--ink);
-  --fg-muted: #5A6780;
-  --accent: #E84C1E;        /* Naranja-rojo: evoca remate, martillo, urgencia */
-  --accent-2: #1A56DB;      /* Azul para acciones secundarias */
-  --accent-bg: #FEF0EB;
-  --accent-2-bg: #EBF2FF;
+  --fg-muted: #6B5F52;         /* Marrón grisáceo cálido */
+  --accent: #1A3A6B;           /* Azul profundo — acción principal */
+  --accent-2: var(--dorado);   /* Dorado — acento premium */
+  --accent-bg: var(--navy-light);
+  --accent-2-bg: var(--dorado-light);
 
   --font-display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -38,16 +39,18 @@
 }
 
 [data-theme="dark"] {
-  --bg: #080D14;            /* Casi negro azulado */
-  --bg-2: #0E1620;          /* Muy oscuro, bien diferenciado */
-  --fg: #F0F4FC;
-  --fg-muted: #8A9BB8;
-  --accent: #FF6B3D;        /* Naranja más brillante en dark */
-  --accent-2: #4D8FFF;
-  --accent-bg: #2A1610;
-  --accent-2-bg: #0F1E3A;
-  --line: #1A2940;
+  --bg: #12100E;               /* Casi negro cálido, no azulado */
+  --bg-2: #1C1914;             /* Oscuro cálido diferenciado */
+  --fg: #F2EDE5;               /* Crema suave — no blanco frío */
+  --fg-muted: #9E9080;         /* Gris cálido */
+  --accent: #4A7CC7;           /* Azul más claro en dark */
+  --accent-2: #D4A94A;         /* Dorado brillante en dark */
+  --accent-bg: #1A2535;
+  --accent-2-bg: #2A2010;
+  --line: #2E2820;             /* Línea oscura cálida */
   --dorado: #D4A94A;
+  --dorado-light: #2A2010;
+  --navy-light: #1A2535;
   color-scheme: dark;
 }
 
@@ -113,8 +116,8 @@ ul { list-style: none; margin: 0; padding: 0; }
   background: var(--accent); color: #fff;
   font-size: 1rem; flex-shrink: 0;
 }
-.brand-name { color: var(--fg); }
-.brand-name span { color: var(--accent); }
+.brand-name { color: var(--fg); font-weight: 800; letter-spacing: -0.02em; }
+.brand-name span { color: var(--dorado); }
 .header-top {
   max-width: var(--content-max);
   margin-inline: auto;
@@ -348,13 +351,13 @@ ul { list-style: none; margin: 0; padding: 0; }
 .hero-mensaje-cta {
   display: inline-flex; align-items: center; gap: 0.4rem;
   align-self: flex-start; margin-top: 0.25rem;
-  background: var(--accent); color: #fff; text-decoration: none;
-  font-weight: 700; font-size: 0.92rem;
+  background: var(--dorado); color: #fff; text-decoration: none;
+  font-weight: 800; font-size: 0.92rem;
   padding: 0.7rem 1.6rem; border-radius: 999px;
-  box-shadow: 0 4px 20px rgba(61,142,255,0.4);
+  box-shadow: 0 4px 20px rgba(196,151,58,0.4);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.hero-mensaje-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(61,142,255,0.55); }
+.hero-mensaje-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(196,151,58,0.55); }
 
 /* Caption del slide (nombre del remate) — abajo a la derecha */
 .slide-caption {
@@ -858,27 +861,35 @@ ul { list-style: none; margin: 0; padding: 0; }
   transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease, filter 0.15s ease;
 }
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent) 0%, #C93D10 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, #102B52 100%);
   color: #fff;
-  box-shadow: 0 3px 10px rgba(232,76,30,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+  box-shadow: 0 3px 10px rgba(26,58,107,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
 }
 .btn-primary:hover {
   filter: brightness(1.08);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(232,76,30,0.45);
+  box-shadow: 0 6px 20px rgba(26,58,107,0.45);
 }
-.btn-primary:active { transform: translateY(0); box-shadow: 0 2px 6px rgba(232,76,30,0.3); }
+.btn-primary:active { transform: translateY(0); box-shadow: 0 2px 6px rgba(26,58,107,0.3); }
 .btn-ghost { border-color: var(--line); color: var(--fg); background: transparent; }
 .btn-ghost:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
 
 /* Botón Ofertar en la card — versión especial más grande */
+/* Botón Ofertar — dorado para destacar la acción principal de compra */
 .lote-oferta-inline button.btn-primary {
-  background: linear-gradient(135deg, var(--accent) 0%, #C93D10 100%);
-  box-shadow: 0 3px 12px rgba(232,76,30,0.4);
+  background: linear-gradient(135deg, #C4973A 0%, #A67C28 100%);
+  box-shadow: 0 3px 12px rgba(196,151,58,0.4);
   font-size: 0.92rem;
   padding: 0.55rem 1.1rem;
   border-radius: 999px;
   letter-spacing: 0.01em;
+  color: #fff;
+  font-weight: 800;
+}
+.lote-oferta-inline button.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(196,151,58,0.5);
 }
 
 /* Separador visual entre grupos de rubros */
@@ -1944,7 +1955,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   display: flex; align-items: center; gap: 1rem;
   background: var(--bg); border: 2px solid var(--accent);
   border-radius: var(--radius-lg); padding: 1rem 1.5rem;
-  box-shadow: 0 8px 24px rgba(232,76,30,0.15);
+  box-shadow: 0 8px 24px rgba(26,58,107,0.15);
 }
 .nosotros-canal-numero {
   font-size: 3rem; font-weight: 900; color: var(--accent);
@@ -2037,7 +2048,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 [data-theme="dark"] .banda-canal10 { background: #000; }
 .banda-canal10-dot {
   width: 0.5rem; height: 0.5rem; border-radius: 50%;
-  background: #E84C1E; animation: parpadeoUrgente 1.5s ease-in-out infinite;
+  background: var(--accent); animation: parpadeoUrgente 1.5s ease-in-out infinite;
   flex-shrink: 0;
 }
 .banda-canal10 strong { color: #fff; }
