@@ -1027,20 +1027,21 @@ ul { list-style: none; margin: 0; padding: 0; }
   text-transform: uppercase;
   color: var(--fg-muted);
   font-family: var(--font-body);
-  margin-bottom: 0.1rem;
+  margin-bottom: 0.15rem;
 }
 .precio-moneda {
-  font-size: 0.75em;
+  font-size: 0.7em;
   font-weight: 700;
-  vertical-align: super;
+  vertical-align: baseline;
   margin-right: 0.1em;
   color: var(--accent);
-  opacity: 0.8;
+  opacity: 0.75;
 }
 .precio-numero {
   font-family: var(--font-display);
   font-size: 1em;
   font-weight: 700;
+  vertical-align: baseline;
 }
 .subasta-card .lote-cuenta {
   margin: 0.2rem var(--space-s) var(--space-s);
