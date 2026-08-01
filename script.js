@@ -2951,8 +2951,8 @@ async function cargarDashboardGanadores() {
 
 // ===== Insignia "Lote popular" =====
 function insigniaPopular(lote) {
-  if (lote.cantidad_ofertas >= 5) return "🔥 Popular";
-  if (lote.cantidad_ofertas >= 3) return "⚡ Activo";
+  if (lote.cantidad_ofertas >= 5) return "Popular";
+  if (lote.cantidad_ofertas >= 3) return "Activo";
   return null;
 }
 

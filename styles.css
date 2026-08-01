@@ -851,45 +851,70 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 .btn {
   display: inline-block;
-  padding: 0.65rem 1.25rem;
-  border-radius: var(--radius);
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;           /* Cuadrado moderado — no píldora, no cuadro */
   text-decoration: none;
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 0.9rem;
   border: 1px solid transparent;
   cursor: pointer;
   font: inherit;
-  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease, filter 0.15s ease;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease, filter 0.15s ease, background 0.15s ease;
 }
+
+/* Primario: navy con sombra, borde ligeramente redondeado */
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent) 0%, #102B52 100%);
+  background: var(--accent);
   color: #fff;
-  box-shadow: 0 3px 10px rgba(26,58,107,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(26,58,107,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
+  font-weight: 700;
 }
 .btn-primary:hover {
-  filter: brightness(1.08);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(26,58,107,0.45);
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 16px rgba(26,58,107,0.35);
 }
-.btn-primary:active { transform: translateY(0); box-shadow: 0 2px 6px rgba(26,58,107,0.3); }
-.btn-ghost { border-color: var(--line); color: var(--fg); background: transparent; }
-.btn-ghost:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+.btn-primary:active { transform: translateY(0); filter: brightness(0.95); }
 
-/* Botón Ofertar en la card — versión especial más grande */
-/* Botón Ofertar — dorado para destacar la acción principal de compra */
+/* Ghost: borde sutil, sin fondo */
+.btn-ghost {
+  border-color: var(--line);
+  color: var(--fg-muted);
+  background: transparent;
+  font-weight: 500;
+}
+.btn-ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+/* Botón Ofertar — píldora dorada, más grande, destaca del resto */
 .lote-oferta-inline button.btn-primary {
-  background: linear-gradient(135deg, #C4973A 0%, #A67C28 100%);
-  box-shadow: 0 3px 12px rgba(196,151,58,0.4);
-  font-size: 0.92rem;
-  padding: 0.55rem 1.1rem;
-  border-radius: 999px;
-  letter-spacing: 0.01em;
-  color: #fff;
+  background: linear-gradient(160deg, #C4973A 0%, #A67C28 100%);
+  box-shadow: 0 3px 12px rgba(196,151,58,0.35);
+  font-size: 0.9rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: 999px;         /* Solo el Ofertar es píldora */
   font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #fff;
+  border-color: transparent;
 }
 .lote-oferta-inline button.btn-primary:hover {
-  filter: brightness(1.1);
+  filter: brightness(1.08);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(196,151,58,0.5);
+  box-shadow: 0 6px 20px rgba(196,151,58,0.45);
+}
+
+/* Botón de panel admin — más pequeño, cuadrado */
+.panel-lote-acciones .btn,
+.panel-lote-acciones button {
+  border-radius: 6px;
+  font-size: 0.82rem;
+  padding: 0.35rem 0.8rem;
+  font-weight: 600;
 }
 
 /* Separador visual entre grupos de rubros */
@@ -977,16 +1002,29 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 .lote-insignia {
   margin: 0.3rem var(--space-s) 0;
-  display: block;
-  text-align: center;
-  font-size: 0.8rem;
-  font-weight: 800;
-  padding: 0.3rem 0.55rem;
-  border-radius: 999px;
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;           /* Cuadrado — más serio, menos app */
 }
-.lote-insignia-ganando { background: var(--accent-bg); color: var(--accent); }
-.lote-insignia-perdiendo { background: rgba(163, 64, 47, 0.12); color: #A3402F; }
-.lote-insignia-popular { background: rgba(255, 160, 0, 0.12); color: #c07800; }
+.lote-insignia-ganando {
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 1px solid rgba(26,58,107,0.2);
+}
+.lote-insignia-perdiendo {
+  background: rgba(185,28,28,0.08);
+  color: #9B1C1C;
+  border: 1px solid rgba(185,28,28,0.15);
+}
+.lote-insignia-popular {
+  background: var(--dorado-light);
+  color: #8A6220;
+  border: 1px solid rgba(196,151,58,0.25);
+}
 
 /* Contador de vistas */
 .modal-vistas {
