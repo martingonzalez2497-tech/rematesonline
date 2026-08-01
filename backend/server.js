@@ -104,24 +104,24 @@ app.get("/lote/:id", (req, res) => {
   const precio = `${moneda} ${Number(lote.oferta_actual).toLocaleString("es-UY")}`;
   const imagen = lote.imagen || `${base}/fotos/og-default.png`;
   const titulo = `${lote.titulo} — Lote ${lote.numero}`;
-  const descripcion = `${lote.cantidad_ofertas > 0 ? `Oferta actual: ${precio}` : `Precio inicial: ${precio}`} · ${lote.remate_titulo}`;
+  const descripcion = `${lote.cantidad_ofertas > 0 ? `Oferta actual: ${precio}` : `Precio inicial: ${precio}`} · ${lote.remate_titulo} · ¿Quién Da Más? Canal 10`;
 
-  // Inyectar OG tags en el HTML base
   const fs = require("fs");
   let html = fs.readFileSync(path.join(carpetaFrontend, "index.html"), "utf8");
-  const ogTags = `
+
+  // Reemplazar el <title> actual (cualquiera que sea)
+  html = html.replace(/<title>[^<]*<\/title>/, `<title>${titulo} — ¿Quién Da Más?</title>
     <meta property="og:title" content="${titulo}">
     <meta property="og:description" content="${descripcion}">
     <meta property="og:image" content="${imagen}">
     <meta property="og:url" content="${base}/lote/${lote.id}">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Remate Directo">
+    <meta property="og:site_name" content="¿Quién Da Más? — Canal 10 Uruguay">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="${titulo}">
     <meta name="twitter:description" content="${descripcion}">
-    <meta name="twitter:image" content="${imagen}">
-    <title>${titulo} — Remate Directo</title>`;
-  html = html.replace("<title>Remate Directo — Subastas en Línea</title>", ogTags);
+    <meta name="twitter:image" content="${imagen}">`);
+
   res.type("text/html").send(html);
 });
 
