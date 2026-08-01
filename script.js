@@ -1197,6 +1197,221 @@ function crearTarjetaLote(lote) {
 
   const fotos = [lote.imagen, ...(lote.fotos_extra ? lote.fotos_extra.split("|") : [])].filter(Boolean);
 
+  // ── Contenedor de foto con badge número y botón favorito superpuestos ──
+  const fotoWrap = document.createElement("div");
+  fotoWrap.className = "subasta-foto-wrap";
+
+  const img = document.createElement(fotos[0] ? "img" : "div");
+  img.className = "subasta-img";
+  if (fotos[0]) {
+    img.src = fotos[0]; img.loading = "lazy";
+    img.alt = `Foto del lote ${lote.numero} — ${lote.titulo}`;
+    img.onerror = () => { img.style.display = "none"; };
+  } else {
+    img.className = "subasta-img subasta-img-placeholder";
+    img.innerHTML = `<svg viewBox="0 0 80 80" width="48" height="48" fill="none"><path d="M28 52L36 40L42 48L48 38L54 52H28Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none" opacity="0.4"/><circle cx="34" cy="34" r="4" stroke="currentColor" stroke-width="1.5" opacity="0.4"/><rect x="18" y="22" width="44" height="36" rx="4" stroke="currentColor" stroke-width="1.5" opacity="0.25"/></svg><span>${sanitizar(lote.titulo)}</span>`;
+  }
+  img.style.cursor = "pointer";
+  img.addEventListener("click", (e) => { e.stopPropagation(); abrirLightbox(fotos, 0); });
+
+  // Badge número de lote — sobre la foto arriba izquierda
+  const numeroBadge = document.createElement("span");
+  numeroBadge.className = "lote-numero-badge";
+  numeroBadge.textContent = `Lote ${lote.numero}`;
+
+  // Botón favorito — corazón arriba derecha sobre la foto
+  const btnFavCard = document.createElement("button");
+  btnFavCard.type = "button";
+  btnFavCard.className = "lote-fav-btn";
+  const esFav = esFavorito(lote.id);
+  const SVG_CORAZON_VACIO = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
+  const SVG_CORAZON_LLENO = `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
+  btnFavCard.innerHTML = esFav ? SVG_CORAZON_LLENO : SVG_CORAZON_VACIO;
+  btnFavCard.classList.toggle("is-activo", esFav);
+  btnFavCard.setAttribute("aria-label", esFav ? "Quitar de favoritos" : "Agregar a favoritos");
+  btnFavCard.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    const activo = await toggleFavorito(lote.id);
+    btnFavCard.innerHTML = activo ? SVG_CORAZON_LLENO : SVG_CORAZON_VACIO;
+    btnFavCard.classList.toggle("is-activo", activo);
+    btnFavCard.setAttribute("aria-label", activo ? "Quitar de favoritos" : "Agregar a favoritos");
+    li.style.borderColor = activo ? "var(--accent)" : "var(--line)";
+  });
+
+  // Carrusel si hay múltiples fotos
+  let contenedorFoto = img;
+  if (fotos.length > 1) {
+    contenedorFoto = document.createElement("div");
+    contenedorFoto.className = "subasta-img-carrusel";
+    contenedorFoto.style.cursor = "pointer";
+    contenedorFoto.addEventListener("click", (e) => {
+      if (!e.target.closest(".carrusel-flecha")) abrirLightbox(fotos, indiceFoto);
+    });
+    let indiceFoto = 0;
+    let autoplaySuspendido = false;
+    const irAFoto = (nuevoIndice, evento) => {
+      if (evento) evento.stopPropagation();
+      indiceFoto = (nuevoIndice + fotos.length) % fotos.length;
+      img.src = fotos[indiceFoto];
+    };
+    const btnAnterior = document.createElement("button");
+    btnAnterior.type = "button"; btnAnterior.className = "carrusel-flecha carrusel-flecha-izq";
+    btnAnterior.setAttribute("aria-label", "Foto anterior"); btnAnterior.innerHTML = "‹";
+    btnAnterior.addEventListener("click", (e) => { autoplaySuspendido = true; irAFoto(indiceFoto - 1, e); });
+    const btnSiguiente = document.createElement("button");
+    btnSiguiente.type = "button"; btnSiguiente.className = "carrusel-flecha carrusel-flecha-der";
+    btnSiguiente.setAttribute("aria-label", "Foto siguiente"); btnSiguiente.innerHTML = "›";
+    btnSiguiente.addEventListener("click", (e) => { autoplaySuspendido = true; irAFoto(indiceFoto + 1, e); });
+    let touchStartX = 0;
+    contenedorFoto.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    contenedorFoto.addEventListener("touchend", (e) => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) < 40) return;
+      autoplaySuspendido = true;
+      irAFoto(diff > 0 ? indiceFoto + 1 : indiceFoto - 1, null);
+    }, { passive: true });
+    if (fotos.length >= 3) {
+      const intervalo = setInterval(() => {
+        if (autoplaySuspendido) { clearInterval(intervalo); return; }
+        irAFoto(indiceFoto + 1, null);
+      }, 5000);
+      const observer = new MutationObserver(() => {
+        if (!document.contains(contenedorFoto)) { clearInterval(intervalo); observer.disconnect(); }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+    contenedorFoto.append(img, btnAnterior, btnSiguiente);
+  }
+
+  fotoWrap.append(contenedorFoto, numeroBadge, btnFavCard);
+
+  // ── Cuerpo de la card ──
+  const cuerpo = document.createElement("div");
+  cuerpo.className = "subasta-card-cuerpo";
+
+  const titulo = document.createElement("h4");
+  titulo.className = "subasta-card-titulo";
+  titulo.textContent = lote.titulo;
+
+  // Precio grande
+  const precio = document.createElement("div");
+  precio.className = "lote-precio";
+  const etiquetaPrecio = cerrado ? "Oferta ganadora" : lote.cantidad_ofertas > 0 ? "Oferta actual" : "Precio inicial";
+  precio.innerHTML = `<span class="precio-etiqueta">${etiquetaPrecio}</span>${formatoMontoHTML(lote.oferta_actual, lote.remate_moneda)}`;
+
+  const cantidadOfertas = document.createElement("p");
+  cantidadOfertas.className = "lote-cantidad-ofertas";
+  cantidadOfertas.textContent = lote.cantidad_ofertas === 1 ? "1 oferta" : `${lote.cantidad_ofertas} ofertas`;
+
+  // Insignia (popular / vas ganando)
+  const estadoPropio = estadoDeMiOferta(lote);
+  let insigniaEstado = null;
+  if (estadoPropio) {
+    insigniaEstado = document.createElement("p");
+    insigniaEstado.className = `lote-insignia lote-insignia-${estadoPropio}`;
+    insigniaEstado.textContent = estadoPropio === "ganando" ? "Vas ganando" : "Vas perdiendo";
+  } else {
+    const txtPopular = insigniaPopular(lote);
+    if (txtPopular) {
+      insigniaEstado = document.createElement("p");
+      insigniaEstado.className = "lote-insignia lote-insignia-popular";
+      insigniaEstado.textContent = txtPopular;
+    }
+  }
+
+  // Cuenta regresiva con ícono
+  const cuenta = document.createElement("p");
+  cuenta.className = "lote-cuenta";
+  cuenta.innerHTML = cerrado ? "Subasta finalizada" : `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span data-cierre="${lote.cierre}">Cargando…</span>`;
+  if (!cerrado) cuenta.dataset.cierre = lote.cierre;
+
+  cuerpo.append(titulo, precio, cantidadOfertas);
+  if (insigniaEstado) cuerpo.appendChild(insigniaEstado);
+  cuerpo.appendChild(cuenta);
+
+  // Separador antes del form
+  if (!cerrado) {
+    const sep = document.createElement("hr");
+    sep.className = "subasta-card-sep";
+    cuerpo.appendChild(sep);
+
+    const minimoValido = lote.oferta_actual + incrementoParaFrontend(lote.oferta_actual);
+
+    // Mínimo en texto gris
+    const minTxt = document.createElement("p");
+    minTxt.className = "lote-minimo-txt";
+    minTxt.textContent = `Mín. ${formatoMonto(minimoValido, lote.remate_moneda)}`;
+    cuerpo.appendChild(minTxt);
+
+    // Botón Ofertar ancho completo
+    const btnOfertar = document.createElement("button");
+    btnOfertar.type = "button";
+    btnOfertar.className = "btn-ofertar-full";
+    btnOfertar.textContent = "Ofertar";
+    btnOfertar.addEventListener("click", (e) => {
+      e.stopPropagation();
+      abrirModal(lote);
+    });
+    cuerpo.appendChild(btnOfertar);
+
+    // Link oferta automática
+    const linkAuto = document.createElement("button");
+    linkAuto.type = "button";
+    linkAuto.className = "lote-link-auto";
+    linkAuto.innerHTML = `¿No querés estar pendiente? Configurar oferta automática <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px"><path d="M9 18l6-6-6-6"/></svg>`;
+    linkAuto.addEventListener("click", (e) => {
+      e.stopPropagation();
+      abrirModal(lote);
+      setTimeout(() => { const d = document.querySelector(".oferta-auto-detalle"); if (d) d.open = true; }, 100);
+    });
+    cuerpo.appendChild(linkAuto);
+  }
+
+  // Botón compartir — separado abajo
+  const sepCompartir = document.createElement("hr");
+  sepCompartir.className = "subasta-card-sep";
+  cuerpo.appendChild(sepCompartir);
+
+  const urlLote = `${location.origin}/lote/${lote.id}`;
+  const textoCompartir = `🔨 *${lote.titulo}* — Lote ${lote.numero}\n💰 ${formatoMonto(lote.oferta_actual, lote.remate_moneda)}\n\nVer en ¿Quién Da Más?: ${urlLote}`;
+  const textoEncoded = encodeURIComponent(textoCompartir);
+  const urlEncoded = encodeURIComponent(urlLote);
+
+  const btnCompartir = document.createElement("button");
+  btnCompartir.type = "button";
+  btnCompartir.className = "lote-btn-compartir";
+  btnCompartir.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Compartir`;
+
+  const panelCompartir = document.createElement("div");
+  panelCompartir.className = "compartir-panel";
+  panelCompartir.hidden = true;
+  panelCompartir.innerHTML = `
+    <a href="https://wa.me/?text=${textoEncoded}" target="_blank" rel="noopener" class="compartir-red compartir-wa"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp</a>
+    <a href="https://www.facebook.com/sharer/sharer.php?u=${urlEncoded}" target="_blank" rel="noopener" class="compartir-red compartir-fb"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Facebook</a>
+    <a href="https://t.me/share/url?url=${urlEncoded}" target="_blank" rel="noopener" class="compartir-red compartir-tg"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg> Telegram</a>
+    <button type="button" class="compartir-red compartir-copy" data-url="${urlLote}"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar link</button>`;
+
+  panelCompartir.querySelector(".compartir-copy").addEventListener("click", async (e) => {
+    await navigator.clipboard.writeText(urlLote).catch(() => {});
+    e.currentTarget.textContent = "✅ ¡Copiado!";
+    setTimeout(() => { e.currentTarget.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar link`; }, 2000);
+  });
+
+  btnCompartir.addEventListener("click", (e) => {
+    e.stopPropagation();
+    panelCompartir.hidden = !panelCompartir.hidden;
+  });
+
+  cuerpo.appendChild(btnCompartir);
+  cuerpo.appendChild(panelCompartir);
+
+  li.append(fotoWrap, cuerpo);
+  return li;
+}
+  if (esFavorito(lote.id)) li.style.borderColor = "var(--accent)";
+
+  const fotos = [lote.imagen, ...(lote.fotos_extra ? lote.fotos_extra.split("|") : [])].filter(Boolean);
+
   const img = document.createElement(fotos[0] ? "img" : "p");
   img.className = "subasta-img";
   if (fotos[0]) {
@@ -1275,177 +1490,6 @@ function crearTarjetaLote(lote) {
     contenedorFoto.append(img, btnAnterior, btnSiguiente);
   }
 
-  const numero = document.createElement("p");
-  numero.className = "lote-numero";
-  numero.textContent = `Lote ${lote.numero}`;
-
-  const titulo = document.createElement("h4");
-  titulo.textContent = lote.titulo;
-
-  const precio = document.createElement("p");
-  precio.className = "lote-precio";
-  const etiquetaPrecio = loteEstaCerrado(lote)
-    ? "Oferta ganadora"
-    : lote.cantidad_ofertas > 0 ? "Oferta actual" : "Precio inicial";
-  precio.innerHTML = `<span class="precio-etiqueta">${etiquetaPrecio}:</span> ${formatoMontoHTML(lote.oferta_actual, lote.remate_moneda)}`;
-
-  const cantidadOfertas = document.createElement("p");
-  cantidadOfertas.className = "lote-cantidad-ofertas";
-  cantidadOfertas.textContent = lote.cantidad_ofertas === 1
-    ? "1 oferta"
-    : `${lote.cantidad_ofertas} ofertas`;
-
-  const estadoPropio = estadoDeMiOferta(lote);
-  let insigniaEstado = null;
-  if (estadoPropio) {
-    insigniaEstado = document.createElement("p");
-    insigniaEstado.className = `lote-insignia lote-insignia-${estadoPropio}`;
-    insigniaEstado.textContent = estadoPropio === "ganando" ? "¡Vas ganando!" : "¡Vas perdiendo!";
-  } else {
-    const txtPopular = insigniaPopular(lote);
-    if (txtPopular) {
-      insigniaEstado = document.createElement("p");
-      insigniaEstado.className = "lote-insignia lote-insignia-popular";
-      insigniaEstado.textContent = txtPopular;
-    }
-  }
-
-  const cuenta = document.createElement("p");
-  cuenta.className = "lote-cuenta";
-  cuenta.textContent = loteEstaCerrado(lote) ? "Subasta finalizada" : "Cargando tiempo restante…";
-  if (!loteEstaCerrado(lote)) cuenta.dataset.cierre = lote.cierre;
-
-  const btnFavCard = document.createElement("button");
-  btnFavCard.type = "button";
-  btnFavCard.className = "lote-fav-btn";
-  const esFav = esFavorito(lote.id);
-  btnFavCard.innerHTML = esFav ? SVG_ESTRELLA_LLENA : SVG_ESTRELLA_VACIA;
-  btnFavCard.classList.toggle("is-activo", esFav);
-  btnFavCard.setAttribute("aria-label", esFav ? "Quitar de favoritos" : "Agregar a favoritos");
-  btnFavCard.addEventListener("click", async (e) => {
-    e.stopPropagation();
-    const activo = await toggleFavorito(lote.id);
-    btnFavCard.innerHTML = activo ? SVG_ESTRELLA_LLENA : SVG_ESTRELLA_VACIA;
-    btnFavCard.classList.toggle("is-activo", activo);
-    btnFavCard.setAttribute("aria-label", activo ? "Quitar de favoritos" : "Agregar a favoritos");
-    li.style.borderColor = activo ? "var(--accent)" : "var(--line)";
-  });
-  li.style.position = "relative";
-  li.appendChild(btnFavCard);
-
-  li.append(contenedorFoto, numero, titulo, precio, cantidadOfertas);
-  if (insigniaEstado) li.appendChild(insigniaEstado);
-  li.appendChild(cuenta);
-
-  if (!loteEstaCerrado(lote)) {
-    const formInline = document.createElement("form");
-    formInline.className = "lote-oferta-inline";
-
-    const minimoValido = lote.oferta_actual + incrementoParaFrontend(lote.oferta_actual);
-    const inputInline = document.createElement("input");
-    inputInline.type = "number";
-    inputInline.step = "1";
-    inputInline.min = String(minimoValido);
-    inputInline.placeholder = `Mín. ${formatoMonto(minimoValido, lote.remate_moneda)}`;
-    inputInline.setAttribute("aria-label", "Tu oferta");
-
-    const btnInline = document.createElement("button");
-    btnInline.type = "submit";
-    btnInline.className = "btn btn-primary";
-    btnInline.textContent = "Ofertar";
-    formInline.append(inputInline, btnInline);
-
-    const mensajeInline = document.createElement("p");
-    mensajeInline.className = "lote-oferta-inline-mensaje";
-
-    formInline.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const monto = Number(inputInline.value);
-      btnInline.disabled = true;
-      await enviarOferta(lote, monto, (texto, esError) => {
-        mensajeInline.textContent = texto;
-        mensajeInline.className = "lote-oferta-inline-mensaje " + (esError ? "error" : "exito");
-        if (!esError) {
-          inputInline.value = "";
-          const nuevoMinimo = lote.oferta_actual + incrementoParaFrontend(lote.oferta_actual);
-          inputInline.min = String(nuevoMinimo);
-          inputInline.placeholder = `Mín. ${formatoMonto(nuevoMinimo, lote.remate_moneda)}`;
-        }
-      });
-      btnInline.disabled = false;
-    });
-    li.appendChild(formInline);
-    li.appendChild(mensajeInline);
-
-    const linkAuto = document.createElement("button");
-    linkAuto.type = "button";
-    linkAuto.className = "lote-link-auto";
-    linkAuto.textContent = "¿No querés estar pendiente? Configurar oferta automática";
-    linkAuto.addEventListener("click", (e) => {
-      e.stopPropagation();
-      abrirModal(lote);
-      setTimeout(() => {
-        const detalle = document.querySelector(".oferta-auto-detalle");
-        if (detalle) detalle.open = true;
-      }, 100);
-    });
-    li.appendChild(linkAuto);
-  }
-
-  // Botón compartir redes sociales
-  const urlLote = `${location.origin}/lote/${lote.id}`;
-  const textoCompartir = `🔨 *${lote.titulo}* — Lote ${lote.numero}\n💰 ${formatoMonto(lote.oferta_actual, lote.remate_moneda)}\n\nVer en ¿Quién Da Más?: ${urlLote}`;
-  const textoEncoded = encodeURIComponent(textoCompartir);
-  const urlEncoded = encodeURIComponent(urlLote);
-
-  const btnCompartir = document.createElement("button");
-  btnCompartir.type = "button";
-  btnCompartir.className = "lote-btn-compartir";
-  btnCompartir.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Compartir`;
-
-  const panelCompartir = document.createElement("div");
-  panelCompartir.className = "compartir-panel";
-  panelCompartir.hidden = true;
-  panelCompartir.innerHTML = `
-    <a href="https://wa.me/?text=${textoEncoded}" target="_blank" rel="noopener" class="compartir-red compartir-wa">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      WhatsApp
-    </a>
-    <a href="https://www.facebook.com/sharer/sharer.php?u=${urlEncoded}" target="_blank" rel="noopener" class="compartir-red compartir-fb">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-      Facebook
-    </a>
-    <a href="https://t.me/share/url?url=${urlEncoded}&text=${encodeURIComponent(lote.titulo)}" target="_blank" rel="noopener" class="compartir-red compartir-tg">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-      Telegram
-    </a>
-    <a href="mailto:?subject=${encodeURIComponent(lote.titulo)}&body=${textoEncoded}" class="compartir-red compartir-mail">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-      Email
-    </a>
-    <button type="button" class="compartir-red compartir-copy" data-url="${urlLote}">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-      Copiar link
-    </button>
-  `;
-
-  panelCompartir.querySelector(".compartir-copy").addEventListener("click", async (e) => {
-    await navigator.clipboard.writeText(urlLote).catch(() => {});
-    e.currentTarget.textContent = "✅ ¡Copiado!";
-    setTimeout(() => { e.currentTarget.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar link`; }, 2000);
-  });
-
-  btnCompartir.addEventListener("click", (e) => {
-    e.stopPropagation();
-    panelCompartir.hidden = !panelCompartir.hidden;
-  });
-
-  li.appendChild(btnCompartir);
-  li.appendChild(panelCompartir);
-
-  return li;
-}
 
 // Agrupa los lotes por remate y arma un bloque por remate con su propia sub-grilla
 function crearGrupoRemate(remate, lotesDelRemate) {
