@@ -1413,6 +1413,48 @@ function crearTarjetaLote(lote) {
   return li;
 }
 
+// Crea la card de portada de un remate (para subastas activas y finalizadas)
+function crearGrupoRemate(remate, lotesDelRemate) {
+  const li = document.createElement("li");
+  li.className = "subasta-card remate-tarjeta-portada";
+  li.dataset.remateId = remate.id;
+  li.dataset.rubro = remate.rubro;
+  li.style.cursor = "pointer";
+  li.setAttribute("role", "button");
+  li.setAttribute("tabindex", "0");
+  li.setAttribute("aria-label", `Ver lotes de ${remate.titulo}`);
+  const abrir = () => abrirRemateDetalle(remate, lotesDelRemate, li);
+  li.addEventListener("click", abrir);
+  li.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); abrir(); } });
+
+  const primerLote = lotesDelRemate.find((l) => l.imagen) || lotesDelRemate[0];
+  const srcPortada = remate.imagen_portada || (primerLote && primerLote.imagen) || null;
+  const portada = document.createElement(srcPortada ? "img" : "p");
+  portada.className = "subasta-img";
+  if (srcPortada) {
+    portada.src = srcPortada; portada.loading = "lazy";
+    portada.alt = `Foto de portada de ${remate.titulo}`;
+  } else {
+    portada.setAttribute("role", "img");
+    portada.setAttribute("aria-label", `Foto de portada de ${remate.titulo}`);
+    portada.textContent = "FOTO";
+  }
+
+  const titulo = document.createElement("h4");
+  titulo.textContent = remate.titulo;
+
+  const rubro = document.createElement("p");
+  rubro.className = "remate-grupo-rubro";
+  rubro.textContent = remate.rubro;
+
+  const cantidad = document.createElement("p");
+  cantidad.className = "lote-cantidad-ofertas";
+  cantidad.textContent = lotesDelRemate.length === 1 ? "1 lote" : `${lotesDelRemate.length} lotes`;
+
+  li.append(portada, titulo, rubro, cantidad);
+  return li;
+}
+
 function renderGridComoListaDeLotes(grid, titulo, descripcion, lotes) {
   mostrarSoloSeccion("activas");
   grid.classList.remove("grid-slider");
