@@ -1050,6 +1050,13 @@ function formatoMonto(valor, moneda) {
   return simbolo + Number(valor).toLocaleString("es-UY");
 }
 
+// Versión con jerarquía visual: moneda pequeña + número grande
+function formatoMontoHTML(valor, moneda) {
+  const simbolo = moneda === "USD" ? "US$" : "$";
+  const numero = Number(valor).toLocaleString("es-UY");
+  return `<span class="precio-moneda">${simbolo}</span><span class="precio-numero">${numero}</span>`;
+}
+
 
 // Notificaciones para el administrador (ej. nuevos registros pendientes)
 const notificacionesAdmin = [];
@@ -1199,7 +1206,14 @@ function crearTarjetaLote(lote) {
   } else {
     img.setAttribute("role", "img");
     img.setAttribute("aria-label", `Foto del lote ${lote.numero}`);
-    img.textContent = "FOTO";
+    img.className = "subasta-img subasta-img-placeholder";
+    img.innerHTML = `<svg viewBox="0 0 80 80" width="48" height="48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="80" height="80" rx="12" fill="currentColor" opacity="0.06"/>
+      <path d="M28 52L36 40L42 48L48 38L54 52H28Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none" opacity="0.4"/>
+      <circle cx="34" cy="34" r="4" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+      <rect x="18" y="22" width="44" height="36" rx="4" stroke="currentColor" stroke-width="1.5" opacity="0.25"/>
+    </svg>
+    <span>${sanitizar(lote.titulo)}</span>`;
   }
   img.style.cursor = "pointer";
   img.addEventListener("click", (e) => { e.stopPropagation(); abrirLightbox(fotos, 0); });
@@ -1270,11 +1284,10 @@ function crearTarjetaLote(lote) {
 
   const precio = document.createElement("p");
   precio.className = "lote-precio";
-  precio.textContent = loteEstaCerrado(lote)
-    ? `Oferta ganadora: ${formatoMonto(lote.oferta_actual, lote.remate_moneda)}`
-    : lote.cantidad_ofertas > 0
-      ? `Oferta actual: ${formatoMonto(lote.oferta_actual, lote.remate_moneda)}`
-      : `Precio inicial: ${formatoMonto(lote.oferta_actual, lote.remate_moneda)}`;
+  const etiquetaPrecio = loteEstaCerrado(lote)
+    ? "Oferta ganadora"
+    : lote.cantidad_ofertas > 0 ? "Oferta actual" : "Precio inicial";
+  precio.innerHTML = `<span class="precio-etiqueta">${etiquetaPrecio}:</span> ${formatoMontoHTML(lote.oferta_actual, lote.remate_moneda)}`;
 
   const cantidadOfertas = document.createElement("p");
   cantidadOfertas.className = "lote-cantidad-ofertas";
