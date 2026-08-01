@@ -1322,8 +1322,12 @@ function crearTarjetaLote(lote) {
   // Cuenta regresiva con ícono
   const cuenta = document.createElement("p");
   cuenta.className = "lote-cuenta";
-  cuenta.innerHTML = cerrado ? "Subasta finalizada" : `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span data-cierre="${lote.cierre}">Cargando…</span>`;
-  if (!cerrado) cuenta.dataset.cierre = lote.cierre;
+  if (cerrado) {
+    cuenta.textContent = "Subasta finalizada";
+  } else {
+    cuenta.dataset.cierre = lote.cierre;
+    cuenta.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Cargando…`;
+  }
 
   cuerpo.append(titulo, precio, cantidadOfertas);
   if (insigniaEstado) cuerpo.appendChild(insigniaEstado);
