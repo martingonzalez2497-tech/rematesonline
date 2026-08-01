@@ -102,25 +102,59 @@ app.get("/lote/:id", (req, res) => {
 
   const moneda = lote.remate_moneda === "USD" ? "US$" : "$";
   const precio = `${moneda} ${Number(lote.oferta_actual).toLocaleString("es-UY")}`;
-  const imagen = lote.imagen || `${base}/fotos/og-default.png`;
+  const imagen = lote.imagen || null;
   const titulo = `${lote.titulo} — Lote ${lote.numero}`;
   const descripcion = `${lote.cantidad_ofertas > 0 ? `Oferta actual: ${precio}` : `Precio inicial: ${precio}`} · ${lote.remate_titulo} · ¿Quién Da Más? Canal 10`;
+  const urlCanonica = `${base}/lote/${lote.id}`;
 
-  const fs = require("fs");
-  let html = fs.readFileSync(path.join(carpetaFrontend, "index.html"), "utf8");
-
-  // Reemplazar el <title> actual (cualquiera que sea)
-  html = html.replace(/<title>[^<]*<\/title>/, `<title>${titulo} — ¿Quién Da Más?</title>
-    <meta property="og:title" content="${titulo}">
-    <meta property="og:description" content="${descripcion}">
-    <meta property="og:image" content="${imagen}">
-    <meta property="og:url" content="${base}/lote/${lote.id}">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="¿Quién Da Más? — Canal 10 Uruguay">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="${titulo}">
-    <meta name="twitter:description" content="${descripcion}">
-    <meta name="twitter:image" content="${imagen}">`);
+  // Página completa con estilos inline — funciona en el browser de WhatsApp
+  const html = `<!DOCTYPE html>
+<html lang="es-UY">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${titulo} — ¿Quién Da Más?</title>
+<meta name="description" content="${descripcion}">
+<meta property="og:title" content="${titulo}">
+<meta property="og:description" content="${descripcion}">
+${imagen ? `<meta property="og:image" content="${imagen}">` : ""}
+<meta property="og:url" content="${urlCanonica}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="¿Quién Da Más? — Canal 10 Uruguay">
+<meta name="twitter:card" content="summary_large_image">
+<meta http-equiv="refresh" content="0;url=${urlCanonica}">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #F7F5F0; color: #1A1612; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1rem; }
+  .card { background: #fff; border-radius: 16px; overflow: hidden; max-width: 28rem; width: 100%; box-shadow: 0 4px 24px rgba(0,0,0,0.1); }
+  .foto { width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block; background: #F0EDE8; }
+  .foto-placeholder { width: 100%; aspect-ratio: 16/10; background: linear-gradient(145deg, #F0EDE8, #E8E3DC); display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+  .cuerpo { padding: 1.25rem; }
+  .badge { display: inline-block; background: #1A3A6B; color: #fff; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 4px; margin-bottom: 0.75rem; }
+  h1 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.75rem; line-height: 1.3; }
+  .etiqueta { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #6B5F52; margin-bottom: 0.2rem; }
+  .precio { font-size: 1.8rem; font-weight: 800; color: #1A3A6B; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+  .ofertas { font-size: 0.82rem; color: #6B5F52; margin-bottom: 1.25rem; }
+  .btn { display: block; width: 100%; padding: 0.9rem; background: #1A3A6B; color: #fff; text-align: center; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 1rem; }
+  .marca { text-align: center; margin-top: 1.25rem; font-size: 0.8rem; color: #6B5F52; }
+  .marca strong { color: #1A3A6B; }
+</style>
+</head>
+<body>
+<div class="card">
+  ${imagen ? `<img class="foto" src="${imagen}" alt="${lote.titulo}">` : `<div class="foto-placeholder">🔨</div>`}
+  <div class="cuerpo">
+    <span class="badge">Lote ${lote.numero}</span>
+    <h1>${lote.titulo}</h1>
+    <p class="etiqueta">${lote.cantidad_ofertas > 0 ? "Oferta actual" : "Precio inicial"}</p>
+    <p class="precio">${precio}</p>
+    <p class="ofertas">${lote.cantidad_ofertas === 1 ? "1 oferta" : `${lote.cantidad_ofertas} ofertas`} · ${lote.remate_titulo}</p>
+    <a class="btn" href="${urlCanonica}">Ver lote y ofertar →</a>
+  </div>
+</div>
+<p class="marca"><strong>¿Quién Da Más?</strong> · Canal 10 Uruguay · Sábados 11:55hs</p>
+</body>
+</html>`;
 
   res.type("text/html").send(html);
 });
