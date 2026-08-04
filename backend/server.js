@@ -2,18 +2,31 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
+const path = require("path");
 const bcrypt = require("bcryptjs");
 const { Server } = require("socket.io");
 const { setIO } = require("./socket");
 const db = require("./db");
 
-// Rate limiting — protección básica contra spam
+// Verificación de configuración crítica al arrancar — falla rápido y claro
+// en vez de dejar el servidor corriendo de forma insegura.
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 16) {
+  console.error("FALTA JWT_SECRET (o es muy corto) en las variables de entorno. El servidor no puede arrancar de forma segura.");
+  process.exit(1);
+}
+
 let rateLimit;
 try {
   rateLimit = require("express-rate-limit");
 } catch (e) {
-  // Si no está instalado, no bloquea el arranque
   rateLimit = null;
+}
+
+let helmet;
+try {
+  helmet = require("helmet");
+} catch (e) {
+  helmet = null;
 }
 
 process.on("unhandledRejection", (err) => {
@@ -54,11 +67,49 @@ const contactoRoutes = require("./routes/contacto");
 
 const app = express();
 
-app.use(cors({ origin: process.env.FRONTEND_ORIGIN || "*" }));
-app.use(express.json());
+// Detrás del proxy de Railway — necesario para que rate-limit y req.ip
+// vean la IP real del cliente en vez de la IP interna del proxy.
+app.set("trust proxy", 1);
+
+// Headers de seguridad HTTP (X-Frame-Options, X-Content-Type-Options,
+// oculta X-Powered-By, fuerza HTTPS en producción, etc.)
+if (helmet) {
+  app.use(
+    helmet({
+      contentSecurityPolicy: false, // el front usa scripts/estilos inline en varios lugares; se puede endurecer más adelante
+      crossOriginResourcePolicy: { policy: "cross-origin" }, // permite que las fotos se vean embebidas en WhatsApp/redes
+    })
+  );
+}
+
+// CORS: si hay FRONTEND_ORIGIN configurado, solo se permite ese origen.
+// Si no está configurado (fase de prueba), se permite cualquiera pero
+// queda un aviso en consola para no olvidarse de restringirlo en producción.
+const origenesPermitidos = process.env.FRONTEND_ORIGIN
+  ? process.env.FRONTEND_ORIGIN.split(",").map((o) => o.trim())
+  : null;
+if (!origenesPermitidos) {
+  console.warn("FRONTEND_ORIGIN no configurado: CORS abierto a cualquier origen. Configurarlo antes de salir a producción.");
+}
+app.use(
+  cors({
+    origin: origenesPermitidos || "*",
+  })
+);
+
+// Límite de tamaño del body — evita payloads gigantes usados para DoS
+app.use(express.json({ limit: "1mb" }));
 
 // Rate limiting
 if (rateLimit) {
+  // Límite general para toda la API — protege contra scraping agresivo y DoS básico
+  const limiteGeneral = rateLimit.rateLimit({
+    windowMs: 60 * 1000, max: 120,
+    message: { error: "Demasiadas solicitudes. Esperá un momento." },
+    standardHeaders: true, legacyHeaders: false,
+  });
+  app.use("/api", limiteGeneral);
+
   const limiteOfertas = rateLimit.rateLimit({
     windowMs: 60 * 1000, max: 10,
     message: { error: "Demasiadas ofertas. Esperá un momento." },
@@ -72,6 +123,16 @@ if (rateLimit) {
   app.use("/api/ofertas", limiteOfertas);
   app.use("/api/auth/registro", limiteAuth);
   app.use("/api/auth/login", limiteAuth);
+
+  // Envían emails a terceros — límite estricto para que no se use el
+  // formulario como relay de spam hacia cualquier dirección de email.
+  const limiteEmail = rateLimit.rateLimit({
+    windowMs: 60 * 60 * 1000, max: 5,
+    message: { error: "Demasiados envíos. Probá de nuevo más tarde." },
+    standardHeaders: true, legacyHeaders: false,
+  });
+  app.use("/api/contacto", limiteEmail);
+  app.use("/api/newsletter/suscribir", limiteEmail);
 }
 
 app.get("/api/salud", (req, res) => res.json({ ok: true }));
@@ -167,7 +228,6 @@ app.use("/api/usuarios", usuariosRoutes);
 app.use("/api/uploads", uploadsRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/contacto", contactoRoutes);
-const path = require("path");
 const uploadsDir = process.env.UPLOADS_PATH || path.join(__dirname, "uploads");
 app.use("/uploads", express.static(uploadsDir));
 
@@ -190,7 +250,7 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 const servidorHttp = http.createServer(app);
 const io = new Server(servidorHttp, {
-  cors: { origin: process.env.FRONTEND_ORIGIN || "*" },
+  cors: { origin: origenesPermitidos || "*" },
 });
 setIO(io);
 

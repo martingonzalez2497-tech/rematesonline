@@ -38,14 +38,25 @@ function cedulaUruguayaValida(cedulaTexto) {
 // Registro público: siempre crea usuarios con rol "publico", pendientes de
 // aprobación por un administrador (no pueden ofertar hasta ser aprobados).
 // Rematadores y administradores se crean aparte (ver /api/usuarios), nunca acá.
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 router.post("/registro", async (req, res) => {
   const { nombre, email, password, cedula, telefono, aceptaTerminos } = req.body;
 
   if (!nombre || !email || !password || !cedula) {
     return res.status(400).json({ error: "Faltan datos: nombre, email, cédula y password son obligatorios." });
   }
-  if (password.length < 6) {
-    return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres." });
+  if (typeof nombre !== "string" || nombre.trim().length < 2 || nombre.length > 120) {
+    return res.status(400).json({ error: "El nombre no es válido." });
+  }
+  if (typeof email !== "string" || !EMAIL_REGEX.test(email) || email.length > 200) {
+    return res.status(400).json({ error: "El email no es válido." });
+  }
+  if (password.length < 6 || password.length > 200) {
+    return res.status(400).json({ error: "La contraseña debe tener entre 6 y 200 caracteres." });
+  }
+  if (telefono && (typeof telefono !== "string" || telefono.length > 30)) {
+    return res.status(400).json({ error: "El teléfono no es válido." });
   }
   if (!cedulaUruguayaValida(cedula)) {
     return res.status(400).json({ error: "La cédula de identidad ingresada no es válida." });
@@ -145,9 +156,12 @@ router.post("/reenviar-codigo", async (req, res) => {
   res.json({ ok: true });
 });
 
+const MAX_INTENTOS_LOGIN = 6;
+const MINUTOS_BLOQUEO_LOGIN = 15;
+
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) {
+  if (!email || !password || typeof email !== "string" || typeof password !== "string") {
     return res.status(400).json({ error: "Faltan datos: email y password son obligatorios." });
   }
 
@@ -156,10 +170,29 @@ router.post("/login", async (req, res) => {
     return res.status(401).json({ error: "Email o contraseña incorrectos." });
   }
 
+  // Bloqueo temporal por intentos fallidos — independiente de la IP, así
+  // no se puede evadir con una VPN o cambiando de red.
+  if (usuario.bloqueado_hasta && new Date(usuario.bloqueado_hasta) > new Date()) {
+    return res.status(429).json({ error: "Demasiados intentos fallidos. Probá de nuevo en unos minutos." });
+  }
+
   const passwordOk = await bcrypt.compare(password, usuario.password_hash);
   if (!passwordOk) {
+    const intentos = (usuario.intentos_fallidos || 0) + 1;
+    if (intentos >= MAX_INTENTOS_LOGIN) {
+      const hasta = new Date(Date.now() + MINUTOS_BLOQUEO_LOGIN * 60 * 1000).toISOString();
+      db.prepare("UPDATE usuarios SET intentos_fallidos = 0, bloqueado_hasta = ? WHERE id = ?").run(hasta, usuario.id);
+      return res.status(429).json({ error: "Demasiados intentos fallidos. Probá de nuevo en unos minutos." });
+    }
+    db.prepare("UPDATE usuarios SET intentos_fallidos = ? WHERE id = ?").run(intentos, usuario.id);
     return res.status(401).json({ error: "Email o contraseña incorrectos." });
   }
+
+  // Login correcto: reiniciar contador de intentos fallidos
+  if (usuario.intentos_fallidos > 0 || usuario.bloqueado_hasta) {
+    db.prepare("UPDATE usuarios SET intentos_fallidos = 0, bloqueado_hasta = NULL WHERE id = ?").run(usuario.id);
+  }
+
   if (usuario.bloqueado) {
     return res.status(403).json({ error: "Tu cuenta fue bloqueada. Contactate con nosotros si creés que es un error." });
   }

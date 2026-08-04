@@ -5,10 +5,12 @@ const { requireAuth, requireRole } = require("../middleware/auth");
 
 const router = express.Router();
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 // Suscribirse al newsletter
 router.post("/suscribir", async (req, res) => {
   const { email } = req.body;
-  if (!email || !email.includes("@")) {
+  if (!email || typeof email !== "string" || !EMAIL_REGEX.test(email) || email.length > 200) {
     return res.status(400).json({ error: "Email inválido." });
   }
   const existe = db.prepare("SELECT id FROM newsletter WHERE email = ?").get(email.toLowerCase());

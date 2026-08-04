@@ -17,6 +17,8 @@ db.exec(`
     aprobado INTEGER NOT NULL DEFAULT 1,
     email_verificado INTEGER NOT NULL DEFAULT 1,
     bloqueado INTEGER NOT NULL DEFAULT 0,
+    intentos_fallidos INTEGER NOT NULL DEFAULT 0,
+    bloqueado_hasta TEXT,
     creado_en TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
@@ -171,6 +173,12 @@ if (!columnasUsuarios.includes("bloqueado")) {
 }
 if (!columnasUsuarios.includes("telefono")) {
   db.exec("ALTER TABLE usuarios ADD COLUMN telefono TEXT");
+}
+if (!columnasUsuarios.includes("intentos_fallidos")) {
+  db.exec("ALTER TABLE usuarios ADD COLUMN intentos_fallidos INTEGER NOT NULL DEFAULT 0");
+}
+if (!columnasUsuarios.includes("bloqueado_hasta")) {
+  db.exec("ALTER TABLE usuarios ADD COLUMN bloqueado_hasta TEXT");
 }
 
 module.exports = db;

@@ -9,20 +9,30 @@ const router = express.Router();
 const carpetaSubidas = process.env.UPLOADS_PATH || path.join(__dirname, "..", "uploads");
 if (!fs.existsSync(carpetaSubidas)) fs.mkdirSync(carpetaSubidas, { recursive: true });
 
+const tiposPermitidos = {
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+  "image/gif": ".gif",
+};
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, carpetaSubidas),
   filename: (req, file, cb) => {
     const sufijo = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, `foto-${sufijo}${path.extname(file.originalname).toLowerCase()}`);
+    // La extensión se decide por el mimetype ya validado, nunca por el
+    // nombre de archivo que manda el usuario — evita subir un .svg/.html
+    // con contenido ejecutable disfrazado de imagen.
+    const extension = tiposPermitidos[file.mimetype] || ".jpg";
+    cb(null, `foto-${sufijo}${extension}`);
   },
 });
 
-const tiposPermitidos = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const upload = multer({
   storage,
   limits: { fileSize: 8 * 1024 * 1024 }, // 8 MB máximo por foto
   fileFilter: (req, file, cb) => {
-    if (!tiposPermitidos.includes(file.mimetype)) {
+    if (!tiposPermitidos[file.mimetype]) {
       return cb(new Error("Formato no permitido. Usá JPG, PNG, WEBP o GIF."));
     }
     cb(null, true);

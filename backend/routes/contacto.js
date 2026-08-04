@@ -3,11 +3,22 @@ const { enviarEmail } = require("../email");
 
 const router = express.Router();
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 // Formulario de contacto — envía email al admin
 router.post("/", async (req, res) => {
   const { nombre, email, mensaje } = req.body;
   if (!nombre || !email || !mensaje) {
     return res.status(400).json({ error: "Completá todos los campos." });
+  }
+  if (typeof nombre !== "string" || nombre.length > 120) {
+    return res.status(400).json({ error: "El nombre no es válido." });
+  }
+  if (typeof email !== "string" || !EMAIL_REGEX.test(email) || email.length > 200) {
+    return res.status(400).json({ error: "El email no es válido." });
+  }
+  if (typeof mensaje !== "string" || mensaje.length < 3 || mensaje.length > 3000) {
+    return res.status(400).json({ error: "El mensaje debe tener entre 3 y 3000 caracteres." });
   }
 
   await enviarEmail({

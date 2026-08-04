@@ -45,7 +45,7 @@ router.patch("/:id/bloquear", requireAuth, requireRole("administrador"), (req, r
 });
 
 router.patch("/:id/desbloquear", requireAuth, requireRole("administrador"), (req, res) => {
-  db.prepare("UPDATE usuarios SET bloqueado = 0 WHERE id = ?").run(req.params.id);
+  db.prepare("UPDATE usuarios SET bloqueado = 0, intentos_fallidos = 0, bloqueado_hasta = NULL WHERE id = ?").run(req.params.id);
   res.json({ ok: true });
 });
 
