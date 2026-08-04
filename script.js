@@ -2007,7 +2007,7 @@ function abrirModal(lote) {
 
   modalOverlay.hidden = false;
   // Actualizar URL a formato limpio /lote/id
-  window.history.pushState({ loteId: lote.id }, `Lote ${lote.numero} — ${lote.titulo}`, `/lote/${lote.id}`);
+  window.history.replaceState({ loteId: lote.id }, `Lote ${lote.numero} — ${lote.titulo}`, `/lote/${lote.id}`);
   document.title = `${lote.titulo} — Remate Directo`;
 
   // Registrar vista y mostrar contador
@@ -2078,7 +2078,7 @@ function cerrarModal() {
   modalOverlay.hidden = true;
   if (intervaloModal) clearInterval(intervaloModal);
   loteAbierto = null;
-  window.history.pushState({}, "¿Quién Da Más?", "/");
+  window.history.replaceState({}, "¿Quién Da Más?", "/");
   document.title = "¿Quién Da Más? — Remates Online · Canal 10";
   window.scrollTo(0, scrollY);
   if (elementoAntesDelModal) elementoAntesDelModal.focus();

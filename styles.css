@@ -695,7 +695,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   box-shadow: 0 12px 32px rgba(0,0,0,0.1);
   border-color: rgba(26,58,107,0.3);
 }
-.subasta-foto-wrap { position: relative; overflow: hidden; }
+.subasta-foto-wrap { position: relative; overflow: hidden; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
 .subasta-foto-wrap .subasta-img { aspect-ratio: 16/10; max-height: 14rem; width: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
 .subasta-card:hover .subasta-foto-wrap .subasta-img { transform: scale(1.04); }
 .lote-numero-badge { position: absolute; top: 0.65rem; left: 0.65rem; background: var(--accent); color: #fff; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 4px; z-index: 2; }
