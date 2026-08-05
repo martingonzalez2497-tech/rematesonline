@@ -1962,8 +1962,16 @@ function abrirModal(lote) {
     ["Medidas", lote.dimensiones],
     ["Año", lote.anio],
   ].filter(([, valor]) => valor);
-  fichaLista.innerHTML = campos.map(([etiqueta, valor]) => `<li><strong>${etiqueta}:</strong> ${valor}</li>`).join("");
+  fichaLista.innerHTML = campos.map(([etiqueta, valor]) => `<li><strong>${etiqueta}:</strong> ${sanitizar(valor)}</li>`).join("");
   fichaLista.hidden = campos.length === 0;
+
+  // El bloque colapsable solo aparece si hay algo que mostrar dentro
+  const detalleArticulo = document.getElementById("detalleArticulo");
+  if (detalleArticulo) {
+    const hayDescripcion = Boolean(lote.descripcion && lote.descripcion.trim());
+    detalleArticulo.hidden = !hayDescripcion && campos.length === 0;
+    detalleArticulo.open = false; // siempre arranca cerrado
+  }
 
   const modalImgContenedor = document.getElementById("modalImg");
   modalImgContenedor.innerHTML = "";
@@ -2020,7 +2028,8 @@ function abrirModal(lote) {
 
   const btnFav = document.getElementById("btnFavorito");
   const esFav = esFavorito(lote.id);
-  btnFav.innerHTML = esFav ? `${SVG_ESTRELLA_LLENA} En tus favoritos` : `${SVG_ESTRELLA_VACIA} Agregar a favoritos`;
+  const txtFav = btnFav.querySelector("span");
+  if (txtFav) txtFav.textContent = esFav ? "En favoritos" : "Favorito";
   btnFav.classList.toggle("is-activo", esFav);
 
   modalOverlay.hidden = false;
@@ -2367,13 +2376,14 @@ document.getElementById("btnCompartirLote").addEventListener("click", async () =
   if (!loteAbierto) return;
   const btn = document.getElementById("btnCompartirLote");
   const url = `${window.location.origin}/lote/${loteAbierto.id}`;
+  const txt = btn.querySelector("span");
   try {
     await navigator.clipboard.writeText(url);
-    btn.textContent = "✅ Link copiado";
+    if (txt) txt.textContent = "¡Copiado!";
   } catch (err) {
-    btn.textContent = url;
+    if (txt) txt.textContent = "Copiá el link";
   }
-  setTimeout(() => { btn.textContent = "🔗 Copiar link de este lote"; }, 2000);
+  setTimeout(() => { if (txt) txt.textContent = "Compartir"; }, 2000);
 });
 
 /* ==========================================================================
@@ -4162,11 +4172,12 @@ function actualizarBtnPush(lote) {
   const sesion = leerSesion();
   const soportado = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
   btn.hidden = !sesion || loteEstaCerrado(lote) || !soportado;
+  const txtPush = btn.querySelector("span");
   if (Notification.permission === "granted") {
-    btn.textContent = "🔔 Notificaciones activadas";
+    if (txtPush) txtPush.textContent = "Avisos activos";
     btn.disabled = true;
   } else {
-    btn.textContent = "🔔 Avisame si me superan";
+    if (txtPush) txtPush.textContent = "Avisarme";
     btn.disabled = false;
   }
 }

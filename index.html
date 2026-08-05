@@ -802,8 +802,6 @@
     <p class="modal-numero" id="modalNumero"></p>
     <h3 id="modalTitulo"></h3>
     <p class="modal-categoria" id="modalCategoria"></p>
-    <p class="modal-descripcion" id="modalDescripcion"></p>
-    <ul class="ficha-tecnica" id="modalFichaTecnica" hidden></ul>
 
     <p class="modal-precio">
       <span id="modalEstadoPrecio">Precio inicial</span>
@@ -823,6 +821,13 @@
       <button class="btn btn-primary" type="submit">Ofertar</button>
     </form>
     <p class="oferta-mensaje" id="ofertaMensaje" aria-live="polite"></p>
+
+    <!-- Detalle del artículo: colapsado para no empujar el precio fuera de pantalla -->
+    <details class="detalle-articulo" id="detalleArticulo">
+      <summary>Ver detalle del artículo</summary>
+      <p class="modal-descripcion" id="modalDescripcion"></p>
+      <ul class="ficha-tecnica" id="modalFichaTecnica" hidden></ul>
+    </details>
 
     <details class="oferta-auto-detalle" id="historialDetalle">
       <summary>¿Preferís no estar pendiente? Configurá una oferta automática</summary>
@@ -844,21 +849,29 @@
       <ul class="historial-lista" id="historialLista"></ul>
     </details>
 
-    <button class="btn-favorito" id="btnFavorito" type="button">
-      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg> Agregar a favoritos
-    </button>
-    <button class="btn-favorito" id="btnNotifPush" type="button" hidden>
-      🔔 Avisame si me superan
-    </button>
-    <button class="btn-favorito" id="btnCompartirLote" type="button">
-      🔗 Copiar link de este lote
-    </button>
+    <div class="modal-acciones">
+      <button class="modal-accion" id="btnFavorito" type="button">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+        <span>Favorito</span>
+      </button>
+      <button class="modal-accion" id="btnNotifPush" type="button" hidden>
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span>Avisarme</span>
+      </button>
+      <button class="modal-accion" id="btnCompartirLote" type="button">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        <span>Compartir</span>
+      </button>
+    </div>
 
-    <p class="modal-terminos">
-      Comisión del 18,3% IVA incluido. Pago en 72 hs hábiles, retiro en 72 hs hábiles
-      (6 días para envíos al interior). Si se recibe una oferta en el último minuto,
-      el cierre se extiende un minuto más.
-    </p>
+    <details class="modal-terminos-detalle">
+      <summary>Condiciones de compra</summary>
+      <p class="modal-terminos">
+        Comisión del 18,3% IVA incluido. Pago en 72 hs hábiles, retiro en 72 hs hábiles
+        (6 días para envíos al interior). Si se recibe una oferta en el último minuto,
+        el cierre se extiende un minuto más.
+      </p>
+    </details>
 
     <!-- Reseña del comprador — solo visible si el usuario ganó este lote -->
     <div class="resena-wrap" id="resenaWrap" hidden>
