@@ -851,7 +851,15 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 
 .lote-cantidad-ofertas { font-size: 0.8rem; color: var(--fg-muted); margin: 0 0 0.3rem; }
-.subasta-card-sep { border: none; border-top: 1px solid var(--line); margin: 0.65rem 0; }
+/* El separador abre el bloque de acción: con margin-top auto absorbe el
+   espacio sobrante y empuja mínimo + botón + links al fondo de la card.
+   Así los botones "Ofertar" quedan alineados entre cards aunque una tenga
+   insignia y otra no, sin necesidad de fijar una altura rígida. */
+.subasta-card-sep {
+  border: none; border-top: 1px solid var(--line);
+  margin: 0.65rem 0;
+}
+.subasta-card-sep:first-of-type { margin-top: auto; }
 .lote-minimo-txt { font-size: 0.85rem; color: var(--fg-muted); margin: 0 0 0.5rem; font-weight: 500; }
 
 .btn-ofertar-full {
