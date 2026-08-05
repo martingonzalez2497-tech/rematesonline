@@ -23,14 +23,41 @@
   --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
   --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
-  --step-0: clamp(1.05rem, 1rem + 0.25vw, 1.15rem);
-  --step-1: clamp(1.25rem, 1.1rem + 0.6vw, 1.55rem);
-  --step-2: clamp(1.65rem, 1.4rem + 1.2vw, 2.4rem);
-  --step-3: clamp(2.2rem, 1.8rem + 2.5vw, 3.6rem);
+  /* ===== Escala tipográfica cerrada — no crear tamaños fuera de esta lista =====
+     Display 48 / H1 40 / H2 32 / H3 24 / Body 16 / Small 14 / Caption 12.
+     Display/H1/H2/H3 son fluidos (clamp) para no perder jerarquía en mobile;
+     Body/Small/Caption son fijos, como corresponde a texto de lectura. */
+  --fs-display: clamp(2.2rem, 1.8rem + 2.5vw, 3rem);     /* 35px → 48px */
+  --fs-h1: clamp(1.9rem, 1.6rem + 2vw, 2.5rem);           /* 30px → 40px */
+  --fs-h2: clamp(1.65rem, 1.4rem + 1.2vw, 2rem);          /* 26px → 32px */
+  --fs-h3: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);        /* 20px → 24px */
+  --fs-body: 1rem;                                          /* 16px, fijo */
+  --fs-small: 0.875rem;                                      /* 14px, fijo */
+  --fs-caption: 0.75rem;                                      /* 12px, fijo */
 
-  --space-s: clamp(0.75rem, 0.7rem + 0.3vw, 1rem);
-  --space-m: clamp(1.5rem, 1.3rem + 1vw, 2.5rem);
-  --space-l: clamp(2.5rem, 2rem + 2.5vw, 5rem);
+  /* Alias de compatibilidad — todo el sitio ya usa --step-*, se mapean
+     a la escala cerrada de arriba en vez de reescribir cada selector */
+  --step-0: var(--fs-body);
+  --step-1: var(--fs-h3);
+  --step-2: var(--fs-h2);
+  --step-3: var(--fs-h1);
+
+  /* ===== Escala de espaciado en múltiplos de 8px — no crear valores fuera
+     de esta escala. Los tramos grandes son fluidos entre dos peldaños
+     válidos de la grilla (nunca caen "fuera de grilla" en ningún viewport). */
+  --sp-xs: 0.5rem;                                    /* 8px, fijo */
+  --sp-sm: 1rem;                                       /* 16px, fijo */
+  --sp-md: 1.5rem;                                      /* 24px, fijo */
+  --sp-lg: clamp(1.5rem, 1.3rem + 1vw, 2rem);            /* 24px → 32px */
+  --sp-xl: clamp(2rem, 1.6rem + 2vw, 3rem);               /* 32px → 48px */
+  --sp-2xl: clamp(3rem, 2.4rem + 3vw, 4rem);               /* 48px → 64px */
+  --sp-3xl: clamp(4rem, 3rem + 5vw, 6rem);                  /* 64px → 96px */
+
+  /* Alias de compatibilidad — todo el sitio ya usa --space-*, se mapean
+     a la grilla de 8px de arriba en vez de reescribir cada selector */
+  --space-s: var(--sp-sm);
+  --space-m: var(--sp-lg);
+  --space-l: var(--sp-2xl);
 
   --radius: 10px;
   --radius-lg: 16px;
@@ -724,9 +751,9 @@ ul { list-style: none; margin: 0; padding: 0; }
   aspect-ratio: 16/10; max-height: 13rem; width: 100%;
   object-fit: cover; display: block;
   border-radius: 6px;
-  transition: transform 0.5s ease;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.subasta-card:hover .subasta-foto-wrap .subasta-img { transform: scale(1.03); }
+.subasta-card:hover .subasta-foto-wrap .subasta-img { transform: scale(1.04); }
 
 /* Badge "etiqueta de papel" — como una tarjeta impresa con un sello
    dorado en la punta, no un bloque de color plano */
@@ -902,7 +929,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   width: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
   margin: 0;
 }
 .remate-tarjeta-portada:hover .subasta-img { transform: scale(1.04); }
@@ -972,7 +999,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   letter-spacing: 0.08em;
   width: 100%;
   object-fit: cover;
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .subasta-img-placeholder {
   flex-direction: column;
@@ -995,7 +1022,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
-.subasta-card:hover .subasta-img { transform: scale(1.06); }
+.subasta-card:hover .subasta-img { transform: scale(1.04); }
 .subasta-card h4 { font-size: var(--step-1); font-family: var(--font-body); font-weight: 700; margin: var(--space-s) var(--space-s) 0.25rem; letter-spacing: -0.01em; }
 .subasta-fecha {
   margin: 0 var(--space-s) var(--space-s);
@@ -1665,12 +1692,12 @@ ul { list-style: none; margin: 0; padding: 0; }
   background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  box-shadow: var(--sombra-sm);
   padding: 1.25rem 1rem;
   min-height: 11rem;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.pasos li:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(26,58,107,0.14); }
+.pasos li:hover { transform: translateY(-4px); box-shadow: var(--sombra-md); }
 .pasos-numero {
   display: flex; align-items: center; justify-content: center;
   width: 2.2rem; height: 2.2rem; border-radius: 50%;
@@ -2086,9 +2113,9 @@ ul { list-style: none; margin: 0; padding: 0; }
 .nosotros-card {
   background: var(--bg-2); border: 1px solid var(--line);
   border-radius: var(--radius-lg); padding: 1.5rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.nosotros-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(26,58,107,0.13); }
+.nosotros-card:hover { transform: translateY(-4px); box-shadow: var(--sombra-md); }
 .nosotros-card-icono { font-size: 2rem; margin-bottom: 0.75rem; }
 .nosotros-card h3 { margin: 0 0 0.5rem; font-size: 1rem; }
 .nosotros-card p { color: var(--fg-muted); margin: 0 0 1rem; font-size: 0.88rem; line-height: 1.6; }
@@ -2220,9 +2247,9 @@ ul { list-style: none; margin: 0; padding: 0; }
 .galeria-card {
   border: 1px solid var(--line); border-radius: var(--radius-lg);
   overflow: hidden; background: var(--bg);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.galeria-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(26,58,107,0.14); }
+.galeria-card:hover { transform: translateY(-4px); box-shadow: var(--sombra-md); }
 .galeria-card-img {
   width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block;
 }
