@@ -377,8 +377,9 @@ ul { list-style: none; margin: 0; padding: 0; }
 .hero-mensaje-tag {
   display: inline-block; align-self: flex-start;
   font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--accent); background: rgba(61,142,255,0.15);
-  border: 1px solid rgba(61,142,255,0.3);
+  color: #fff; background: rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.35);
+  backdrop-filter: blur(4px);
   padding: 0.25rem 0.75rem; border-radius: 999px;
 }
 .hero-mensaje-titulo {
@@ -386,7 +387,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   font-size: clamp(1.6rem, 3.5vw, 2.6rem); line-height: 1.08; letter-spacing: -0.02em;
   text-shadow: 0 2px 20px rgba(0,0,0,0.4);
 }
-.hero-mensaje-titulo em { font-style: normal; color: var(--accent); }
+.hero-mensaje-titulo em { font-style: normal; color: var(--dorado); }
 .hero-mensaje-sub {
   margin: 0; color: rgba(255,255,255,0.82);
   font-size: clamp(0.88rem, 1.6vw, 1.05rem); line-height: 1.5;
@@ -820,13 +821,13 @@ ul { list-style: none; margin: 0; padding: 0; }
   margin-bottom: 0.2rem;
 }
 .precio-moneda {
-  font-size: 1.1rem; font-weight: 700;
-  color: var(--accent); font-family: var(--font-display);
-  margin-right: 0.12em; opacity: 0.85;
+  font-size: 1.05rem; font-weight: 700;
+  color: var(--accent); font-family: var(--font-body);
+  margin-right: 0.14em; opacity: 0.75;
 }
 .precio-numero {
-  font-family: var(--font-display);
-  font-size: 1.9rem; font-weight: 800;
+  font-family: var(--font-body);
+  font-size: 1.75rem; font-weight: 700;
   color: var(--accent); letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
@@ -1374,7 +1375,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   color: var(--fg-muted); font-family: var(--font-body); margin-bottom: 0.2rem;
 }
 .modal-precio strong {
-  font-family: var(--font-display); font-size: 2.2rem; font-weight: 800;
+  font-family: var(--font-body); font-size: 2.1rem; font-weight: 700;
   color: var(--accent); letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
 }
 .modal-cierre { margin: 0.25rem 0; }
