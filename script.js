@@ -1189,6 +1189,27 @@ function estadoDeMiOferta(lote) {
   return lote.ganador_actual_id === sesion.usuario.id ? "ganando" : "perdiendo";
 }
 
+// Muestra todos los lotes activos de un rubro en la sección "activas".
+// La usan tanto el link "Ver rubro completo" como el click en una card.
+function abrirRubroCompleto(rubro) {
+  mostrarSoloSeccion("activas");
+  const activasGrid = document.getElementById("activasGrid");
+  const lotesDelRubroActivos = LOTES.filter(
+    (l) => !loteEstaCerrado(l) && (l.remate_rubro || l.rubro) === rubro
+  );
+  renderGridComoListaDeLotes(activasGrid, rubro, "", lotesDelRubroActivos);
+  const resultado = document.getElementById("filtrosResultado");
+  if (resultado) {
+    resultado.hidden = false;
+    resultado.textContent = `${lotesDelRubroActivos.length} lote${lotesDelRubroActivos.length !== 1 ? "s" : ""} en ${rubro}`;
+  }
+  const btnLimpiar = document.getElementById("btnLimpiarFiltros");
+  if (btnLimpiar) btnLimpiar.hidden = false;
+  setTimeout(() => {
+    document.getElementById("activas").scrollIntoView({ behavior: "smooth" });
+  }, 50);
+}
+
 function crearTarjetaLote(lote) {
   const li = document.createElement("li");
   const cerrado = loteEstaCerrado(lote);
@@ -1214,7 +1235,6 @@ function crearTarjetaLote(lote) {
     img.innerHTML = `<svg viewBox="0 0 80 80" width="48" height="48" fill="none"><path d="M28 52L36 40L42 48L48 38L54 52H28Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none" opacity="0.4"/><circle cx="34" cy="34" r="4" stroke="currentColor" stroke-width="1.5" opacity="0.4"/><rect x="18" y="22" width="44" height="36" rx="4" stroke="currentColor" stroke-width="1.5" opacity="0.25"/></svg><span>${sanitizar(lote.titulo)}</span>`;
   }
   img.style.cursor = "pointer";
-  img.addEventListener("click", (e) => { e.stopPropagation(); abrirLightbox(fotos, 0); });
 
   // Badge número de lote — sobre la foto arriba izquierda
   const numeroBadge = document.createElement("span");
@@ -1246,9 +1266,6 @@ function crearTarjetaLote(lote) {
     contenedorFoto = document.createElement("div");
     contenedorFoto.className = "subasta-img-carrusel";
     contenedorFoto.style.cursor = "pointer";
-    contenedorFoto.addEventListener("click", (e) => {
-      if (!e.target.closest(".carrusel-flecha")) abrirLightbox(fotos, indiceFoto);
-    });
     let indiceFoto = 0;
     let autoplaySuspendido = false;
     const irAFoto = (nuevoIndice, evento) => {
@@ -1412,6 +1429,19 @@ function crearTarjetaLote(lote) {
   cuerpo.appendChild(panelCompartir);
 
   li.append(fotoWrap, cuerpo);
+
+  // Click en la card → ver el rubro completo.
+  // Se excluyen los controles propios (ofertar, favorito, compartir, flechas
+  // del carrusel y sus paneles) para que conserven su acción original.
+  const rubroDelLote = lote.remate_rubro || lote.rubro;
+  if (rubroDelLote) {
+    li.style.cursor = "pointer";
+    li.addEventListener("click", (e) => {
+      if (e.target.closest("button, a, input, form, .compartir-panel")) return;
+      abrirRubroCompleto(rubroDelLote);
+    });
+  }
+
   return li;
 }
 
@@ -1686,21 +1716,7 @@ function renderCarruselesPorRubro() {
     link.textContent = "Ver rubro completo";
     link.addEventListener("click", (e) => {
       e.preventDefault();
-      // Mostrar todos los lotes del rubro directamente en la sección activas
-      mostrarSoloSeccion("activas");
-      const activasGrid = document.getElementById("activasGrid");
-      const lotesDelRubroActivos = LOTES.filter(l => !loteEstaCerrado(l) && (l.remate_rubro || l.rubro) === rubro);
-      renderGridComoListaDeLotes(activasGrid, rubro, "", lotesDelRubroActivos);
-      const resultado = document.getElementById("filtrosResultado");
-      if (resultado) {
-        resultado.hidden = false;
-        resultado.textContent = `${lotesDelRubroActivos.length} lote${lotesDelRubroActivos.length !== 1 ? "s" : ""} en ${rubro}`;
-      }
-      const btnLimpiar = document.getElementById("btnLimpiarFiltros");
-      if (btnLimpiar) btnLimpiar.hidden = false;
-      setTimeout(() => {
-        document.getElementById("activas").scrollIntoView({ behavior: "smooth" });
-      }, 50);
+      abrirRubroCompleto(rubro);
     });
     encabezado.append(h2, link);
 
