@@ -1309,8 +1309,11 @@ ul { list-style: none; margin: 0; padding: 0; }
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: var(--space-m);
+  text-align: left;          /* el contenido no hereda centrado */
 }
+.lote-modal > * { max-width: 100%; }   /* nada desborda a lo ancho */
 .modal-close {
   position: absolute; top: 0.75rem; right: 0.75rem;
   background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--fg-muted);
@@ -2341,8 +2344,7 @@ ul { list-style: none; margin: 0; padding: 0; }
    mediante ::after, sin alterar su tamaño visual. */
 @media (hover: none) and (pointer: coarse) {
   .lote-fav-btn,
-  .carrusel-flecha,
-  .modal-close {
+  .carrusel-flecha {
     position: relative;
   }
   .lote-fav-btn::after,
@@ -2354,4 +2356,35 @@ ul { list-style: none; margin: 0; padding: 0; }
     width: 44px; height: 44px;
     transform: translate(-50%, -50%);
   }
+}
+
+/* ===== Modal de lote en mobile =====
+   El modal no tenía overrides responsive: en pantallas chicas quedaba con
+   padding de escritorio y el overlay le robaba ancho, generando desborde
+   lateral. Acá se aprovecha todo el alto y ancho disponible. */
+@media (max-width: 40rem) {
+  .modal-overlay {
+    padding: 0;
+    align-items: stretch;
+  }
+  .lote-modal {
+    max-width: 100%;
+    max-height: 100dvh;      /* alto real del viewport, descuenta barras del navegador */
+    min-height: 100dvh;
+    border-radius: 0;
+    padding: 1rem 1rem 2rem;
+  }
+  .modal-close {
+    position: sticky;        /* la X queda siempre accesible al scrollear */
+    top: 0;
+    float: right;
+    background: var(--bg);
+    border-radius: 50%;
+    width: 2.2rem; height: 2.2rem;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 3;
+  }
+  .modal-precio strong { font-size: 1.8rem; }
+  .form-oferta { flex-wrap: wrap; }
+  .form-oferta input { min-width: 8rem; }
 }

@@ -151,7 +151,8 @@ app.get("/sitemap.xml", (req, res) => {
 // Open Graph dinámico para /lote/:id — el crawler de WhatsApp/Facebook recibe este HTML
 app.get("/lote/:id", (req, res) => {
   const lote = db.prepare(`
-    SELECT lotes.*, remates.titulo AS remate_titulo, remates.moneda AS remate_moneda
+    SELECT lotes.*, remates.titulo AS remate_titulo, remates.moneda AS remate_moneda,
+           (SELECT COUNT(*) FROM ofertas WHERE ofertas.lote_id = lotes.id) AS cantidad_ofertas
     FROM lotes JOIN remates ON remates.id = lotes.remate_id
     WHERE lotes.id = ?
   `).get(req.params.id);
@@ -160,6 +161,16 @@ app.get("/lote/:id", (req, res) => {
   const carpetaFrontend = path.join(__dirname, "..");
 
   if (!lote) return res.sendFile(path.join(carpetaFrontend, "index.html"));
+
+  // Los bots que arman la preview del link (WhatsApp, Facebook, Telegram,
+  // Twitter, Google...) necesitan el HTML con los meta OG. Una persona, en
+  // cambio, tiene que entrar directo a la app: si le servimos la preview ve
+  // una pantalla intermedia innecesaria antes del lote.
+  const ua = (req.get("user-agent") || "").toLowerCase();
+  const esCrawler = /bot|crawler|spider|facebookexternalhit|whatsapp|telegram|twitterbot|slackbot|discordbot|linkedinbot|embedly|preview|skypeuripreview|vkshare|googlebot|bingbot/.test(ua);
+  if (!esCrawler) {
+    return res.redirect(302, `${base}/?lote=${lote.id}`);
+  }
 
   const moneda = lote.remate_moneda === "USD" ? "US$" : "$";
   const precio = `${moneda} ${Number(lote.oferta_actual).toLocaleString("es-UY")}`;
@@ -187,7 +198,6 @@ ${imagen ? `<meta property="og:image" content="${imagen}">` : ""}
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="¿Quién Da Más? — Canal 10 Uruguay">
 <meta name="twitter:card" content="summary_large_image">
-<meta http-equiv="refresh" content="0;url=${urlApp}">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #F7F5F0; color: #1A1612; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1rem; }
