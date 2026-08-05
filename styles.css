@@ -363,13 +363,13 @@ ul { list-style: none; margin: 0; padding: 0; }
 .hero-mensaje-cta {
   display: inline-flex; align-items: center; gap: 0.4rem;
   align-self: flex-start; margin-top: 0.25rem;
-  background: var(--dorado); color: #fff; text-decoration: none;
-  font-weight: 800; font-size: 0.92rem;
+  background: var(--accent); color: #fff; text-decoration: none;
+  font-weight: 700; font-size: 0.92rem;
   padding: 0.7rem 1.6rem; border-radius: 999px;
-  box-shadow: 0 4px 20px rgba(196,151,58,0.4);
+  box-shadow: var(--sombra-md);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.hero-mensaje-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(196,151,58,0.55); }
+.hero-mensaje-cta:hover { transform: translateY(-2px); box-shadow: var(--sombra-lg); }
 
 /* Caption del slide (nombre del remate) — abajo a la derecha */
 .slide-caption {
@@ -444,9 +444,8 @@ ul { list-style: none; margin: 0; padding: 0; }
   content: "";
   position: absolute;
   top: -1px; left: 2rem; right: 2rem;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--dorado) 30%, var(--dorado) 70%, transparent);
-  border-radius: 999px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line) 20%, var(--line) 80%, transparent);
 }
 .ofertas-recientes-titulo {
   margin: 0 0 0.6rem;
@@ -495,12 +494,12 @@ ul { list-style: none; margin: 0; padding: 0; }
   animation: parpadeoUrgente 1.6s ease-in-out infinite;
 }
 .icono-inline, .icono-fuego { display: inline-flex; vertical-align: -2px; }
-.icono-fuego { color: var(--dorado); }
+.icono-fuego { color: var(--accent); }
 .theme-toggle svg { vertical-align: -3px; }
 .cart-link svg { vertical-align: -4px; }
 
 .lote-destacado-encabezado {
-  font-weight: 700; font-size: 1.1rem; color: var(--dorado);
+  font-weight: 700; font-size: 1.1rem; color: var(--accent);
   margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;
   letter-spacing: 0.02em;
 }
@@ -598,8 +597,6 @@ ul { list-style: none; margin: 0; padding: 0; }
 .subastas h2 {
   font-family: var(--font-display); font-size: var(--step-2);
   margin: 0 0 var(--space-s); letter-spacing: -0.01em;
-  padding-left: 0.85rem; border-left: 3px solid var(--dorado);
-  width: fit-content;
 }
 .subastas-grid {
   display: grid;
@@ -742,15 +739,8 @@ ul { list-style: none; margin: 0; padding: 0; }
   padding: 0.38rem 1.3rem 0.38rem 0.8rem;
   clip-path: polygon(0 0, 100% 0, calc(100% - 0.9rem) 100%, 0 100%);
   z-index: 2;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.28);
+  box-shadow: var(--sombra-sm);
   border: 1.5px solid var(--accent);
-}
-.lote-numero-badge::after {
-  content: "";
-  position: absolute; top: 50%; right: 0.55rem;
-  width: 0.32rem; height: 0.32rem; border-radius: 50%;
-  background: var(--dorado);
-  transform: translateY(-50%);
 }
 
 /* Favorito — círculo simple; al activarse toma el color de lacre/sello */
@@ -845,9 +835,9 @@ ul { list-style: none; margin: 0; padding: 0; }
   font: inherit; font-weight: 700; font-size: 0.96rem;
   cursor: pointer; transition: filter 0.15s, transform 0.15s, box-shadow 0.15s;
   margin-bottom: 0.5rem;
-  box-shadow: 0 2px 8px rgba(26,58,107,0.25);
+  box-shadow: var(--sombra-sm);
 }
-.btn-ofertar-full:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(26,58,107,0.32); }
+.btn-ofertar-full:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: var(--sombra-md); }
 
 .lote-link-auto { display: flex; align-items: center; gap: 0.25rem; background: none; border: none; color: var(--accent); font: inherit; font-size: 0.79rem; font-weight: 600; cursor: pointer; padding: 0; text-align: left; }
 .lote-link-auto:hover { text-decoration: underline; }
@@ -1021,7 +1011,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   top: 0.9rem; right: -2.6rem;
   width: 10rem;
   padding: 0.3rem 0;
-  background: var(--dorado);
+  background: var(--ink);
   color: #fff;
   font-size: 0.65rem;
   font-weight: 800;
@@ -1313,12 +1303,12 @@ ul { list-style: none; margin: 0; padding: 0; }
 .ficha-tecnica strong { color: var(--fg-muted); font-weight: 600; }
 .importar-lotes-detalle {
   margin: 0.5rem 0 1rem;
-  border: 1px solid var(--dorado);
+  border: 1px solid var(--accent);
   border-radius: var(--radius);
   padding: 0.75rem 1rem;
   grid-column: 1 / -1;
 }
-.importar-lotes-detalle summary { cursor: pointer; font-weight: 700; font-size: 0.9rem; color: var(--dorado); }
+.importar-lotes-detalle summary { cursor: pointer; font-weight: 700; font-size: 0.9rem; color: var(--accent); }
 .importar-lotes-detalle label, .importar-lotes-detalle select, .importar-lotes-detalle input,
 .importar-lotes-detalle .btn { display: block; margin-top: 0.5rem; width: 100%; }
 .importar-lotes-detalle #linkDescargarPlantilla { width: fit-content; text-decoration: none; }
@@ -1401,11 +1391,11 @@ ul { list-style: none; margin: 0; padding: 0; }
   width: 3.25rem; height: 3.25rem; border-radius: 50%;
   background: #25D366; color: #fff;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 16px rgba(37,211,102,0.45);
+  box-shadow: 0 4px 14px rgba(37,211,102,0.28);
   z-index: 150; text-decoration: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
 }
-.whatsapp-flotante:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(37,211,102,0.6); }
+.whatsapp-flotante:hover { transform: scale(1.08); box-shadow: 0 6px 18px rgba(37,211,102,0.35); }
 .whatsapp-flotante.oculto { opacity: 0; pointer-events: none; transform: translateY(1rem); }
 
 .oferta-mensaje {
@@ -1506,9 +1496,9 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 .panel-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
 .usuarios-pendientes-titulo {
-  font-weight: 700; color: var(--dorado); font-size: 0.95rem; margin: 0.5rem 0 0.3rem;
+  font-weight: 700; color: #9C7A3C; font-size: 0.95rem; margin: 0.5rem 0 0.3rem;
 }
-.usuario-pendiente { border-color: var(--dorado); background: rgba(176, 141, 87, 0.08); }
+.usuario-pendiente { border-color: #9C7A3C; background: rgba(156, 122, 60, 0.08); }
 .usuario-bloqueado { border-color: #A3402F; background: rgba(163, 64, 47, 0.08); opacity: 0.85; }
 
 .estadisticas-grid {
@@ -1541,7 +1531,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   font-weight: 700; font-size: 0.8rem; color: #fff; margin-right: 0.4rem;
 }
 .puntaje-alto { background: #2E9E5B; }   /* verde: excelente pagador */
-.puntaje-medio { background: var(--dorado); } /* dorado: buen historial */
+.puntaje-medio { background: #9C7A3C; } /* ámbar neutro: buen historial (distinto del dorado de precio) */
 .puntaje-nuevo { background: var(--fg-muted); } /* gris: sin historial aún */
 .puntaje-bajo { background: #A3402F; }   /* rojo: no pagó */
 
@@ -1613,8 +1603,6 @@ ul { list-style: none; margin: 0; padding: 0; }
 .carrusel-rubro-encabezado {
   display: flex; align-items: baseline; justify-content: space-between;
   margin-bottom: var(--space-s);
-  padding-left: 0.85rem;
-  border-left: 3px solid var(--dorado);
 }
 .carrusel-rubro-encabezado h2 { font-family: var(--font-display); font-size: var(--step-1); margin: 0; letter-spacing: -0.01em; }
 .carrusel-rubro-encabezado a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
