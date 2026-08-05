@@ -981,7 +981,12 @@ ul { list-style: none; margin: 0; padding: 0; }
 .remate-tarjeta-portada .remate-grupo-rubro {
   bottom: 1.5rem; margin: 0;
   padding: 0 1rem;
-  color: rgba(255,255,255,0.8);
+  /* Va sobre la foto con overlay oscuro: se anula la píldora clara de la
+     regla base, que dejaba texto blanco sobre fondo azul claro. */
+  background: none;
+  border-radius: 0;
+  color: rgba(255,255,255,0.85);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
   font-size: 0.8rem;
   z-index: 1;
 }
