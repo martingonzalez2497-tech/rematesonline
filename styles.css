@@ -8,8 +8,12 @@
   --navy: #1A3A6B;             /* Azul profundo — confianza, institución */
   --navy-light: #EBF1FA;       /* Azul muy suave */
   --line: #DDD8CF;             /* Línea crema */
-  --danger: #B91C1C;
-  --success: #166534;
+  /* Colores de estado — un solo rojo y un solo verde en todo el sitio.
+     Antes convivían #A3402F/#C0392B y #2E9E5B/#1A9E5C para lo mismo. */
+  --danger: #A3402F;
+  --danger-strong: #C0392B;   /* solo para el banner EN VIVO, necesita más saturación */
+  --success: #2E9E5B;
+  --whatsapp: #25D366;
 
   --bg: var(--white);
   --bg-2: var(--off-white);    /* Crema suave */
@@ -128,8 +132,8 @@ ul { list-style: none; margin: 0; padding: 0; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 @keyframes destelloPrecio {
-  0%   { background: #1A9E5C; color: #fff; padding: 0 4px; border-radius: 4px; transform: scale(1.08); }
-  60%  { background: rgba(26,158,92,0.15); color: #1A9E5C; transform: scale(1.02); }
+  0%   { background: var(--success); color: #fff; padding: 0 4px; border-radius: 4px; transform: scale(1.08); }
+  60%  { background: rgba(26,158,92,0.15); color: var(--success); transform: scale(1.02); }
   100% { background: transparent; color: var(--accent); transform: scale(1); }
 }
 .lote-precio-destello { animation: destelloPrecio 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -210,7 +214,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 .aviso-superado {
   display: inline-block; width: 0.5rem; height: 0.5rem; border-radius: 50%;
-  background: #A3402F; margin-left: 0.2rem; vertical-align: middle;
+  background: var(--danger); margin-left: 0.2rem; vertical-align: middle;
   animation: parpadeoUrgente 1.2s ease-in-out infinite;
 }
 .cuenta-nombre { font-weight: 600; font-size: 0.9rem; }
@@ -588,9 +592,9 @@ ul { list-style: none; margin: 0; padding: 0; }
 .carrito-stat { text-align: center; }
 .carrito-stat span { display: block; font-size: 1.3rem; font-weight: 800; color: var(--accent); }
 .carrito-stat small { font-size: 0.75rem; color: var(--fg-muted); }
-.carrito-stat-total span { color: #2E9E5B; }
+.carrito-stat-total span { color: var(--success); }
 .carrito-btn-global { width: 100%; justify-content: center; display: flex; align-items: center; gap: 0.5rem; }
-.carrito-todos-pagos { color: #2E9E5B; font-weight: 600; text-align: center; margin: 0; }
+.carrito-todos-pagos { color: var(--success); font-weight: 600; text-align: center; margin: 0; }
 .carrito-seccion-titulo {
   list-style: none; font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.05em; color: var(--fg-muted); padding: 0.5rem 0; margin-top: 0.5rem;
@@ -604,8 +608,8 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 .carrito-desglose span:nth-child(odd) { color: var(--fg-muted); }
 .carrito-total-label { font-weight: 700; color: var(--fg) !important; }
-.carrito-total-valor { font-weight: 800; color: #2E9E5B !important; }
-.carrito-pagado-badge { color: #2E9E5B; font-weight: 600; font-size: 0.85rem; margin: 0; }
+.carrito-total-valor { font-weight: 800; color: var(--success) !important; }
+.carrito-pagado-badge { color: var(--success); font-weight: 600; font-size: 0.85rem; margin: 0; }
 
 @keyframes shimmer {
   0% { background-position: -200% 0; }
@@ -837,7 +841,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   font-variant-numeric: tabular-nums;
 }
 .lote-cuenta.lote-cuenta-urgente {
-  color: #fff; background: #A3402F; border-color: #A3402F;
+  color: #fff; background: var(--danger); border-color: var(--danger);
   animation: parpadeoUrgente 1.4s ease-in-out infinite;
 }
 .lote-cuenta.lote-cuenta-vencida {
@@ -846,8 +850,8 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 /* La card entera se resalta cuando el cierre es inminente */
 .subasta-card:has(.lote-cuenta-urgente) {
-  border-color: #A3402F;
-  box-shadow: 0 0 0 1px #A3402F, var(--sombra-sm);
+  border-color: var(--danger);
+  box-shadow: 0 0 0 1px var(--danger), var(--sombra-sm);
 }
 
 .lote-cantidad-ofertas { font-size: 0.8rem; color: var(--fg-muted); margin: 0 0 0.3rem; }
@@ -1151,7 +1155,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 .notificacion-item:hover { background: var(--bg-2); }
 .notificacion-item.notificacion-exito { border-left: 3px solid var(--accent); }
-.notificacion-item.notificacion-alerta { border-left: 3px solid #A3402F; }
+.notificacion-item.notificacion-alerta { border-left: 3px solid var(--danger); }
 .notificaciones-vacio { padding: 0.8rem; font-size: 0.85rem; color: var(--fg-muted); text-align: center; }
 .dropdown-menu.is-open { display: block; }
 .rubro-item-con-link { display: flex; align-items: center; justify-content: space-between; gap: 0.3rem; }
@@ -1412,7 +1416,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   background: var(--bg); color: var(--fg); border: 1px solid var(--line);
 }
 .compartir-red:hover { opacity: 0.8; }
-.compartir-wa  { color: #25D366; border-color: #25D366; }
+.compartir-wa  { color: var(--whatsapp); border-color: var(--whatsapp); }
 .compartir-fb  { color: #1877F2; border-color: #1877F2; }
 .compartir-tg  { color: #229ED9; border-color: #229ED9; }
 .compartir-mail { color: var(--fg-muted); }
@@ -1422,7 +1426,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 .whatsapp-flotante {
   position: fixed; bottom: 1.5rem; right: 1.5rem;
   width: 3.25rem; height: 3.25rem; border-radius: 50%;
-  background: #25D366; color: #fff;
+  background: var(--whatsapp); color: #fff;
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 4px 14px rgba(37,211,102,0.28);
   z-index: 150; text-decoration: none;
@@ -1438,7 +1442,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   min-height: 1.2em;
 }
 .oferta-mensaje.exito { color: var(--accent); }
-.oferta-mensaje.error { color: #A3402F; }
+.oferta-mensaje.error { color: var(--danger); }
 .btn-favorito {
   display: block; width: 100%;
   background: none; border: 1px solid var(--line); border-radius: var(--radius);
@@ -1475,7 +1479,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 .form-auth button { margin-top: var(--space-s); }
 .login-mensaje { min-height: 1.2em; font-size: 0.85rem; font-weight: 600; margin: 0 0 0.5rem; }
-.login-mensaje.error { color: #A3402F; }
+.login-mensaje.error { color: var(--danger); }
 .login-mensaje.exito { color: var(--accent); }
 .login-nota { font-size: 0.75rem; color: var(--fg-muted); margin: 0.5rem 0 0; }
 .login-checkbox {
@@ -1505,7 +1509,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 .panel-modal h3 { font-family: var(--font-display); margin: 0 0 var(--space-s); }
 .panel-modal h4 { font-size: 1rem; margin: var(--space-m) 0 0.5rem; }
 .panel-mensaje { min-height: 1.2em; font-size: 0.85rem; font-weight: 600; margin: 0; }
-.panel-mensaje.error { color: #A3402F; }
+.panel-mensaje.error { color: var(--danger); }
 .panel-mensaje.exito { color: var(--accent); }
 
 .form-panel {
@@ -1532,7 +1536,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   font-weight: 700; color: #9C7A3C; font-size: 0.95rem; margin: 0.5rem 0 0.3rem;
 }
 .usuario-pendiente { border-color: #9C7A3C; background: rgba(156, 122, 60, 0.08); }
-.usuario-bloqueado { border-color: #A3402F; background: rgba(163, 64, 47, 0.08); opacity: 0.85; }
+.usuario-bloqueado { border-color: var(--danger); background: rgba(163, 64, 47, 0.08); opacity: 0.85; }
 
 .estadisticas-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
@@ -1563,14 +1567,14 @@ ul { list-style: none; margin: 0; padding: 0; }
   min-width: 1.8rem; height: 1.8rem; padding: 0 0.4rem; border-radius: 999px;
   font-weight: 700; font-size: 0.8rem; color: #fff; margin-right: 0.4rem;
 }
-.puntaje-alto { background: #2E9E5B; }   /* verde: excelente pagador */
+.puntaje-alto { background: var(--success); }   /* verde: excelente pagador */
 .puntaje-medio { background: #9C7A3C; } /* ámbar neutro: buen historial (distinto del dorado de precio) */
 .puntaje-nuevo { background: var(--fg-muted); } /* gris: sin historial aún */
-.puntaje-bajo { background: #A3402F; }   /* rojo: no pagó */
+.puntaje-bajo { background: var(--danger); }   /* rojo: no pagó */
 
 .estado-pago { font-size: 0.8rem; font-weight: 600; margin-right: 0.5rem; }
-.estado-pago.pago-si { color: #2E9E5B; }
-.estado-pago.pago-no { color: #A3402F; }
+.estado-pago.pago-si { color: var(--success); }
+.estado-pago.pago-no { color: var(--danger); }
 .estado-pago.pago-pendiente { color: var(--fg-muted); }
 .panel-lote-img { width: 3rem; height: 3rem; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
 .panel-lote-item {
@@ -1583,7 +1587,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 .carrito-columna { display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem; }
 .carrito-btn-pagar {
   display: inline-flex; align-items: center; gap: 0.5rem;
-  background: #25D366; color: #fff; text-decoration: none;
+  background: var(--whatsapp); color: #fff; text-decoration: none;
   padding: 0.55rem 1.1rem; border-radius: 999px; font-weight: 600; font-size: 0.9rem;
   transition: filter 0.15s ease;
 }
@@ -1597,7 +1601,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   font-size: 0.75rem; padding: 0.35rem 0.6rem; border-radius: var(--radius);
   border: 1px solid var(--line); background: var(--bg-2); color: var(--fg); cursor: pointer;
 }
-.panel-lote-acciones button.peligro { border-color: #A3402F; color: #A3402F; }
+.panel-lote-acciones button.peligro { border-color: var(--danger); color: var(--danger); }
 
 .panel-remate-item {
   border: 1px solid var(--line);
@@ -2267,7 +2271,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 /* ===== Banner EN VIVO ===== */
 .banner-en-vivo {
-  background: #C0392B;
+  background: var(--danger-strong);
   color: #fff;
   font-size: 0.85rem; font-weight: 700;
   padding: 0.55rem 1.5rem;
@@ -2286,7 +2290,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 .en-vivo-link:hover { color: #fff; }
 @keyframes pulsoEnVivo {
-  0%, 100% { background: #C0392B; }
+  0%, 100% { background: var(--danger-strong); }
   50% { background: #E74C3C; }
 }
 

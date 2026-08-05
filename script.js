@@ -193,14 +193,14 @@ function renderHeroDesdeLotes() {
       imgFondo.alt = "";
       imgFondo.className = "hero-slide-fondo";
       imgFondo.setAttribute("aria-hidden", "true");
-      if (i > 0) imgFondo.loading = "lazy";
+      if (i > 0) imgFondo.loading = "lazy"; else imgFondo.fetchPriority = "high";
       li.appendChild(imgFondo);
 
       const imgPrincipal = document.createElement("img");
       imgPrincipal.src = lote.imagen;
       imgPrincipal.alt = "";
       imgPrincipal.className = "hero-slide-img";
-      if (i > 0) imgPrincipal.loading = "lazy";
+      if (i > 0) imgPrincipal.loading = "lazy"; else imgPrincipal.fetchPriority = "high";
       li.appendChild(imgPrincipal);
     }
     const caption = document.createElement("p");
@@ -1204,7 +1204,7 @@ function crearTarjetaLote(lote) {
   const img = document.createElement(fotos[0] ? "img" : "div");
   img.className = "subasta-img";
   if (fotos[0]) {
-    img.src = fotos[0]; img.loading = "lazy";
+    img.src = fotos[0]; img.loading = "lazy"; img.decoding = "async";
     img.alt = `Foto del lote ${lote.numero} — ${lote.titulo}`;
     img.onerror = () => { img.style.display = "none"; };
   } else {
@@ -1432,7 +1432,7 @@ function crearGrupoRemate(remate, lotesDelRemate) {
   const portada = document.createElement(srcPortada ? "img" : "p");
   portada.className = "subasta-img";
   if (srcPortada) {
-    portada.src = srcPortada; portada.loading = "lazy";
+    portada.src = srcPortada; portada.loading = "lazy"; portada.decoding = "async";
     portada.alt = `Foto de portada de ${remate.titulo}`;
   } else {
     portada.setAttribute("role", "img");
