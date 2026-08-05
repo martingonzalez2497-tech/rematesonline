@@ -551,7 +551,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 /* ===== Hero fallback (sin imágenes) ===== */
 .hero-slide-fallback {
   background: linear-gradient(135deg, var(--bg) 0%, var(--bg-2) 100%);
-  display: flex !important; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between;
   padding: 3rem 2rem; min-height: 22rem; position: relative; overflow: hidden;
 }
 .hero-fallback-contenido { flex: 1; max-width: 28rem; z-index: 1; }
@@ -663,7 +663,6 @@ ul { list-style: none; margin: 0; padding: 0; }
 .remate-volver, .remate-detalle-encabezado {
   grid-column: 1 / -1;
 }
-.btn-volver { text-align: left; }
 .btn-volver {
   display: flex; width: fit-content; align-items: center; gap: 0.4rem;
   margin: 0 auto 0 0;
@@ -1053,7 +1052,6 @@ ul { list-style: none; margin: 0; padding: 0; }
 .subasta-card.is-ganada::after { content: "GANADO"; background: var(--accent); }
 
 .subasta-card.is-cerrada .subasta-fecha { color: var(--fg-muted); text-transform: none; font-weight: 500; }
-.subasta-card .btn { margin: 0 var(--space-s) var(--space-s); text-align: center; }
 
 .btn {
   display: inline-block;
@@ -2032,8 +2030,6 @@ ul { list-style: none; margin: 0; padding: 0; }
   /* Botones más altos y fáciles de tocar */
   .lote-oferta-inline input { min-height: 2.8rem; font-size: 0.95rem; }
   .lote-oferta-inline button { min-height: 2.8rem; font-size: 0.95rem; padding: 0.7rem 1rem; }
-  /* Solo los botones de oferta son grandes, no todos */
-  .hero-mensaje-cta { min-height: unset !important; }
 
   /* --- Remate grupo: padding más chico --- */
   .remate-grupo {
