@@ -167,6 +167,10 @@ app.get("/lote/:id", (req, res) => {
   const titulo = `${lote.titulo} — Lote ${lote.numero}`;
   const descripcion = `${lote.cantidad_ofertas > 0 ? `Oferta actual: ${precio}` : `Precio inicial: ${precio}`} · ${lote.remate_titulo} · ¿Quién Da Más? Canal 10`;
   const urlCanonica = `${base}/lote/${lote.id}`;
+  // Destino real de navegación: la app (home) con el lote a abrir.
+  // NO puede ser urlCanonica, porque esta misma ruta la sirve este handler
+  // y el meta-refresh entraría en un bucle infinito de recargas.
+  const urlApp = `${base}/?lote=${lote.id}`;
 
   // Página completa con estilos inline — funciona en el browser de WhatsApp
   const html = `<!DOCTYPE html>
@@ -183,7 +187,7 @@ ${imagen ? `<meta property="og:image" content="${imagen}">` : ""}
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="¿Quién Da Más? — Canal 10 Uruguay">
 <meta name="twitter:card" content="summary_large_image">
-<meta http-equiv="refresh" content="0;url=${urlCanonica}">
+<meta http-equiv="refresh" content="0;url=${urlApp}">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #F7F5F0; color: #1A1612; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1rem; }
@@ -210,7 +214,7 @@ ${imagen ? `<meta property="og:image" content="${imagen}">` : ""}
     <p class="etiqueta">${lote.cantidad_ofertas > 0 ? "Oferta actual" : "Precio inicial"}</p>
     <p class="precio">${precio}</p>
     <p class="ofertas">${lote.cantidad_ofertas === 1 ? "1 oferta" : `${lote.cantidad_ofertas} ofertas`} · ${lote.remate_titulo}</p>
-    <a class="btn" href="${urlCanonica}">Ver lote y ofertar →</a>
+    <a class="btn" href="${urlApp}">Ver lote y ofertar →</a>
   </div>
 </div>
 <p class="marca"><strong>¿Quién Da Más?</strong> · Canal 10 Uruguay · Sábados 11:55hs</p>

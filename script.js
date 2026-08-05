@@ -518,8 +518,10 @@ function revisarLandingDeRubro() {
     const lote = LOTES.find((l) => String(l.id) === loteId);
     if (lote) {
       abrirModal(lote);
-      // Normalizar URL a formato limpio
-      window.history.replaceState({}, "", `/lote/${lote.id}`);
+      // Normalizar a ?lote= — /lote/:id lo sirve el backend como preview
+      // estática (para WhatsApp/redes), así que recargar ahí sacaría al
+      // usuario de la app.
+      window.history.replaceState({}, "", `/?lote=${lote.id}`);
     }
   }
 }
@@ -2006,8 +2008,9 @@ function abrirModal(lote) {
   btnFav.classList.toggle("is-activo", esFav);
 
   modalOverlay.hidden = false;
+  document.body.style.overflow = "hidden"; // el fondo no scrollea detrás del modal
   // Actualizar URL a formato limpio /lote/id
-  window.history.replaceState({ loteId: lote.id }, `Lote ${lote.numero} — ${lote.titulo}`, `/lote/${lote.id}`);
+  window.history.replaceState({ loteId: lote.id }, `Lote ${lote.numero} — ${lote.titulo}`, `/?lote=${lote.id}`);
   document.title = `${lote.titulo} — Remate Directo`;
 
   // Registrar vista y mostrar contador
@@ -2076,6 +2079,7 @@ function actualizarCuentaModal() {
 function cerrarModal() {
   const scrollY = window.scrollY;
   modalOverlay.hidden = true;
+  document.body.style.overflow = ""; // devolver el scroll al fondo
   if (intervaloModal) clearInterval(intervaloModal);
   loteAbierto = null;
   window.history.replaceState({}, "¿Quién Da Más?", "/");

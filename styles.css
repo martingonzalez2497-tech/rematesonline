@@ -101,9 +101,15 @@
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;            /* corta el scroll lateral accidental */
+  -webkit-text-size-adjust: 100%; /* iOS no reescala el texto al rotar */
+}
 body {
   margin: 0;
+  overflow-x: hidden;
+  overflow-wrap: break-word;      /* URLs/palabras largas no ensanchan la página */
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-body);
@@ -2328,3 +2334,24 @@ ul { list-style: none; margin: 0; padding: 0; }
   transition: color 0.1s, transform 0.1s;
 }
 .resena-estrellas button:hover { transform: scale(1.2); color: #F5A623; }
+
+/* ===== Accesibilidad táctil en mobile =====
+   Los controles circulares miden ~34px por diseño. En pantallas táctiles se
+   les agrega un área de toque invisible hasta 44px (mínimo recomendado)
+   mediante ::after, sin alterar su tamaño visual. */
+@media (hover: none) and (pointer: coarse) {
+  .lote-fav-btn,
+  .carrusel-flecha,
+  .modal-close {
+    position: relative;
+  }
+  .lote-fav-btn::after,
+  .carrusel-flecha::after,
+  .modal-close::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 44px; height: 44px;
+    transform: translate(-50%, -50%);
+  }
+}
