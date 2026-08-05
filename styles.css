@@ -595,7 +595,12 @@ ul { list-style: none; margin: 0; padding: 0; }
 .skeleton-img { width: 100%; aspect-ratio: 4/3; border-radius: 0; }
 .skeleton-linea { height: 0.9rem; }
 
-.subastas h2 { font-family: var(--font-display); font-size: var(--step-2); margin: 0 0 var(--space-s); letter-spacing: -0.01em; }
+.subastas h2 {
+  font-family: var(--font-display); font-size: var(--step-2);
+  margin: 0 0 var(--space-s); letter-spacing: -0.01em;
+  padding-left: 0.85rem; border-left: 3px solid var(--dorado);
+  width: fit-content;
+}
 .subastas-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
@@ -712,22 +717,40 @@ ul { list-style: none; margin: 0; padding: 0; }
   border-color: rgba(26,58,107,0.28);
 }
 
-.subasta-foto-wrap { position: relative; overflow: hidden; border-radius: var(--radius-lg) var(--radius-lg) 0 0; background: var(--bg-2); }
-.subasta-foto-wrap .subasta-img { aspect-ratio: 16/10; max-height: 14rem; width: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
-.subasta-card:hover .subasta-foto-wrap .subasta-img { transform: scale(1.04); }
+.subasta-foto-wrap {
+  position: relative; overflow: hidden;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--bg-2);
+  padding: 0.6rem 0.6rem 0;
+}
+.subasta-foto-wrap .subasta-img {
+  aspect-ratio: 16/10; max-height: 13rem; width: 100%;
+  object-fit: cover; display: block;
+  border-radius: 6px;
+  transition: transform 0.5s ease;
+}
+.subasta-card:hover .subasta-foto-wrap .subasta-img { transform: scale(1.03); }
 
-/* Badge "paleta de subasta" — rectángulo con la punta derecha cortada en
-   ángulo, como una etiqueta de ticket/paleta numerada */
+/* Badge "etiqueta de papel" — como una tarjeta impresa con un sello
+   dorado en la punta, no un bloque de color plano */
 .lote-numero-badge {
   position: absolute; top: 0; left: 0;
-  background: var(--accent); color: #fff;
+  background: var(--bg-2); color: var(--accent);
   font-family: var(--font-body);
   font-size: 0.72rem; font-weight: 800;
-  letter-spacing: 0.07em; text-transform: uppercase;
-  padding: 0.4rem 1.1rem 0.4rem 0.75rem;
-  clip-path: polygon(0 0, 100% 0, calc(100% - 0.55rem) 100%, 0 100%);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 0.38rem 1.3rem 0.38rem 0.8rem;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 0.9rem) 100%, 0 100%);
   z-index: 2;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.28);
+  border: 1.5px solid var(--accent);
+}
+.lote-numero-badge::after {
+  content: "";
+  position: absolute; top: 50%; right: 0.55rem;
+  width: 0.32rem; height: 0.32rem; border-radius: 50%;
+  background: var(--dorado);
+  transform: translateY(-50%);
 }
 
 /* Favorito — círculo simple; al activarse toma el color de lacre/sello */
@@ -753,14 +776,21 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 
 /* Precio — línea de libro de actas: etiqueta pequeña, cifra grande en
-   serif, regla dorada fina debajo que ancla el bloque de precio */
+   serif, con una viñeta dorada que ancla el bloque como en un registro */
 .subasta-card .lote-precio {
-  margin: 0 0 0.5rem;
-  padding-bottom: 0.5rem;
+  position: relative;
+  margin: 0 0 0.6rem;
+  padding: 0 0 0.55rem 0.75rem;
   line-height: 1.05;
-  border-bottom: 1.5px solid var(--dorado);
+  border-bottom: 2px solid var(--dorado);
   width: fit-content;
   max-width: 100%;
+}
+.subasta-card .lote-precio::before {
+  content: "";
+  position: absolute; left: 0; top: 0.2rem; bottom: 0.75rem;
+  width: 3px; border-radius: 2px;
+  background: var(--dorado);
 }
 .precio-etiqueta {
   display: block;
@@ -770,13 +800,13 @@ ul { list-style: none; margin: 0; padding: 0; }
   margin-bottom: 0.2rem;
 }
 .precio-moneda {
-  font-size: 1.05rem; font-weight: 700;
+  font-size: 1.1rem; font-weight: 700;
   color: var(--accent); font-family: var(--font-display);
   margin-right: 0.12em; opacity: 0.85;
 }
 .precio-numero {
   font-family: var(--font-display);
-  font-size: 1.7rem; font-weight: 800;
+  font-size: 1.9rem; font-weight: 800;
   color: var(--accent); letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
@@ -1297,12 +1327,19 @@ ul { list-style: none; margin: 0; padding: 0; }
   grid-column: 1 / -1; margin: 0.5rem 0 -0.3rem; font-weight: 700; font-size: 0.85rem; color: var(--fg-muted);
 }
 .modal-precio {
+  position: relative;
   display: block;
   margin: 0.75rem 0 0.9rem;
-  padding-bottom: 0.6rem;
-  border-bottom: 1.5px solid var(--dorado);
+  padding: 0 0 0.65rem 0.9rem;
+  border-bottom: 2px solid var(--dorado);
   width: fit-content;
   max-width: 100%;
+}
+.modal-precio::before {
+  content: "";
+  position: absolute; left: 0; top: 0.25rem; bottom: 0.9rem;
+  width: 3px; border-radius: 2px;
+  background: var(--dorado);
 }
 #modalEstadoPrecio {
   display: block;
@@ -1310,7 +1347,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   color: var(--fg-muted); font-family: var(--font-body); margin-bottom: 0.2rem;
 }
 .modal-precio strong {
-  font-family: var(--font-display); font-size: 2rem; font-weight: 800;
+  font-family: var(--font-display); font-size: 2.2rem; font-weight: 800;
   color: var(--accent); letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
 }
 .modal-cierre { margin: 0.25rem 0; }
@@ -1576,6 +1613,8 @@ ul { list-style: none; margin: 0; padding: 0; }
 .carrusel-rubro-encabezado {
   display: flex; align-items: baseline; justify-content: space-between;
   margin-bottom: var(--space-s);
+  padding-left: 0.85rem;
+  border-left: 3px solid var(--dorado);
 }
 .carrusel-rubro-encabezado h2 { font-family: var(--font-display); font-size: var(--step-1); margin: 0; letter-spacing: -0.01em; }
 .carrusel-rubro-encabezado a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
