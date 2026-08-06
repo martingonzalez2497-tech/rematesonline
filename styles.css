@@ -1276,7 +1276,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   list-style: none; margin: 0.5rem 0 0; padding: 0;
 }
 .modal-galeria img {
-  width: 4rem; height: 4rem; object-fit: cover; border-radius: 6px;
+  width: 5.5rem; height: 5.5rem; object-fit: cover; border-radius: 8px;
   cursor: pointer; border: 2px solid transparent; flex-shrink: 0;
 }
 .modal-galeria img:hover { border-color: var(--accent); }
