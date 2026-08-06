@@ -99,9 +99,14 @@ const dotsNav = document.querySelector(".hero-dots");
 let currentSlide = 0;
 let intervaloHero = null;
 
+let tickerOfertas = [];
+let tickerIndice = 0;
+let tickerTimer = null;
+
 async function renderOfertasRecientes() {
   const seccion = document.getElementById("ofertasRecientesSeccion");
-  const lista = document.getElementById("ofertasRecientesLista");
+  const item = document.getElementById("tickerItem");
+  if (!seccion || !item) return;
 
   try {
     const resp = await fetch(`${API_URL}/ofertas/recientes`);
@@ -110,30 +115,43 @@ async function renderOfertasRecientes() {
 
     if (ofertas.length === 0) {
       seccion.hidden = true;
+      if (tickerTimer) { clearInterval(tickerTimer); tickerTimer = null; }
       return;
     }
 
-    lista.innerHTML = "";
-    ofertas.forEach((oferta) => {
-      const li = document.createElement("li");
-      li.className = "ofertas-recientes-item";
-
-      const avatar = document.createElement("span");
-      avatar.className = "ofertas-recientes-avatar";
-      avatar.textContent = (oferta.usuario_nombre || "?").trim().charAt(0).toUpperCase();
-
-      const texto = document.createElement("span");
-      texto.className = "ofertas-recientes-texto";
-      texto.innerHTML = `${sanitizar(oferta.usuario_nombre)} ofertó <strong>${formatoMonto(oferta.monto)}</strong> por "${sanitizar(oferta.lote_titulo)}"
-        <span class="ofertas-recientes-tiempo">${tiempoRelativo(oferta.fecha)}</span>`;
-
-      li.append(avatar, texto);
-      lista.appendChild(li);
-    });
+    tickerOfertas = ofertas;
+    if (tickerIndice >= tickerOfertas.length) tickerIndice = 0;
     seccion.hidden = false;
+    mostrarOfertaTicker();
+
+    // Un solo intervalo activo, aunque la lista se refresque
+    if (!tickerTimer) tickerTimer = setInterval(avanzarTicker, 4000);
   } catch (err) {
     seccion.hidden = true;
   }
+}
+
+function mostrarOfertaTicker() {
+  const item = document.getElementById("tickerItem");
+  const oferta = tickerOfertas[tickerIndice];
+  if (!item || !oferta) return;
+  item.innerHTML = `<strong>${sanitizar(oferta.usuario_nombre)}</strong> ofertó ` +
+    `<strong class="ticker-monto">${formatoMonto(oferta.monto)}</strong> por ` +
+    `"${sanitizar(oferta.lote_titulo)}" ` +
+    `<span class="ticker-tiempo">${tiempoRelativo(oferta.fecha)}</span>`;
+}
+
+function avanzarTicker() {
+  if (tickerOfertas.length <= 1) return;
+  const item = document.getElementById("tickerItem");
+  if (!item) return;
+  // Salida, cambio de contenido, entrada
+  item.classList.add("is-saliendo");
+  setTimeout(() => {
+    tickerIndice = (tickerIndice + 1) % tickerOfertas.length;
+    mostrarOfertaTicker();
+    item.classList.remove("is-saliendo");
+  }, 320);
 }
 
 function tiempoRelativo(fechaTexto) {

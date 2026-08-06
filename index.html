@@ -144,9 +144,12 @@
     <ul class="subastas-grid" id="activasGrid"></ul>
   </section>
 
-  <section class="ofertas-recientes" id="ofertasRecientesSeccion" hidden>
-    <p class="ofertas-recientes-titulo"><span class="punto-en-vivo" aria-hidden="true"></span> Actividad reciente</p>
-    <ul class="ofertas-recientes-lista" id="ofertasRecientesLista"></ul>
+  <section class="ticker-actividad" id="ofertasRecientesSeccion" aria-live="polite" hidden>
+    <span class="punto-en-vivo" aria-hidden="true"></span>
+    <span class="ticker-etiqueta">En vivo</span>
+    <div class="ticker-viewport">
+      <p class="ticker-item" id="tickerItem"></p>
+    </div>
   </section>
 
   <section class="carruseles-por-rubro" id="carruselesPorRubro"></section>
