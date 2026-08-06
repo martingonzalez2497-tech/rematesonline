@@ -828,13 +828,13 @@ ul { list-style: none; margin: 0; padding: 0; }
   margin-bottom: 0.2rem;
 }
 .precio-moneda {
-  font-size: 1.05rem; font-weight: 700;
+  font-size: 0.85rem; font-weight: 700;
   color: var(--accent); font-family: var(--font-body);
-  margin-right: 0.14em; opacity: 0.75;
+  margin-right: 0.1em; opacity: 0.75;
 }
 .precio-numero {
   font-family: var(--font-body);
-  font-size: 1.75rem; font-weight: 700;
+  font-size: 1.35rem; font-weight: 700;
   color: var(--accent); letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
