@@ -269,35 +269,40 @@ const io = new Server(servidorHttp, {
 setIO(io);
 
 servidorHttp.listen(PORT, () => {
-  console.log(`Backend escuchando en http://localhost:${PORT}`);
+  const entorno = process.env.NODE_ENV || 'development';
+  console.log(`[ARRANQUE] Backend escuchando en http://localhost:${PORT} | entorno: ${entorno} | CORS: ${origenesPermitidos ? origenesPermitidos.join(", ") : "abierto (*)"}  | JWT_SECRET: configurado`);
 });
 
 // ===== Cierre automático de lotes =====
 // Cada minuto revisa si hay lotes cuya fecha de cierre ya pasó
 // y los finaliza automáticamente asignando el ganador.
 function cerrarLotesVencidos() {
-  const ahora = new Date().toISOString();
-  const lotesVencidos = db.prepare(
-    `SELECT * FROM lotes WHERE estado = 'activa' AND cierre <= ?`
-  ).all(ahora);
+  try {
+    const ahora = new Date().toISOString();
+    const lotesVencidos = db.prepare(
+      `SELECT * FROM lotes WHERE estado = 'activa' AND cierre <= ?`
+    ).all(ahora);
 
-  if (lotesVencidos.length === 0) return;
+    if (lotesVencidos.length === 0) return;
 
-  lotesVencidos.forEach((lote) => {
-    const mejorOferta = db.prepare(
-      `SELECT usuario_id, monto FROM ofertas WHERE lote_id = ? ORDER BY monto DESC, id DESC LIMIT 1`
-    ).get(lote.id);
+    lotesVencidos.forEach((lote) => {
+      const mejorOferta = db.prepare(
+        `SELECT usuario_id, monto FROM ofertas WHERE lote_id = ? ORDER BY monto DESC, id DESC LIMIT 1`
+      ).get(lote.id);
 
-    db.prepare(
-      `UPDATE lotes SET estado = 'finalizada', ganador_id = ? WHERE id = ?`
-    ).run(mejorOferta ? mejorOferta.usuario_id : null, lote.id);
+      db.prepare(
+        `UPDATE lotes SET estado = 'finalizada', ganador_id = ? WHERE id = ?`
+      ).run(mejorOferta ? mejorOferta.usuario_id : null, lote.id);
 
-    console.log(`Lote #${lote.numero} "${lote.titulo}" cerrado automáticamente. Ganador: ${mejorOferta ? `usuario ${mejorOferta.usuario_id} con $${mejorOferta.monto}` : "sin ofertas"}`);
-  });
+      console.log(`[CRON] Lote #${lote.numero} "${lote.titulo}" cerrado. Ganador: ${mejorOferta ? `usuario ${mejorOferta.usuario_id} con $${mejorOferta.monto}` : "sin ofertas"}`);
+    });
 
-  if (lotesVencidos.length > 0) {
-    const { avisarActualizacion } = require("./socket");
-    avisarActualizacion();
+    if (lotesVencidos.length > 0) {
+      const { avisarActualizacion } = require("./socket");
+      avisarActualizacion();
+    }
+  } catch (err) {
+    console.error("[CRON] Error al cerrar lotes vencidos:", err);
   }
 }
 
