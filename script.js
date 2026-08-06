@@ -1290,10 +1290,13 @@ function crearTarjetaLote(lote) {
       if (evento) evento.stopPropagation();
       indiceFoto = (nuevoIndice + fotos.length) % fotos.length;
       img.style.opacity = '0';
-      setTimeout(() => {
-        img.src = fotos[indiceFoto];
+      const nuevaSrc = fotos[indiceFoto];
+      const tmp = new Image();
+      tmp.onload = () => {
+        img.src = nuevaSrc;
         img.style.opacity = '1';
-      }, 150);
+      };
+      tmp.src = nuevaSrc;
     };
     const btnAnterior = document.createElement("button");
     btnAnterior.type = "button"; btnAnterior.className = "carrusel-flecha carrusel-flecha-izq";
