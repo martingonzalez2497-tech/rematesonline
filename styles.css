@@ -762,6 +762,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   object-fit: cover; display: block;
   border-radius: 6px;
   transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none; -webkit-user-drag: none; -webkit-touch-callout: none;
 }
 .subasta-card:hover .subasta-foto-wrap .subasta-img { transform: scale(1.04); }
 
@@ -1023,6 +1024,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   width: 100%;
   object-fit: cover;
   transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none; -webkit-user-drag: none; -webkit-touch-callout: none;
 }
 .subasta-img-placeholder {
   flex-direction: column;

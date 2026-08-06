@@ -1245,7 +1245,7 @@ function crearTarjetaLote(lote) {
   const img = document.createElement(fotos[0] ? "img" : "div");
   img.className = "subasta-img";
   if (fotos[0]) {
-    img.src = fotos[0]; img.loading = "lazy"; img.decoding = "async";
+    img.src = fotos[0]; img.loading = "lazy"; img.decoding = "async"; img.draggable = false;
     img.alt = `Foto del lote ${lote.numero} — ${lote.titulo}`;
     img.onerror = () => { img.style.display = "none"; };
   } else {
@@ -1482,7 +1482,7 @@ function crearGrupoRemate(remate, lotesDelRemate) {
   const portada = document.createElement(srcPortada ? "img" : "p");
   portada.className = "subasta-img";
   if (srcPortada) {
-    portada.src = srcPortada; portada.loading = "lazy"; portada.decoding = "async";
+    portada.src = srcPortada; portada.loading = "lazy"; portada.decoding = "async"; portada.draggable = false;
     portada.alt = `Foto de portada de ${remate.titulo}`;
   } else {
     portada.setAttribute("role", "img");
