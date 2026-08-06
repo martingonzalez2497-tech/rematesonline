@@ -1314,7 +1314,7 @@ function crearTarjetaLote(lote) {
       autoplaySuspendido = true;
       irAFoto(diff > 0 ? indiceFoto + 1 : indiceFoto - 1, null);
     }, { passive: true });
-    if (fotos.length >= 3) {
+    if (fotos.length > 1) {
       const intervalo = setInterval(() => {
         if (autoplaySuspendido) { clearInterval(intervalo); return; }
         irAFoto(indiceFoto + 1, null);
