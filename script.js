@@ -1289,7 +1289,11 @@ function crearTarjetaLote(lote) {
     const irAFoto = (nuevoIndice, evento) => {
       if (evento) evento.stopPropagation();
       indiceFoto = (nuevoIndice + fotos.length) % fotos.length;
-      img.src = fotos[indiceFoto];
+      img.style.opacity = '0';
+      setTimeout(() => {
+        img.src = fotos[indiceFoto];
+        img.style.opacity = '1';
+      }, 150);
     };
     const btnAnterior = document.createElement("button");
     btnAnterior.type = "button"; btnAnterior.className = "carrusel-flecha carrusel-flecha-izq";
@@ -1307,7 +1311,7 @@ function crearTarjetaLote(lote) {
       autoplaySuspendido = true;
       irAFoto(diff > 0 ? indiceFoto + 1 : indiceFoto - 1, null);
     }, { passive: true });
-    if (fotos.length > 1) {
+    if (fotos.length >= 3) {
       const intervalo = setInterval(() => {
         if (autoplaySuspendido) { clearInterval(intervalo); return; }
         irAFoto(indiceFoto + 1, null);
