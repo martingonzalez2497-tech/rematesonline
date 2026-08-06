@@ -649,7 +649,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   scrollbar-width: thin;
   scrollbar-color: var(--accent) transparent;
   -webkit-overflow-scrolling: touch;
-  touch-action: pan-x;
+  touch-action: pan-x pan-y;
 }
 .grid-slider::-webkit-scrollbar { height: 6px; }
 .grid-slider::-webkit-scrollbar-track { background: transparent; }
