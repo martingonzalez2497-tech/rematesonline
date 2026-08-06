@@ -1050,16 +1050,6 @@ const FRANJAS_INCREMENTO_FRONTEND = [
 ];
 // Genera 15 montos válidos consecutivos para el desplegable de "Ofertar",
 // empezando en el mínimo permitido y subiendo de a un incremento por vez.
-function generarOpcionesDeOferta(lote) {
-  const opciones = [];
-  let monto = lote.oferta_actual;
-  for (let i = 0; i < 15; i++) {
-    monto += incrementoParaFrontend(monto);
-    opciones.push(monto);
-  }
-  return opciones;
-}
-
 function incrementoParaFrontend(montoActual) {
   const franja = FRANJAS_INCREMENTO_FRONTEND.find((f) => montoActual < f.hasta);
   return franja ? franja.incremento : 10000;
