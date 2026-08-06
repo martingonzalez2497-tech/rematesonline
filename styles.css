@@ -75,6 +75,7 @@
 
   /* Garnet — color de lacre/sello, se usa solo para el favorito activo */
   --garnet: #7A2436;
+  --amber: #9C7A3C;                 /* ámbar neutro: usuario pendiente, puntaje medio */
 
   color-scheme: light;
 }
@@ -93,6 +94,7 @@
   --dorado-light: #2A2010;
   --navy-light: #1A2535;
   --garnet: #B24A5C;
+  --amber: #B8944A;    /* ámbar más claro en dark */
   --sombra-sm: 0 1px 3px rgba(0,0,0,0.3);
   --sombra-md: 0 8px 24px rgba(0,0,0,0.4);
   --sombra-lg: 0 20px 48px rgba(0,0,0,0.5);
@@ -278,14 +280,13 @@ ul { list-style: none; margin: 0; padding: 0; }
   .btn-buscar-mobile { display: flex !important; }
 
   /* --- Grids: 1 columna, sin minmax fijo --- */
-  .info-cards { grid-template-columns: 1fr; padding: 0 0.75rem; }
+
   .subastas-grid { grid-template-columns: 1fr; }
   .lotes-subgrid { grid-template-columns: 1fr; }
 
   /* --- Prevenir scroll horizontal global --- */
   body { overflow-x: hidden; }
   .subastas { padding: 0 0.75rem; }
-  .info-cards { margin-top: 1.5rem; }
 
   /* --- Menú notificaciones: ancho completo en mobile --- */
   .notificaciones-menu { min-width: unset; max-width: calc(100vw - 1.5rem); right: 0; }
@@ -452,23 +453,6 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 
 /* ===== Info cards ===== */
-.info-cards {
-  max-width: var(--content-max);
-  margin: var(--space-m) auto;
-  padding: 0 var(--space-m);
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: var(--space-m);
-}
-.info-card {
-  background: var(--bg-2);
-  border-radius: var(--radius);
-  padding: var(--space-m);
-}
-.info-card h2 { font-family: var(--font-display); font-size: var(--step-1); margin: 0 0 0.5rem; }
-.info-card p { color: var(--fg-muted); margin: 0 0 1rem; }
-.link-more { color: var(--accent); font-weight: 600; text-decoration: none; }
-.link-more:hover { text-decoration: underline; }
 
 /* ===== Subastas (agrupadas por remate) ===== */
 .subastas { max-width: var(--content-max); margin: var(--space-m) auto; padding: 0 var(--space-m); }
@@ -515,32 +499,15 @@ ul { list-style: none; margin: 0; padding: 0; }
   .ticker-item { font-size: 0.75rem; }
 }
 
-.lote-destacado-seccion {
-  max-width: var(--content-max);
-  margin: var(--space-m) auto 0;
-  padding: 0.9rem;
-  background: var(--accent-bg);
-  border: 2px solid var(--accent);
-  border-radius: var(--radius);
-}
-.lote-destacado-seccion .subastas-grid { grid-template-columns: 1fr; max-width: 22rem; }
-.lote-destacado-seccion .subasta-img { max-height: 9rem; }
-.lote-destacado-seccion .subasta-card h4 { font-size: 1rem; }
 .punto-en-vivo {
   display: inline-block; width: 0.5rem; height: 0.5rem; border-radius: 50%;
   background: var(--danger); vertical-align: middle; flex-shrink: 0;
   animation: parpadeoUrgente 1.6s ease-in-out infinite;
 }
 .icono-inline, .icono-fuego { display: inline-flex; vertical-align: -2px; }
-.icono-fuego { color: var(--accent); }
 .theme-toggle svg { vertical-align: -3px; }
 .cart-link svg { vertical-align: -4px; }
 
-.lote-destacado-encabezado {
-  font-weight: 700; font-size: 1.1rem; color: var(--accent);
-  margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;
-  letter-spacing: 0.02em;
-}
 
 .reveal-pendiente { opacity: 0; transform: translateY(20px); }
 .reveal-pendiente.reveal-visible {
@@ -705,13 +672,8 @@ ul { list-style: none; margin: 0; padding: 0; }
   border-radius: var(--radius);
   padding: var(--space-m);
   background: var(--bg-2);
-}
-.remate-grupo-header { margin-bottom: var(--space-m); }
-.remate-grupo-header h3 {
-  font-family: var(--font-display);
-  font-size: var(--step-1);
-  margin: 0;
-  display: inline;
+  position: relative;
+  padding-top: 2rem;
 }
 .remate-grupo-rubro {
   margin-left: 0.6rem;
@@ -725,11 +687,6 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 .remate-grupo-descripcion { margin: 0.5rem 0 0; color: var(--fg-muted); font-size: 0.9rem; }
 
-.lotes-subgrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: var(--space-m);
-}
 /* ===== Card de lote =====
    Firma visual: el número de lote se muestra como una paleta de subasta
    (el cartel numerado que levanta quien oferta), con un corte en la punta;
@@ -843,7 +800,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 .lote-cuenta {
   display: inline-flex; align-items: center; gap: 0.3rem;
   font-size: 0.76rem; font-weight: 700;
-  color: #8A5E10; background: #FBF0D3; border: 1px solid #EFD9A0;
+  color: var(--amber); background: rgba(156,122,60,0.1); border: 1px solid rgba(156,122,60,0.3);
   padding: 0.22rem 0.6rem; border-radius: 999px;
   margin: 0 0 0.55rem; width: fit-content;
   font-variant-numeric: tabular-nums;
@@ -1049,13 +1006,6 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 .subasta-card:hover .subasta-img { transform: scale(1.04); }
 .subasta-card h4 { font-size: var(--step-1); font-family: var(--font-body); font-weight: 700; margin: var(--space-s) var(--space-s) 0.25rem; letter-spacing: -0.01em; }
-.subasta-fecha {
-  margin: 0 var(--space-s) var(--space-s);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  color: var(--accent);
-}
 .subasta-card.is-cerrada { position: relative; overflow: hidden; }
 .subasta-card.is-cerrada::after {
   content: "FINALIZADO";
@@ -1130,10 +1080,6 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 
 /* Separador visual entre grupos de rubros */
-.remate-grupo {
-  position: relative;
-  padding-top: 2rem;
-}
 .remate-grupo + .remate-grupo::before {
   content: "";
   position: absolute;
@@ -1198,11 +1144,6 @@ ul { list-style: none; margin: 0; padding: 0; }
   background: var(--accent-bg);
   color: var(--accent);
   border: 1px solid rgba(26,58,107,0.2);
-}
-.lote-insignia-perdiendo {
-  background: rgba(185,28,28,0.08);
-  color: #9B1C1C;
-  border: 1px solid rgba(185,28,28,0.15);
 }
 .lote-insignia-popular {
   background: var(--dorado-light);
@@ -1436,7 +1377,6 @@ ul { list-style: none; margin: 0; padding: 0; }
 .compartir-wa  { color: var(--whatsapp); border-color: var(--whatsapp); }
 .compartir-fb  { color: #1877F2; border-color: #1877F2; }
 .compartir-tg  { color: #229ED9; border-color: #229ED9; }
-.compartir-mail { color: var(--fg-muted); }
 .compartir-copy { color: var(--fg-muted); }
 
 /* Botón flotante WhatsApp */
@@ -1507,18 +1447,6 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 
 /* ===== Modal de panel de lotes (rematador / admin) ===== */
-.panel-modal {
-  position: relative;
-  background: var(--bg);
-  border-radius: var(--radius);
-  max-width: 64rem;
-  width: 95%;
-  max-height: 95vh;
-  overflow-y: auto;
-  padding: var(--space-l) var(--space-l);
-}
-.panel-modal h3 { font-family: var(--font-display); margin: 0 0 var(--space-s); }
-.panel-modal h4 { font-size: 1rem; margin: var(--space-m) 0 0.5rem; }
 .panel-mensaje { min-height: 1.2em; font-size: 0.85rem; font-weight: 600; margin: 0; }
 .panel-mensaje.error { color: var(--danger); }
 .panel-mensaje.exito { color: var(--accent); }
@@ -1544,9 +1472,9 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 .panel-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
 .usuarios-pendientes-titulo {
-  font-weight: 700; color: #9C7A3C; font-size: 0.95rem; margin: 0.5rem 0 0.3rem;
+  font-weight: 700; color: var(--amber); font-size: 0.95rem; margin: 0.5rem 0 0.3rem;
 }
-.usuario-pendiente { border-color: #9C7A3C; background: rgba(156, 122, 60, 0.08); }
+.usuario-pendiente { border-color: var(--amber); background: rgba(156,122,60,0.08); }
 .usuario-bloqueado { border-color: var(--danger); background: rgba(163, 64, 47, 0.08); opacity: 0.85; }
 
 .estadisticas-grid {
@@ -1579,7 +1507,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   font-weight: 700; font-size: 0.8rem; color: #fff; margin-right: 0.4rem;
 }
 .puntaje-alto { background: var(--success); }   /* verde: excelente pagador */
-.puntaje-medio { background: #9C7A3C; } /* ámbar neutro: buen historial (distinto del dorado de precio) */
+.puntaje-medio { background: var(--amber); } /* ámbar neutro: buen historial (distinto del dorado de precio) */
 .puntaje-nuevo { background: var(--fg-muted); } /* gris: sin historial aún */
 .puntaje-bajo { background: var(--danger); }   /* rojo: no pagó */
 
