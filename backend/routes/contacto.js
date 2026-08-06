@@ -1,5 +1,6 @@
 const express = require("express");
 const { enviarEmail } = require("../email");
+const { sanitizarTexto } = require("../sanitizar");
 
 const router = express.Router();
 

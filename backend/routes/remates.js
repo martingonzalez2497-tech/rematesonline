@@ -2,6 +2,7 @@ const express = require("express");
 const db = require("../db");
 const { avisarActualizacion } = require("../socket");
 const { requireAuth, requireRole } = require("../middleware/auth");
+const { sanitizarTexto } = require("../sanitizar");
 
 const router = express.Router();
 
@@ -45,7 +46,7 @@ router.post("/", requireAuth, requireRole("rematador", "administrador"), (req, r
   }
   const resultado = db
     .prepare("INSERT INTO remates (titulo, rubro, descripcion, moneda, rematador_id, fecha_inicio) VALUES (?, ?, ?, ?, ?, ?)")
-    .run(titulo, rubro, descripcion || "", moneda === "USD" ? "USD" : "UYU", req.usuario.id, fecha_inicio || null);
+    .run(sanitizarTexto(titulo), sanitizarTexto(rubro), sanitizarTexto(descripcion), moneda === "USD" ? "USD" : "UYU", req.usuario.id, fecha_inicio || null);
   avisarActualizacion();
   res.status(201).json({ id: resultado.lastInsertRowid });
 });
@@ -62,9 +63,9 @@ router.put("/:id", requireAuth, requireRole("rematador", "administrador"), (req,
 
   const { titulo, rubro, descripcion, moneda, imagen_portada, fecha_inicio } = req.body;
   db.prepare("UPDATE remates SET titulo = ?, rubro = ?, descripcion = ?, moneda = ?, imagen_portada = ?, fecha_inicio = ? WHERE id = ?").run(
-    titulo ?? remate.titulo,
-    rubro ?? remate.rubro,
-    descripcion ?? remate.descripcion,
+    titulo !== undefined ? sanitizarTexto(titulo) : remate.titulo,
+    rubro !== undefined ? sanitizarTexto(rubro) : remate.rubro,
+    descripcion !== undefined ? sanitizarTexto(descripcion) : remate.descripcion,
     moneda === "USD" || moneda === "UYU" ? moneda : remate.moneda,
     imagen_portada !== undefined ? imagen_portada : remate.imagen_portada,
     fecha_inicio !== undefined ? (fecha_inicio || null) : remate.fecha_inicio,
