@@ -4187,17 +4187,11 @@ document.getElementById("btnNotifPush")?.addEventListener("click", async () => {
 function actualizarBtnPush(lote) {
   const btn = document.getElementById("btnNotifPush");
   if (!btn) return;
-  const sesion = leerSesion();
-  const soportado = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
-  btn.hidden = !sesion || loteEstaCerrado(lote) || !soportado;
+  // Siempre visible si el lote está abierto (no depende de VAPID ni PushManager)
+  btn.hidden = loteEstaCerrado(lote);
+  btn.disabled = false;
   const txtPush = btn.querySelector("span");
-  if (Notification.permission === "granted") {
-    if (txtPush) txtPush.textContent = "Avisos activos";
-    btn.disabled = true;
-  } else {
-    if (txtPush) txtPush.textContent = "Avisarme";
-    btn.disabled = false;
-  }
+  if (txtPush) txtPush.textContent = "Avisarme";
 }
 // ===== Favicon dinámico =====
 function actualizarFavicon(tieneActividad) {

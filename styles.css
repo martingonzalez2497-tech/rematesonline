@@ -1848,7 +1848,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 
   /* --- Carruseles por rubro --- */
   .carruseles-por-rubro { padding: 0 0.75rem; }
-  .grid-slider > li { width: 14rem; }
+  .grid-slider > li { width: calc(100vw - 5rem); max-width: 16rem; }
   .grid-slider > li.remate-tarjeta-fija { width: 100%; }
 
   /* --- Sección de confianza: 1 columna --- */
